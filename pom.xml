@@ -17,13 +17,6 @@
         <module>datarangers-sdk-core</module>
         <module>datarangers-sdk-starter</module>
     </modules>
-<!--    <distributionManagement>-->
-<!--        <repository>-->
-<!--            <id>github</id>-->
-<!--            <name>GitHub OWNER Apache Maven Packages</name>-->
-<!--            <url>https://maven.pkg.github.com/volcengine/datarangers-sdk-java</url>-->
-<!--        </repository>-->
-<!--    </distributionManagement>-->
     <distributionManagement>
         <repository>
             <id>local-repo-release</id>
