@@ -38,13 +38,6 @@ public abstract class Collector implements EventCollector {
         return this;
     }
 
-    /**
-     * 功能描述: 发送数据到AppLog
-     *
-     * @param: [message, url]
-     * @return: void
-     * @date: 2020/8/26 15:15
-     */
     public void send(Message message) {
         sendMessage(message);
     }
