@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class HttpUtils {
-    private static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
+    public static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
     private static RangersLoggerWriter writer;
 
     public static void setWriter(final String targetPrefix, final String targetName, int maxSize) {

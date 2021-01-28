@@ -8,8 +8,10 @@ package com.datarangers.config;
 
 import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.datarangers.asynccollector.CollectorContainer;
+import com.datarangers.asynccollector.CollectorCounter;
 import com.datarangers.asynccollector.Consumer;
 import com.datarangers.collector.Collector;
+import com.datarangers.logger.RangersFileCleaner;
 import com.datarangers.util.HttpUtils;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.message.BasicHeader;
@@ -44,6 +46,7 @@ public class DataRangersSDKConfigProperties {
     public String eventSaveName = "datarangers.log";
     public int eventSaveMaxHistory = 20;
     public int eventSaveMaxFileSize = 100;
+    public int eventSaveMaxDays = 5;
 
 
     public int getHttpTimeout() {
@@ -61,6 +64,15 @@ public class DataRangersSDKConfigProperties {
             eventFilePaths.add(eventSavePath);
         }
         return eventFilePaths;
+    }
+
+    public int getEventSaveMaxDays() {
+        return eventSaveMaxDays;
+    }
+
+    public DataRangersSDKConfigProperties setEventSaveMaxDays(int eventSaveMaxDays) {
+        this.eventSaveMaxDays = eventSaveMaxDays;
+        return this;
     }
 
     public DataRangersSDKConfigProperties setEventFilePaths(List<String> eventFilePaths) {
@@ -239,23 +251,26 @@ public class DataRangersSDKConfigProperties {
     }
 
     public Executor setThreadPool() {
-        ExecutorService executor = Executors.newFixedThreadPool(getCorePoolSize());
-        ;
-        //提交Consumer到线程池
-        return executor;
+        return Executors.newFixedThreadPool(getCorePoolSize());
     }
 
     public void setConsumer(int threadCount) {
         if (EventConfig.saveFlag) {
             threadCount = 1;
-            logger.info("启动LogAgent模式");
+            logger.info("Start LogAgent Mode");
         } else {
-            logger.info("启动Http模式");
+            logger.info("Start Http Mode");
         }
 
         for (int i = 0; i < threadCount; i++) {
             Collector.httpRequestPool.execute(new Consumer(new CollectorContainer(Collector.blockingQueue)));
         }
+        Collector.scheduled = Executors.newSingleThreadScheduledExecutor();
+        Collector.scheduled.scheduleAtFixedRate(new CollectorCounter(getEventSavePath()), 0, 2, TimeUnit.MINUTES);
+        if (EventConfig.saveFlag) {
+            Collector.scheduled.scheduleAtFixedRate(new RangersFileCleaner(getEventFilePaths(), getEventSaveName(), getEventSaveMaxDays()), 0, 12, TimeUnit.HOURS);
+        }
+        logger.info("Start DataRangers Cleaner/Record Thread");
     }
 
 

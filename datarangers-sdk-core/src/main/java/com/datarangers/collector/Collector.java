@@ -21,11 +21,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
 
 public abstract class Collector implements EventCollector {
     private String appType;
     public static final Logger logger = LoggerFactory.getLogger("DatarangersLog");
     public static Executor httpRequestPool = null;
+    public static ScheduledExecutorService scheduled = null;
     public static BlockingQueue<Message> blockingQueue;
     public static CollectorContainer collectorContainer;
 
@@ -38,13 +40,6 @@ public abstract class Collector implements EventCollector {
         return this;
     }
 
-    /**
-     * 功能描述: 发送数据到AppLog
-     *
-     * @param: [message, url]
-     * @return: void
-     * @date: 2020/8/26 15:15
-     */
     public void send(Message message) {
         sendMessage(message);
     }
@@ -65,9 +60,9 @@ public abstract class Collector implements EventCollector {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            } else
+            } else {
                 HttpUtils.post(message.getUrl(), sendMessage, EventConfig.SEND_HEADER);
-
+            }
         }
     }
 }

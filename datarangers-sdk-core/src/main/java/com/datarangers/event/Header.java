@@ -10,8 +10,6 @@ import java.io.Serializable;
 
 /**
  * 功能描述: 公共属性
- *
- * @date: 2020/8/26 15:19
  */
 public interface Header extends Serializable {
     Integer getAppId();
