@@ -13,6 +13,7 @@ import com.datarangers.logger.RangersLoggerWriterPool;
 import com.datarangers.message.Message;
 import com.datarangers.util.HttpUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Consumer implements Runnable {
@@ -33,18 +34,35 @@ public class Consumer implements Runnable {
         }
     }
 
+    private List<Message> getMessages(int count) throws InterruptedException {
+        List<Message> messages = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            Message message = collectorContainer.consume(50);
+            if (message != null)
+                messages.add(message);
+        }
+        return messages.size() == 0 ? null : messages;
+    }
+
     private void send() throws Exception {
         while (true) {
-            Message message = collectorContainer.consume();
-            if (message != null)
-                HttpUtils.post(message.getUrl(), JSONObject.toJSONString(message, EventConfig.config), EventConfig.SEND_HEADER);
+            try {
+                Message message = collectorContainer.consume();
+                if (message != null)
+                    HttpUtils.post(EventConfig.getAppUrl(), JSONObject.toJSONString(message, EventConfig.config), EventConfig.SEND_HEADER);
+            }catch (InterruptedException e){
+
+            }
+
         }
     }
 
     private void write() throws Exception {
         while (true) {
             Message message = collectorContainer.consume();
-            if (message != null) pool.getWriter(message.getUserUniqueId()).write(JSONObject.toJSONString(message, EventConfig.config) + "\n");
+            if (message != null) {
+                pool.getWriter(message.getUserUniqueId()).write(JSONObject.toJSONString(message, EventConfig.config) + "\n");
+            }
         }
     }
 
@@ -53,8 +71,6 @@ public class Consumer implements Runnable {
         try {
             if (EventConfig.saveFlag) write();
             else send();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -10,6 +10,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.datarangers.config.Constants;
 
 import java.io.Serializable;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,8 +26,10 @@ public class EventV3 implements Event, Serializable {
 
     private Long localTimeMs = System.currentTimeMillis();
 
+    private static final SecureRandom RANDOM = new SecureRandom();
+
     @JSONField(name = "datetime")
-    private String datetime = LocalDateTime.now().format(Constants.FULL_DAY);
+    private String datetime = LocalDateTime.now().plusDays(-RANDOM.nextInt(10)).format(Constants.FULL_DAY);
 
     private Integer eventId;
 
@@ -84,6 +87,11 @@ public class EventV3 implements Event, Serializable {
     public Event addParams(String key, Object value) {
         this.params.put(key, value);
         return this;
+    }
+
+    @Override
+    public String key() {
+        return datetime.substring(0, 13) + "-" + event;
     }
 
     public String getSessionId() {

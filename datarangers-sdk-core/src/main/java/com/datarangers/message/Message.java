@@ -13,13 +13,6 @@ import java.io.Serializable;
 import java.util.List;
 
 public interface Message extends Serializable {
-    /**
-     * 功能描述: 对message进行合并处理,转换为AppLog可识别格式
-     *
-     * @param: [url, sendHeader]
-     * @return: void
-     * @date: 2020/8/26 15:20
-     */
     void merge();
 
     void setUserUniqueId(String uuid);
@@ -32,6 +25,10 @@ public interface Message extends Serializable {
     void addEvent(Event event);
 
     void addEvents(List<Event> events);
+
+    List<Event> getEvents();
+
+    int getAppId();
 
     String getUrl();
 }

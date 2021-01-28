@@ -12,6 +12,7 @@ import com.datarangers.event.Event;
 import com.datarangers.event.Header;
 import com.datarangers.profile.ProfileItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Deprecated
@@ -49,7 +50,7 @@ public class ProfileMessage implements Message {
     @JSONField(name = "app_type")
     private String appType = "profile";
 
-    private Integer appId;
+    private int appId;
     @JSONField(serialize = false)
     private String url;
 
@@ -66,7 +67,7 @@ public class ProfileMessage implements Message {
         return this;
     }
 
-    public Integer getAppId() {
+    public int getAppId() {
         return appId;
     }
 
@@ -82,5 +83,9 @@ public class ProfileMessage implements Message {
 
     public String getAppType() {
         return appType;
+    }
+
+    public List<Event> getEvents() {
+        return new ArrayList<>();
     }
 }
