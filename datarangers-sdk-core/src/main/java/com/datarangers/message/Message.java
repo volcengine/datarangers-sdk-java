@@ -26,5 +26,9 @@ public interface Message extends Serializable {
 
     void addEvents(List<Event> events);
 
+    List<Event> getEvents();
+
+    int getAppId();
+
     String getUrl();
 }
