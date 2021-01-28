@@ -3,13 +3,7 @@ package com.datarangers.logger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * @Description: TODO
- * @Author: hezhiwei.alden@bytedance.com
- * @Date 2020/12/25 14:54
- **/
 public class RangersLoggerWriterPool {
     private static RangersLoggerWriterPool POOL = null;
     private static final List<RangersLoggerWriter> WRITERS_POOL = new ArrayList<>();

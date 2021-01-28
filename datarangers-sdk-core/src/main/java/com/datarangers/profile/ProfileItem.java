@@ -31,18 +31,6 @@ public class ProfileItem {
     public ProfileItem() {
     }
 
-    /**
-     * 功能描述:
-     *
-     * @param userUniqueId
-     * @param appId
-     * @param profileRequestType :枚举类,为ProfileRequestType.APPEND或ProfileRequestType.SET
-     * @param property           :String profile属性名
-     * @param value              :Object类型,可以为String或Integer,profile的值
-     * @param: [userUniqueId, appId, profileRequestType, property, value]
-     * @return:
-     * @date: 2020/9/23 18:18
-     */
     public ProfileItem(String userUniqueId, int appId, ProfileRequestType profileRequestType, String property, Object value) {
         setUserUniqueId(userUniqueId);
         setAppId(appId);

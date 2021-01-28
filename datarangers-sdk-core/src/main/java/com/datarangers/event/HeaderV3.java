@@ -200,6 +200,12 @@ public class HeaderV3 implements Serializable, Header {
         return this;
     }
 
+    public HeaderV3 addCustom(String key, Object value) {
+        if (this.custom == null) this.custom = new HashMap<>();
+        this.custom.put(key, value);
+        return this;
+    }
+
     public Long getDeviceId() {
         return deviceId;
     }
@@ -634,6 +640,7 @@ public class HeaderV3 implements Serializable, Header {
         }
 
         public Header build() {
+            headerV3.addCustom("__sdk_platform", Constants.SDK_VERSION);
             return this.headerV3;
         }
     }

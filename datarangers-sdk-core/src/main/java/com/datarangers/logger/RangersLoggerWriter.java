@@ -95,14 +95,6 @@ public class RangersLoggerWriter implements RangersFileWriter {
         }
     }
 
-    /**
-     * 功能描述: 创建一个实例
-     * 如果存在文件,则需要判断文件大小,如果文件大小大于
-     *
-     * @param: [targetName, schedule]
-     * @return:
-     * @date: 2020/9/8 20:59
-     */
     public RangersLoggerWriter(final String targetPrefix, final String targetName, int maxSize) {
         this.targetName = targetName;
         this.targetPrefix = targetPrefix;
