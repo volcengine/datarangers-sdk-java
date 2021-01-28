@@ -15,4 +15,8 @@ public interface Event extends Serializable {
     Event setParams(Map<String, Object> params);
 
     Event addParams(String key, Object value);
+
+    String key();
+    String getEvent();
+    String getDatetime();
 }
