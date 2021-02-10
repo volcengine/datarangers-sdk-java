@@ -13,11 +13,11 @@ datarangers-sdk-java是 [DataRangers](https://datarangers.com.cn/) 的用户行�
 <dependency>
   <groupId>com.datarangers</groupId>
   <artifactId>datarangers-sdk-core</artifactId>
-  <version>1.3.0-release</version>
+  <version>1.4.0-release</version>
 </dependency>
 ```
 
-version是sdk的版本号，当前最新的版本为1.3.2-release。
+version是sdk的版本号，当前最新的版本为1.4.0-release。
 
 ### 2. 配置SDK
 DataRangers SDK需要进行一定的参数配置才能够使用，具体需要配置的参数为：
@@ -66,7 +66,7 @@ DataRangers SDK需要进行一定的参数配置才能够使用，具体需要�
 <dependency>
    <groupId>com.datarangers</groupId>
    <artifactId>datarangers-sdk-starter</artifactId>
-   <version>1.3.0-release</version>
+   <version>1.4.0-release</version>
 </dependency>
 ```
 
