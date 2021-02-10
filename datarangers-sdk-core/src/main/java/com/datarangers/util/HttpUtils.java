@@ -6,9 +6,8 @@
  */
 package com.datarangers.util;
 
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
 import com.datarangers.config.EventConfig;
+import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.logger.RangersLoggerWriter;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -91,6 +90,7 @@ public class HttpUtils {
         logger.debug(body);
         CloseableHttpResponse response = null;
         String requestId = getXRequestID();
+        Map object = null;
         try {
             StringEntity entity = new StringEntity(body, ContentType.APPLICATION_JSON);
             httpPost.setHeaders(EventConfig.headers);
@@ -98,12 +98,12 @@ public class HttpUtils {
             httpPost.setEntity(entity);
             response = (CloseableHttpResponse) httpClient.execute(httpPost);
             String resultStr = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-            JSONObject object = JSONObject.parseObject(resultStr);
+            object = RangersJSONConfig.getInstance().fromJson(resultStr, Map.class);
             if (object != null &&
-                    (object.containsKey("message") && "success".equals(object.getString("message"))
+                    (object.containsKey("message") && "success".equals(object.get("message").toString())
                             || (object.containsKey("responses")))) {
                 logger.debug("Send Success:" + url);
-                logger.debug(object.toJSONString());
+                logger.debug(resultStr);
             } else {
                 logger.error("HTTP ERROR: " + response.getEntity().toString());
                 logger.error("requestId=" + requestId + ",url=" + url + ",body=" + body + ",header=" + headers + ",result:" + resultStr);
@@ -117,7 +117,7 @@ public class HttpUtils {
                 count++;
                 post(url, body, headers, count);
             }
-        } catch (ParseException | JSONException e) {
+        } catch (ParseException e) {
             logger.error("Parse Json error:requestId=" + requestId + ",url=" + url + ",body=" + body + ",header=" + headers);
             writeFailedMessage(body);
         } finally {
@@ -130,6 +130,7 @@ public class HttpUtils {
     }
 
     public static void post(String url, String body, Map<String, String> headers) {
+        if (body == null) return;
         post(url, body, headers, 1);
     }
 

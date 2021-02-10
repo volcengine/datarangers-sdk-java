@@ -7,10 +7,8 @@
 package com.datarangers.collector;
 
 import com.datarangers.event.Event;
-import com.datarangers.event.EventsBuilder;
 import com.datarangers.event.Header;
-import com.datarangers.event.Items;
-import com.datarangers.profile.ProfileItem;
+import com.datarangers.event.Item;
 import com.datarangers.profile.ProfileMethod;
 
 import java.util.List;
@@ -95,11 +93,11 @@ public interface EventCollector {
      *
      * @param appId app id
      * @param name  业务对象的名称
-     * @param items 业务对象的类，需要继承Items类,注意
+     * @param items 业务对象的类，需要继承Items类,注意必须带上item_name
      * @return: void
      * @date: 2020/12/23 10:47
      */
-    void itemSet(int appId, String name, List<Items> items);
+    void itemSet(int appId, String name, List<Item> items);
 
     /**
      * 功能描述: 删除item的属性
@@ -115,23 +113,4 @@ public interface EventCollector {
     
     @Deprecated
     void sendProfiles(String userUniqueId, int appId, List<ProfileMethod> profileModes, List<Map<String, Object>> profiles);
-
-    @Deprecated
-    void setUserProfile(String userUniqueId, int appId, String propertyName, String value);
-
-    @Deprecated
-    void setUserProfile(String userUniqueId, int appId, String propertyName, int value);
-
-    @Deprecated
-    void setProfiles(List<ProfileItem> properties);
-
-    @Deprecated
-    void appendUserProfile(String userUniqueId, int appId, String propertyName, String value);
-
-    @Deprecated
-    void appendUserProfile(String userUniqueId, int appId, String propertyName, int value);
-
-    @Deprecated
-    void profiles(String userUniqueId, int appId, List<ProfileItem> methods, List<Map<String, Object>> eventParams);
-
 }

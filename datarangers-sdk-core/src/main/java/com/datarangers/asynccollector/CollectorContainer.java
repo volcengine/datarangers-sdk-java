@@ -8,27 +8,26 @@ package com.datarangers.asynccollector;
 
 import com.datarangers.message.Message;
 
-import java.util.concurrent.BlockingQueue;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
 
 public class CollectorContainer {
-    private BlockingQueue<Message> blockingQueue;
+    private CollectorQueue messageQueue;
     public static final ConcurrentHashMap<String, ConcurrentHashMap<String, LongAdder>> SEND_HISTORY = new ConcurrentHashMap<>();
 
-    public CollectorContainer(BlockingQueue<Message> blockingQueue) {
-        this.blockingQueue = blockingQueue;
+    public CollectorContainer(CollectorQueue messageQueue) {
+        this.messageQueue = messageQueue;
     }
 
     public boolean produce(Message message) throws InterruptedException {
-        return blockingQueue.offer(message);
+        return messageQueue.offer(message);
     }
 
-    private Message handleMessage(Message message) throws InterruptedException {
-        if (message == null) return null;
-        int appId = message.getAppId();
-        message.getEvents().forEach(event -> {
+    private List<Message> handleMessage(List<Message> messages) throws InterruptedException {
+        if (messages == null) return null;
+        messages.forEach(message -> message.getEvents().forEach(event -> {
+            int appId = message.getAppId();
             String eventName = event.getEvent();
             String date = event.getDatetime().substring(0, 13);
             if (!SEND_HISTORY.containsKey(date)) {
@@ -38,16 +37,23 @@ public class CollectorContainer {
             ConcurrentHashMap<String, LongAdder> map = SEND_HISTORY.get(date);
             if (!map.containsKey(key)) map.put(key, new LongAdder());
             map.get(key).increment();
-        });
-
-        return message;
+        }));
+        return messages;
     }
 
-    public Message consume() throws InterruptedException {
-        return handleMessage(blockingQueue.take());
+    public List<Message> consume() throws InterruptedException {
+        return handleMessage(messageQueue.take());
     }
 
-    public Message consume(int waitTimeMs) throws InterruptedException {
-        return handleMessage(blockingQueue.poll(waitTimeMs, TimeUnit.MILLISECONDS));
+    public List<Message> consume(int waitTimeMs) throws InterruptedException {
+        return handleMessage(messageQueue.poll(waitTimeMs));
+    }
+
+    public int size() {
+        return messageQueue.size();
+    }
+
+    public CollectorQueue getMessageQueue() {
+        return messageQueue;
     }
 }

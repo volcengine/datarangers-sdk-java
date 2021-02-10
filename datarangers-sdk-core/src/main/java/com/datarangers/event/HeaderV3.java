@@ -7,8 +7,8 @@
 
 package com.datarangers.event;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.datarangers.config.Constants;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ public class HeaderV3 implements Serializable, Header {
     private String os;
     private String osApi;
     private String osVersion;
-    @JSONField(name = "package")
+    @JsonProperty("package")
     private String packages;
     private String region;
     private String sdkVersion;

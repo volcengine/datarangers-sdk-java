@@ -6,9 +6,12 @@
  */
 package com.datarangers.event;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.io.Serializable;
 import java.util.Map;
 
+@JsonDeserialize(as = EventV3.class)
 public interface Event extends Serializable {
     Event setEvent(String event);
 
@@ -17,6 +20,8 @@ public interface Event extends Serializable {
     Event addParams(String key, Object value);
 
     String key();
+
     String getEvent();
+
     String getDatetime();
 }
