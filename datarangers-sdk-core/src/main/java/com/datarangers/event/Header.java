@@ -6,11 +6,14 @@
  */
 package com.datarangers.event;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.io.Serializable;
 
 /**
  * 功能描述: 公共属性
  */
+@JsonDeserialize(as = HeaderV3.class)
 public interface Header extends Serializable {
     Integer getAppId();
 

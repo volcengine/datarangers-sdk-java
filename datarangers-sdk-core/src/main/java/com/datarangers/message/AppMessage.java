@@ -6,55 +6,50 @@
  */
 package com.datarangers.message;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.datarangers.config.EventConfig;
 import com.datarangers.event.Event;
 import com.datarangers.event.Header;
+import com.datarangers.event.HeaderV3;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AppMessage implements Message {
-    @JSONField(name = "app_type")
+    @JsonProperty("app_type")
     private String appType;
 
-    @JSONField(name = "_format_name")
+    @JsonProperty("_format_name")
     private String formatName = "datarangers_svc_app_log_v3_server_sdk_1.2.7";
 
-    @JSONField(name = "client_ip")
+    @JsonProperty("client_ip")
     private String clientIp;
 
-    @JSONField(name = "trace_id")
+    @JsonProperty("trace_id")
     private String traceId;
 
-    @JSONField(name = "app_id")
+    @JsonProperty("app_id")
     private int appId;
 
-    @JSONField(name = "header")
-    private Header header;
+    @JsonProperty("header")
+    private HeaderV3 header;
 
-    @JSONField(name = "user_unique_id")
+    @JsonProperty("user_unique_id")
     private String userUniqueId;
 
-    @JSONField(name = "time_sync", serialize = false)
-    private Map<String, Object> timeSync = new HashMap<String, Object>() {{
-        put("local_time", System.currentTimeMillis() / 1000);
-    }};
-
-    @JSONField(name = "event_v3")
+    @JsonProperty("event_v3")
     private List<Event> events = new ArrayList<>();
 
-    @JSONField(serialize = false)
+    @JsonIgnore
     private String url;
 
-    public Header getHeader() {
+    public HeaderV3 getHeader() {
         return header;
     }
 
     public void setHeader(Header header) {
-        this.header = header;
+        this.header = (HeaderV3)header;
         setAppId(header.getAppId());
     }
 
@@ -131,13 +126,5 @@ public class AppMessage implements Message {
 
     public void setUserUniqueId(String userUniqueId) {
         this.userUniqueId = userUniqueId;
-    }
-
-    public Map<String, Object> getTimeSync() {
-        return timeSync;
-    }
-
-    public void setTimeSync(Map<String, Object> timeSync) {
-        this.timeSync = timeSync;
     }
 }

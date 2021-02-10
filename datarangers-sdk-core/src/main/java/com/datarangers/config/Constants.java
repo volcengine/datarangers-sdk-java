@@ -18,6 +18,7 @@ public class Constants {
     public static DateTimeFormatter FULL_DAY = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     public static final String SSID_INFO_URL = "/query/ssidinfo";
     public static final String APP_LOG_URL = "/sdk/log";
+    public static final String APP_LOG_BATCH="/sdk/list";
     public static final String MP_URL = "/v2/event/json";
     public static final String PROFILE_URL = "/data/app/importprofile";
     public static final String DEFAULT_USER = "__rangers";
