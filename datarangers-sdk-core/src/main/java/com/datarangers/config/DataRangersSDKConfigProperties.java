@@ -6,10 +6,7 @@
  */
 package com.datarangers.config;
 
-import com.alibaba.fastjson.PropertyNamingStrategy;
-import com.datarangers.asynccollector.CollectorContainer;
-import com.datarangers.asynccollector.CollectorCounter;
-import com.datarangers.asynccollector.Consumer;
+import com.datarangers.asynccollector.*;
 import com.datarangers.collector.Collector;
 import com.datarangers.logger.RangersFileCleaner;
 import com.datarangers.util.HttpUtils;
@@ -32,7 +29,6 @@ public class DataRangersSDKConfigProperties {
     public int threadPoolCount = 1;
     public int maxPoolSize = 8;
     public int corePoolSize = 4;
-    public boolean async = true;
     public int httpTimeout = 500;
     public String timeZone = "+8";
     public ZoneOffset timeOffset = null;
@@ -48,6 +44,28 @@ public class DataRangersSDKConfigProperties {
     public int eventSaveMaxFileSize = 100;
     public int eventSaveMaxDays = 5;
 
+    public CollectorQueue userQueue;
+
+    public boolean hasConsumer = true;
+    public boolean hasProducer = true;
+
+    public boolean isHasConsumer() {
+        return hasConsumer;
+    }
+
+    public DataRangersSDKConfigProperties setHasConsumer(boolean hasConsumer) {
+        this.hasConsumer = hasConsumer;
+        return this;
+    }
+
+    public boolean isHasProducer() {
+        return hasProducer;
+    }
+
+    public DataRangersSDKConfigProperties setHasProducer(boolean hasProducer) {
+        this.hasProducer = hasProducer;
+        return this;
+    }
 
     public int getHttpTimeout() {
         return httpTimeout;
@@ -157,14 +175,6 @@ public class DataRangersSDKConfigProperties {
         this.corePoolSize = corePoolSize;
     }
 
-    public boolean isAsync() {
-        return async;
-    }
-
-    public void setAsync(boolean async) {
-        this.async = async;
-    }
-
     public Map<String, String> getHeaders() {
         if (headers == null) headers = new HashMap<>();
         return headers;
@@ -222,32 +232,23 @@ public class DataRangersSDKConfigProperties {
 
     public void setCommon() {
         HttpUtils.setRequestTimeOut(getHttpTimeout());
-        HttpUtils.createHttpClient();
         EventConfig.saveFlag = save;
-        EventConfig.sendFlag = isSend();
-        EventConfig.config.setPropertyNamingStrategy(PropertyNamingStrategy.SnakeCase);
-        EventConfig.async = isAsync();
-        if (EventConfig.SEND_HEADER == null) {
-            EventConfig.SEND_HEADER = getHeaders();
-            EventConfig.SEND_HEADER.put("User-Agent", "DataRangers Java SDK/1.2.0");
-            EventConfig.SEND_HEADER.put("Content-Type", "application/json");
-            List<Header> headerList = new ArrayList<>();
-            EventConfig.SEND_HEADER.forEach((key, value) -> {
-                headerList.add(new BasicHeader(key, value));
-            });
-            EventConfig.headers = headerList.toArray(new Header[0]);
+        EventConfig.sendFlag = !save;
+        if (!save) {
+            HttpUtils.createHttpClient();
+            if (EventConfig.SEND_HEADER == null) {
+                EventConfig.SEND_HEADER = getHeaders();
+                EventConfig.SEND_HEADER.put("User-Agent", "DataRangers Java SDK");
+                EventConfig.SEND_HEADER.put("Content-Type", "application/json");
+                List<Header> headerList = new ArrayList<>();
+                EventConfig.SEND_HEADER.forEach((key, value) -> {
+                    headerList.add(new BasicHeader(key, value));
+                });
+                EventConfig.headers = headerList.toArray(new Header[0]);
+            }
         }
-        if (EventConfig.SEND_HEADER.containsKey("Host")) {
-            EventConfig.HOST = EventConfig.SEND_HEADER.get("Host");
-        }
-        if (isSend() && isAsync() && Collector.httpRequestPool == null) {
-            Collector.httpRequestPool = setThreadPool();
-            Collector.blockingQueue = new LinkedBlockingQueue<>(getQueueSize());
-            Collector.collectorContainer = new CollectorContainer(Collector.blockingQueue);
-            setConsumer(getThreadCount());
-        }
+        setConsumer(getThreadCount());
         EventConfig.setUrl(getDomain());
-
     }
 
     public Executor setThreadPool() {
@@ -261,14 +262,23 @@ public class DataRangersSDKConfigProperties {
         } else {
             logger.info("Start Http Mode");
         }
-
-        for (int i = 0; i < threadCount; i++) {
-            Collector.httpRequestPool.execute(new Consumer(new CollectorContainer(Collector.blockingQueue)));
+        if (userQueue == null) {
+            Collector.collectorContainer = new CollectorContainer(RangersCollectorQueue.getInstance(getQueueSize()));
+        } else {//如果客户自定义了queue，则需要替换为客户自定义queue
+            Collector.collectorContainer = new CollectorContainer(userQueue);
         }
-        Collector.scheduled = Executors.newSingleThreadScheduledExecutor();
-        Collector.scheduled.scheduleAtFixedRate(new CollectorCounter(getEventSavePath()), 0, 2, TimeUnit.MINUTES);
-        if (EventConfig.saveFlag) {
-            Collector.scheduled.scheduleAtFixedRate(new RangersFileCleaner(getEventFilePaths(), getEventSaveName(), getEventSaveMaxDays()), 0, 12, TimeUnit.HOURS);
+        if (hasConsumer && Collector.httpRequestPool == null) {//有消费者才初始化消费者
+            Collector.httpRequestPool = setThreadPool();
+            for (int i = 0; i < threadCount; i++) {//必须全部消费同一个队列
+                Collector.httpRequestPool.execute(new Consumer(Collector.collectorContainer));
+            }
+        }
+        if(hasProducer){//有生产者才需要记录
+            Collector.scheduled = Executors.newSingleThreadScheduledExecutor();
+            Collector.scheduled.scheduleAtFixedRate(new CollectorCounter(getEventSavePath()), 0, 2, TimeUnit.MINUTES);
+            if (EventConfig.saveFlag) {
+                Collector.scheduled.scheduleAtFixedRate(new RangersFileCleaner(getEventFilePaths(), getEventSaveName(), getEventSaveMaxDays()), 0, 12, TimeUnit.HOURS);
+            }
         }
         logger.info("Start DataRangers Cleaner/Record Thread");
     }
@@ -286,6 +296,15 @@ public class DataRangersSDKConfigProperties {
                 }
             }
         }
+    }
+
+    public CollectorQueue getUserQueue() {
+        return userQueue;
+    }
+
+    public DataRangersSDKConfigProperties setUserQueue(CollectorQueue userQueue) {
+        this.userQueue = userQueue;
+        return this;
     }
 }
 

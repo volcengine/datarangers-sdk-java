@@ -6,9 +6,9 @@
  */
 package com.datarangers.asynccollector;
 
-import com.alibaba.fastjson.JSON;
 import com.datarangers.collector.Collector;
 import com.datarangers.config.Constants;
+import com.datarangers.config.RangersJSONConfig;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,9 +36,9 @@ public class CollectorCounter implements Runnable {
             stream = new FileOutputStream(output, true);
             Map<String, Object> status = new HashMap<String, Object>() {{
                 put("history", CollectorContainer.SEND_HISTORY);
-                put("queue_length", Collector.blockingQueue.size());
+                put("queue_length", Collector.collectorContainer.size());
             }};
-            stream.write((LocalDateTime.now().format(Constants.FULL_DAY) + " " + JSON.toJSONString(status) + "\n").getBytes());
+            stream.write((LocalDateTime.now().format(Constants.FULL_DAY) + " " + RangersJSONConfig.getInstance().toJson(status) + "\n").getBytes());
             stream.flush();
         } catch (IOException e) {
             e.printStackTrace();

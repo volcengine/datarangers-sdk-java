@@ -6,7 +6,6 @@
  */
 package com.datarangers.config;
 
-import com.alibaba.fastjson.serializer.SerializeConfig;
 import org.apache.hc.core5.http.Header;
 
 import java.util.Map;
@@ -16,13 +15,11 @@ public class EventConfig {
     public static Header[] headers;
     public static String profileUrl;
     public static String mpUrl;
-    public static String HOST = "snssdk.vpc.com";
-    public static boolean async = true;
     public static Map<String, String> SEND_HEADER;
     public static boolean saveFlag = false;
     public static boolean sendFlag = true;
     public static String ssidInfoUrl;
-    public static SerializeConfig config = new SerializeConfig();
+    public static boolean batchMode=false;
 
     public static void setUrl(String url) {
         setAppUrl(url + Constants.APP_LOG_URL);
