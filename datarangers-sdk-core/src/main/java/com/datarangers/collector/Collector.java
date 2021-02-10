@@ -6,20 +6,13 @@
  */
 package com.datarangers.collector;
 
-import com.alibaba.fastjson.JSON;
 import com.datarangers.asynccollector.CollectorContainer;
-import com.datarangers.config.EventConfig;
+import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.message.Message;
-import com.datarangers.message.ProfileMessage;
-import com.datarangers.profile.ProfileItem;
-import com.datarangers.profile.ProfileRequestType;
 import com.datarangers.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -28,7 +21,6 @@ public abstract class Collector implements EventCollector {
     public static final Logger logger = LoggerFactory.getLogger("DatarangersLog");
     public static Executor httpRequestPool = null;
     public static ScheduledExecutorService scheduled = null;
-    public static BlockingQueue<Message> blockingQueue;
     public static CollectorContainer collectorContainer;
 
     public String getAppType() {
@@ -46,23 +38,22 @@ public abstract class Collector implements EventCollector {
 
     protected void sendMessage(Message message) {
         message.merge();
-        String sendMessage = JSON.toJSONString(message, EventConfig.config);
-        if (EventConfig.sendFlag) {
-            if (blockingQueue != null) {
-                try {
-                    if (!collectorContainer.produce(message)) {
-                        //队列满了,需要保存到log
-                        logger.error("datarangers send Queue reach max length");
-                        HttpUtils.writeFailedMessage(sendMessage);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
+        String sendMessage = null;
+        sendMessage = RangersJSONConfig.getInstance().toJson(message);
+        if (collectorContainer.getMessageQueue() != null) {
+            try {
+                if (!collectorContainer.produce(message)) {
+                    //队列满了,需要保存到log
+                    logger.error("datarangers send Queue reach max length");
+                    HttpUtils.writeFailedMessage(sendMessage);
                 }
-            } else {
-                HttpUtils.post(message.getUrl(), sendMessage, EventConfig.SEND_HEADER);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        } else {
+            HttpUtils.writeFailedMessage(sendMessage);
         }
     }
 }

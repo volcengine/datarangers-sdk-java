@@ -6,20 +6,16 @@
  */
 package com.datarangers.collector;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.datarangers.config.Constants;
 import com.datarangers.config.DataRangersSDKConfigProperties;
-import com.datarangers.config.EventConfig;
+import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.event.*;
 import com.datarangers.message.AppMessage;
 import com.datarangers.message.Message;
-import com.datarangers.message.ProfileMessage;
 import com.datarangers.profile.ItemMethod;
-import com.datarangers.profile.ProfileItem;
 import com.datarangers.profile.ProfileMethod;
-import com.datarangers.profile.ProfileRequestType;
 
+import java.io.IOException;
 import java.util.*;
 
 public class AppEventCollector extends Collector {
@@ -65,18 +61,6 @@ public class AppEventCollector extends Collector {
         sendEvents(header, builder.build());
     }
 
-    @Override
-    @Deprecated
-    public void profiles(String userUniqueId, int appId, List<ProfileItem> methods, List<Map<String, Object>> eventParams) {
-        Header header = new HeaderV3.Builder().setAppId(appId).setUserUniqueId(userUniqueId).build();
-        List<Event> events = new ArrayList<>();
-        for (int i = 0; i < Math.min(methods.size(), eventParams.size()); i++) {
-            Event event = new EventV3().setEvent(methods.get(i).toString()).setParams(eventParams.get(i)).setUserId(header.getUserUniqueId());
-            events.add(event);
-        }
-        sendEvents(header, events);
-    }
-
     private void profile(String userUniqueId, int appId, ProfileMethod method, Map<String, Object> eventParams) {
         if (eventParams == null) {
             logger.error("userUniqueId=" + userUniqueId + ",appId=" + appId + ",eventName=" + method.getMethod() + " params are null");
@@ -115,7 +99,7 @@ public class AppEventCollector extends Collector {
     }
 
     @Override
-    public void itemSet(int appId, String itemName, List<Items> items) {
+    public void itemSet(int appId, String itemName, List<Item> items) {
         item(ItemMethod.SET.toString(), appId, items);
     }
 
@@ -131,21 +115,25 @@ public class AppEventCollector extends Collector {
         sendEvents(header, events);
     }
 
-    private void itemDelete(int appId, List<Items> items) {
+    private void itemDelete(int appId, List<Item> items) {
         item(ItemMethod.DELETE.toString(), appId, items);
     }
 
-    private void item(String eventName, int appId, List<Items> items) {
+    private void item(String eventName, int appId, List<Item> items) {
         if (items == null) {
             logger.error("appId=" + appId + ",eventName=" + eventName + " params are null");
             return;
         }
         Header header = new HeaderV3.Builder().setAppId(appId).setUserUniqueId(Constants.DEFAULT_USER).build();
         List<Event> events = new ArrayList<>();
-        for (Items item : items) {
+        for (Item item : items) {
             if (item != null) {
                 Event event = new EventV3().setEvent(eventName);
-                ((JSONObject) JSON.toJSON(item, EventConfig.config)).forEach(event::addParams);
+                try {
+                    RangersJSONConfig.getInstance().fromJson(RangersJSONConfig.getInstance().toJson(item), Map.class).forEach((key, value) -> event.addParams((String) key, value));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 events.add(event);
             }
         }
@@ -179,42 +167,5 @@ public class AppEventCollector extends Collector {
         message.setHeader(header);
         message.addEvents(events);
         send(message);
-    }
-
-    @Deprecated
-    public void setUserProfile(String userUniqueId, int appId, String propertyName, String value) {
-        sendProfileRequest(appId, userUniqueId, ProfileRequestType.SET.toString(), propertyName, value);
-    }
-
-    @Deprecated
-    public void setUserProfile(String userUniqueId, int appId, String propertyName, int value) {
-        sendProfileRequest(appId, userUniqueId, ProfileRequestType.SET.toString(), propertyName, value);
-    }
-
-    @Deprecated
-    public void appendUserProfile(String userUniqueId, int appId, String propertyName, String value) {
-        sendProfileRequest(appId, userUniqueId, ProfileRequestType.APPEND.toString(), propertyName, value);
-    }
-
-    @Deprecated
-    public void appendUserProfile(String userUniqueId, int appId, String propertyName, int value) {
-        sendProfileRequest(appId, userUniqueId, ProfileRequestType.APPEND.toString(), propertyName, value);
-    }
-
-    @Deprecated
-    public void setProfiles(List<ProfileItem> properties) {
-        ProfileMessage message = new ProfileMessage();
-        message.setItems(properties);
-        sendMessage(message);
-    }
-
-    @Deprecated
-    private void sendProfileRequest(int appId, String userUniqueId, String requestType, String propertyName, Object value) {
-        ProfileMessage message = new ProfileMessage();
-        message.setItems(Arrays.asList(new ProfileItem().
-                setAppId(appId).setRequestType(requestType).
-                setUserUniqueId(userUniqueId).
-                setProperty(propertyName).addValues(value)));
-        sendMessage(message);
     }
 }
