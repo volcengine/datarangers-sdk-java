@@ -6,8 +6,9 @@
  */
 package com.datarangers.event;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.datarangers.config.Constants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.security.SecureRandom;
@@ -28,17 +29,17 @@ public class EventV3 implements Event, Serializable {
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    @JSONField(name = "datetime")
+    @JsonProperty("datetime")
     private String datetime = LocalDateTime.now().plusDays(-RANDOM.nextInt(10)).format(Constants.FULL_DAY);
 
     private Integer eventId;
 
-    @JSONField(serialize = false)
+    @JsonIgnore
     private String userId;
 
     private Long teaEventIndex;
 
-    @JSONField(serialize = false)
+    @JsonIgnore
     private Map<String, List<Object>> itemParams = new HashMap<>();
 
     public String getEvent() {
@@ -59,10 +60,10 @@ public class EventV3 implements Event, Serializable {
     public EventV3 setParams(Map<String, Object> params) {
         if (params != null) {
             params.forEach((key, value) -> {
-                if (value instanceof Items) {
+                if (value instanceof Item) {
                     Map<String, Object> itemMap = new HashMap<>();
-                    itemMap.put("id", ((Items) value).getId());
-                    String name = ((Items) value).itemName;
+                    itemMap.put("id", ((Item) value).getItemId());
+                    String name = ((Item) value).getItemName();
                     List<Object> list = itemParams.getOrDefault(name, new ArrayList<>());
                     list.add(itemMap);
                     itemParams.put(name, list);
@@ -70,15 +71,15 @@ public class EventV3 implements Event, Serializable {
                     this.params.put(key, value);
                 }
             });
-            List<Object> itemP = new ArrayList<>();
             if (itemParams.size() > 0) {
+                List<Object> itemP = new ArrayList<>();
                 itemParams.forEach((key, value) -> {
                     Map<String, List<Object>> res = new HashMap<>();
                     res.put(key, value);
                     itemP.add(res);
                 });
+                this.params.put("__items", itemP);
             }
-            this.params.put("__items", itemP);
         }
         return this;
     }

@@ -35,7 +35,7 @@ public class RangersLoggerWriter implements RangersFileWriter {
 
     public static RangersLoggerWriter getInstance(final String targetPrefix, final String targetName, int maxSize) {
         synchronized (instance) {
-            String key=targetPrefix + "/" + targetName;
+            String key = targetPrefix + "/" + targetName;
             if (!instance.containsKey(key)) {
                 instance.put(key, new RangersLoggerWriter(targetPrefix, targetName, maxSize));
             }
@@ -142,6 +142,7 @@ public class RangersLoggerWriter implements RangersFileWriter {
 
     @Override
     public boolean write(String message) {
+        if (message == null) return false;
         FileLock lock = null;
         try {
             final FileChannel channel = stream.getChannel();

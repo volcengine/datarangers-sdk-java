@@ -6,14 +6,12 @@
  */
 package com.datarangers.asynccollector;
 
-import com.alibaba.fastjson.JSONObject;
 import com.datarangers.config.EventConfig;
-import com.datarangers.logger.RangersLoggerWriter;
+import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.logger.RangersLoggerWriterPool;
 import com.datarangers.message.Message;
 import com.datarangers.util.HttpUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Consumer implements Runnable {
@@ -34,34 +32,28 @@ public class Consumer implements Runnable {
         }
     }
 
-    private List<Message> getMessages(int count) throws InterruptedException {
-        List<Message> messages = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            Message message = collectorContainer.consume(50);
-            if (message != null)
-                messages.add(message);
-        }
-        return messages.size() == 0 ? null : messages;
-    }
-
     private void send() throws Exception {
         while (true) {
             try {
-                Message message = collectorContainer.consume();
-                if (message != null)
-                    HttpUtils.post(EventConfig.getAppUrl(), JSONObject.toJSONString(message, EventConfig.config), EventConfig.SEND_HEADER);
-            }catch (InterruptedException e){
-
+                List<Message> messages = collectorContainer.consume();
+                if (messages != null) {
+                    messages.forEach(message -> {
+                        HttpUtils.post(EventConfig.getAppUrl(), RangersJSONConfig.getInstance().toJson(message), EventConfig.SEND_HEADER);
+                    });
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-
         }
     }
 
     private void write() throws Exception {
         while (true) {
-            Message message = collectorContainer.consume();
-            if (message != null) {
-                pool.getWriter(message.getUserUniqueId()).write(JSONObject.toJSONString(message, EventConfig.config) + "\n");
+            List<Message> messages = collectorContainer.consume();
+            if (messages != null) {
+                messages.forEach(message -> {
+                    pool.getWriter(message.getUserUniqueId()).write(RangersJSONConfig.getInstance().toJson(message) + "\n");
+                });
             }
         }
     }
