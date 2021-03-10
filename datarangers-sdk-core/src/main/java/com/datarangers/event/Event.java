@@ -19,6 +19,8 @@ public interface Event extends Serializable {
 
     Event addParams(String key, Object value);
 
+    Event setLocalTimeMs(Long localTimeMs);
+
     String key();
 
     String getEvent();
