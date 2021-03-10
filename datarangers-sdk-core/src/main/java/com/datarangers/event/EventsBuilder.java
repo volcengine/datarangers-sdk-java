@@ -12,9 +12,30 @@ import java.util.Map;
 
 public class EventsBuilder {
     List<Event> eventList = new ArrayList<>();
-
+    /**
+     * 功能描述: 增加事件
+     *
+     * @param: [eventName, eventParams]
+     * @return: com.datarangers.event.EventsBuilder
+     * @date: 2021/3/5 14:56
+     */
     public EventsBuilder addEvent(String eventName, Map<String, Object> eventParams) {
         Event event = new EventV3().setEvent(eventName).setParams(eventParams);
+        eventList.add(event);
+        return this;
+    }
+
+    /**
+     * 功能描述: 增加事件
+     *
+     * @param eventName 事件名
+     * @param eventParams 事件参数
+     * @param localTimeMs 事件发生的时间
+     * @return: com.datarangers.event.EventsBuilder
+     * @date: 2021/3/5 14:56
+     */
+    public EventsBuilder addEvent(String eventName, Map<String, Object> eventParams, long localTimeMs) {
+        Event event = new EventV3().setEvent(eventName).setParams(eventParams).setLocalTimeMs(localTimeMs);
         eventList.add(event);
         return this;
     }

@@ -13,7 +13,7 @@ datarangers-sdk-java是 [DataRangers](https://datarangers.com.cn/) 的用户行�
 <dependency>
   <groupId>com.datarangers</groupId>
   <artifactId>datarangers-sdk-core</artifactId>
-  <version>1.4.0-release</version>
+  <version>1.4.1-release</version>
 </dependency>
 ```
 
