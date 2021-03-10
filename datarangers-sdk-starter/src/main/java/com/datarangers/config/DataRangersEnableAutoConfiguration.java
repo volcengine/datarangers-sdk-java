@@ -8,41 +8,34 @@ package com.datarangers.config;
 
 import com.datarangers.collector.AppEventCollector;
 import com.datarangers.collector.EventCollector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
+
 /**
- * @Description: TODO
- * @Author: bytedance
- * @Date 2020/12/2 20:07
+ * @author bytedance
+ * @date 2020/12/2 20:07
  **/
 @Configuration
 @EnableAsync
 @EnableConfigurationProperties(DataRangersSDKConfigPropertiesInfo.class)
 public class DataRangersEnableAutoConfiguration {
-    private static final Logger logger = LoggerFactory.getLogger(DataRangersSDKConfigPropertiesInfo.class);
     @Autowired
     private DataRangersSDKConfigPropertiesInfo dataRangersSDKConfigPropertiesInfo;
 
     @Bean(name = "appEventCollector")
-    @ConditionalOnProperty(prefix = "datarangers.sdk", name = "enable", havingValue = "true")
     public EventCollector defaultAppCollector() {
         return new AppEventCollector("app",dataRangersSDKConfigPropertiesInfo);
     }
 
     @Bean(name = "webEventCollector")
-    @ConditionalOnProperty(prefix = "datarangers.sdk", name = "enable", havingValue = "true")
     public EventCollector defaultWebCollector() {
         return new AppEventCollector("web",dataRangersSDKConfigPropertiesInfo);
     }
 
     @Bean(name = "mpEventCollector")
-    @ConditionalOnProperty(prefix = "datarangers.sdk", name = "enable", havingValue = "true")
     public EventCollector defaultMpbCollector() {
         return new AppEventCollector("mp",dataRangersSDKConfigPropertiesInfo);
     }
