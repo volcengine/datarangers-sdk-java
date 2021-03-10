@@ -13,27 +13,12 @@ import java.util.Map;
 public class EventConfig {
     public static String appUrl;
     public static Header[] headers;
-    public static String profileUrl;
-    public static String mpUrl;
     public static Map<String, String> SEND_HEADER;
     public static boolean saveFlag = false;
     public static boolean sendFlag = true;
-    public static String ssidInfoUrl;
-    public static boolean batchMode=false;
 
     public static void setUrl(String url) {
         setAppUrl(url + Constants.APP_LOG_URL);
-        setMpUrl(url + Constants.MP_URL);
-        setProfileUrl(url + Constants.PROFILE_URL);
-        setSsidInfoUrl(url + Constants.SSID_INFO_URL);
-    }
-
-    public static String getSsidInfoUrl() {
-        return EventConfig.ssidInfoUrl;
-    }
-
-    public static void setSsidInfoUrl(String ssidInfoUrl) {
-        EventConfig.ssidInfoUrl = ssidInfoUrl;
     }
 
     public static String getAppUrl() {
@@ -43,22 +28,4 @@ public class EventConfig {
     public static void setAppUrl(String appUrl) {
         EventConfig.appUrl = appUrl;
     }
-
-    public static String getMpUrl() {
-        return EventConfig.mpUrl;
-    }
-
-    public static void setMpUrl(String mpUrl) {
-        EventConfig.mpUrl = mpUrl;
-    }
-
-
-    public static void setProfileUrl(String profileUrl) {
-        EventConfig.profileUrl = profileUrl;
-    }
-
-    public static String getProfileUrl() {
-        return profileUrl;
-    }
-
 }

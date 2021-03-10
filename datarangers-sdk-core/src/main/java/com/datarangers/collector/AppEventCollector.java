@@ -27,26 +27,37 @@ public class AppEventCollector extends Collector {
 
     @Override
     public void sendEvent(String userUniqueId, int appId, Map<String, Object> custom, String eventName, Map<String, Object> eventParams) {
+        sendEvent(userUniqueId, appId, custom, eventName, eventParams, System.currentTimeMillis());
+    }
+
+    @Override
+    public void sendEvent(String userUniqueId, int appId, Map<String, Object> custom, String eventName, Map<String, Object> eventParams, long localTimeMs) {
         if (eventParams == null) {
             logger.error("userUniqueId=" + userUniqueId + ",appId=" + appId + ",eventName=" + eventName + " params are null");
             return;
         }
         Header header = new HeaderV3.Builder().setCustom(custom).setAppId(appId).setUserUniqueId(userUniqueId).build();
-        Event event = new EventV3().setEvent(eventName).setParams(eventParams).setUserId(userUniqueId);
+        Event event = new EventV3().setEvent(eventName).setParams(eventParams).setUserId(userUniqueId).setLocalTimeMs(localTimeMs);
         sendEvent(header, event);
     }
 
     @Override
     public void sendEvent(Header header, String eventName, Map<String, Object> eventParams) {
+        sendEvent(header, eventName, eventParams, System.currentTimeMillis());
+    }
+
+    @Override
+    public void sendEvent(Header header, String eventName, Map<String, Object> eventParams, long localTimeMs) {
         if (eventParams == null) {
             logger.error("userUniqueId=" + header.getUserUniqueId() + ",appId=" + header.getAppId() + ",eventName=" + eventName + " params are null");
             return;
         }
-        Event event = new EventV3().setEvent(eventName).setParams(eventParams).setUserId(header.getUserUniqueId());
+        Event event = new EventV3().setEvent(eventName).setParams(eventParams).setUserId(header.getUserUniqueId()).setLocalTimeMs(localTimeMs);
         sendEvent(header, event);
     }
 
     @Override
+    @Deprecated
     public void sendEvent(Header header, List<String> eventName, List<Map<String, Object>> eventParams) {
         List<Event> events = new ArrayList<>();
         for (int i = 0; i < Math.min(eventName.size(), eventParams.size()); i++) {

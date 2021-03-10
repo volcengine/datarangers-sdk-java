@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,10 +28,8 @@ public class EventV3 implements Event, Serializable {
 
     private Long localTimeMs = System.currentTimeMillis();
 
-    private static final SecureRandom RANDOM = new SecureRandom();
-
     @JsonProperty("datetime")
-    private String datetime = LocalDateTime.now().plusDays(-RANDOM.nextInt(10)).format(Constants.FULL_DAY);
+    private String datetime = LocalDateTime.now().format(Constants.FULL_DAY);
 
     private Integer eventId;
 
@@ -108,8 +107,10 @@ public class EventV3 implements Event, Serializable {
         return localTimeMs;
     }
 
+    @Override
     public EventV3 setLocalTimeMs(Long localTimeMs) {
         this.localTimeMs = localTimeMs;
+        this.datetime=LocalDateTime.ofInstant(Instant.ofEpochMilli(localTimeMs), Constants.TIME_ZONE_ID).format(Constants.FULL_DAY);
         return this;
     }
 
