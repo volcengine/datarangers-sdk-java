@@ -7,6 +7,7 @@
 package com.datarangers.collector;
 
 import com.datarangers.asynccollector.CollectorContainer;
+import com.datarangers.config.DataRangersSDKConfigProperties;
 import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.message.Message;
 import com.datarangers.util.HttpUtils;
@@ -16,12 +17,21 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 
+/**
+ * @author taojian
+ */
 public abstract class Collector implements EventCollector {
     private String appType;
     public static final Logger logger = LoggerFactory.getLogger("DatarangersLog");
     public static Executor httpRequestPool = null;
     public static ScheduledExecutorService scheduled = null;
     public static CollectorContainer collectorContainer;
+
+    private boolean enable;
+
+    public Collector(String appType, DataRangersSDKConfigProperties properties) {
+        enable = properties.isEnable();
+    }
 
     public String getAppType() {
         return appType;
@@ -37,8 +47,11 @@ public abstract class Collector implements EventCollector {
     }
 
     protected void sendMessage(Message message) {
+        if(!enable) {
+            return;
+        }
         message.merge();
-        String sendMessage = null;
+        String sendMessage;
         sendMessage = RangersJSONConfig.getInstance().toJson(message);
         if (collectorContainer.getMessageQueue() != null) {
             try {
@@ -47,9 +60,7 @@ public abstract class Collector implements EventCollector {
                     logger.error("datarangers send Queue reach max length");
                     HttpUtils.writeFailedMessage(sendMessage);
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
+            }  catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
