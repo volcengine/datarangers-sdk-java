@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.LongAdder;
 
+/**
+ * @author hTangle
+ */
 public class CollectorContainer {
     private CollectorQueue messageQueue;
     public static final ConcurrentHashMap<String, ConcurrentHashMap<String, LongAdder>> SEND_HISTORY = new ConcurrentHashMap<>();
@@ -25,7 +28,9 @@ public class CollectorContainer {
     }
 
     private List<Message> handleMessage(List<Message> messages) throws InterruptedException {
-        if (messages == null) return null;
+        if (messages == null) {
+            return null;
+        }
         messages.forEach(message -> message.getEvents().forEach(event -> {
             int appId = message.getAppId();
             String eventName = event.getEvent();
@@ -35,7 +40,9 @@ public class CollectorContainer {
             }
             String key = appId + "-" + eventName;
             ConcurrentHashMap<String, LongAdder> map = SEND_HISTORY.get(date);
-            if (!map.containsKey(key)) map.put(key, new LongAdder());
+            if (!map.containsKey(key)) {
+                map.put(key, new LongAdder());
+            }
             map.get(key).increment();
         }));
         return messages;
