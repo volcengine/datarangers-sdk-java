@@ -2,7 +2,6 @@ package com.datarangers.asynccollector;
 
 import com.datarangers.message.Message;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -10,9 +9,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Description: TODO
- * @Author: hezhiwei.alden@bytedance.com
- * @Date 2021/2/4 14:57
+ * @author hezhiwei.alden@bytedance.com
+ * @date 2021/2/4 14:57
  **/
 public class RangersCollectorQueue implements CollectorQueue {
     volatile private static CollectorQueue instance = null;
@@ -20,7 +18,7 @@ public class RangersCollectorQueue implements CollectorQueue {
     private BlockingQueue<Message> queue;
 
     private RangersCollectorQueue(int queueLength) {
-        queue = new LinkedBlockingQueue(queueLength);
+        queue = new LinkedBlockingQueue<>(queueLength);
     }
 
     public static CollectorQueue getInstance(int queueLength) {
