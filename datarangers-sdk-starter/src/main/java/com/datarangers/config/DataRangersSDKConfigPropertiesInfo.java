@@ -10,10 +10,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * @Description: TODO
- * @Author: bytedance
- * @Date 2020/12/2 20:02
+ * @author bytedance
+ * @date 2020/12/2 20:02
  **/
+@SuppressWarnings("AlibabaClassNamingShouldBeCamel")
 @Component
 @ConfigurationProperties(prefix = "datarangers.sdk")
 public class DataRangersSDKConfigPropertiesInfo extends DataRangersSDKConfigProperties{

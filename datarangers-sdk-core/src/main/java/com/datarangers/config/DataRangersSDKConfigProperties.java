@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
+/**
+ * @author hTangle
+ */
 public class DataRangersSDKConfigProperties {
     public static final Logger logger = LoggerFactory.getLogger(DataRangersSDKConfigProperties.class);
     public Map<String, String> headers;
@@ -36,6 +39,16 @@ public class DataRangersSDKConfigProperties {
     public int threadCount = 1;
     public int queueSize = 10240;
     public boolean send = true;
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
+    }
+
+    public boolean enable = true;
 
     public String eventSavePath = "logs/";
     public List<String> eventFilePaths;
@@ -176,7 +189,9 @@ public class DataRangersSDKConfigProperties {
     }
 
     public Map<String, String> getHeaders() {
-        if (headers == null) headers = new HashMap<>();
+        if (headers == null) {
+            headers = new HashMap<>();
+        }
         return headers;
     }
 
@@ -241,9 +256,7 @@ public class DataRangersSDKConfigProperties {
                 EventConfig.SEND_HEADER.put("User-Agent", "DataRangers Java SDK");
                 EventConfig.SEND_HEADER.put("Content-Type", "application/json");
                 List<Header> headerList = new ArrayList<>();
-                EventConfig.SEND_HEADER.forEach((key, value) -> {
-                    headerList.add(new BasicHeader(key, value));
-                });
+                EventConfig.SEND_HEADER.forEach((key, value) -> headerList.add(new BasicHeader(key, value)));
                 EventConfig.headers = headerList.toArray(new Header[0]);
             }
         }
@@ -264,16 +277,19 @@ public class DataRangersSDKConfigProperties {
         }
         if (userQueue == null) {
             Collector.collectorContainer = new CollectorContainer(RangersCollectorQueue.getInstance(getQueueSize()));
-        } else {//如果客户自定义了queue，则需要替换为客户自定义queue
+        } else {
+            //如果客户自定义了queue，则需要替换为客户自定义queue
             Collector.collectorContainer = new CollectorContainer(userQueue);
         }
-        if (hasConsumer && Collector.httpRequestPool == null) {//有消费者才初始化消费者
+        if (hasConsumer && Collector.httpRequestPool == null) {
+            //有消费者才初始化消费者
             Collector.httpRequestPool = setThreadPool();
             for (int i = 0; i < threadCount; i++) {//必须全部消费同一个队列
                 Collector.httpRequestPool.execute(new Consumer(Collector.collectorContainer));
             }
         }
-        if(hasProducer){//有生产者才需要记录
+        if(hasProducer){
+            //有生产者才需要记录
             Collector.scheduled = Executors.newSingleThreadScheduledExecutor();
             Collector.scheduled.scheduleAtFixedRate(new CollectorCounter(getEventSavePath()), 0, 2, TimeUnit.MINUTES);
             if (EventConfig.saveFlag) {
