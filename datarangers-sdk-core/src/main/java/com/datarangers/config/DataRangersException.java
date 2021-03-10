@@ -8,6 +8,7 @@ package com.datarangers.config;
 
 /**
  * 功能描述: 自定义异常,会提示发送数据过程中的错误
+ * @author taojian
  */
 public class DataRangersException extends Exception{
     public DataRangersException(String message) {

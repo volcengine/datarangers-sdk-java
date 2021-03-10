@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @Description: 自动保存到文件
- * @Author: hezhiwei.alden@bytedance.com
+ * @apiNote  自动保存到文件
+ * @author  hezhiwei.alden@bytedance.com
  **/
 public class CollectorCounter implements Runnable {
     private String countName;

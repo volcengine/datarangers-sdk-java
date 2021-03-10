@@ -18,11 +18,18 @@ import com.datarangers.profile.ProfileMethod;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * @author hTangle
+ */
 public class AppEventCollector extends Collector {
     public AppEventCollector(String appType, DataRangersSDKConfigProperties properties) {
+        super(appType, properties);
         setAppType(appType);
-        if (properties != null) properties.init();
-        else System.out.println(Constants.INIT_ERROR);
+        if (properties != null) {
+            properties.init();
+        } else {
+            System.out.println(Constants.INIT_ERROR);
+        }
     }
 
     @Override
@@ -50,8 +57,10 @@ public class AppEventCollector extends Collector {
     public void sendEvent(Header header, List<String> eventName, List<Map<String, Object>> eventParams) {
         List<Event> events = new ArrayList<>();
         for (int i = 0; i < Math.min(eventName.size(), eventParams.size()); i++) {
-            if (eventParams.get(i) == null) continue;
-            Event event = new EventV3().setEvent(eventName.get(i).toString()).setParams(eventParams.get(i)).setUserId(header.getUserUniqueId());
+            if (eventParams.get(i) == null) {
+                continue;
+            }
+            Event event = new EventV3().setEvent(eventName.get(i)).setParams(eventParams.get(i)).setUserId(header.getUserUniqueId());
             events.add(event);
         }
         sendEvents(header, events);
@@ -89,7 +98,7 @@ public class AppEventCollector extends Collector {
     @Override
     public void profileUnset(String userUniqueId, int appId, List<String> params) {
         Map<String, Object> eventParams = new HashMap<>();
-        for (String p : params) eventParams.put(p, "java");
+        params.forEach(p -> eventParams.put(p, "java"));
         profile(userUniqueId, appId, ProfileMethod.UNSET, eventParams);
     }
 
@@ -108,7 +117,7 @@ public class AppEventCollector extends Collector {
         Header header = new HeaderV3.Builder().setAppId(appId).setUserUniqueId(Constants.DEFAULT_USER).build();
         List<Event> events = new ArrayList<>();
         Map<String, Object> eventParams = new HashMap<>();
-        for (String p : params) eventParams.put(p, "");
+        params.forEach(p -> eventParams.put(p, ""));
         events.add(new EventV3().
                 setEvent(ItemMethod.UNSET.toString()).
                 addParams("item_id", id).addParams("item_name", name).setParams(eventParams));
@@ -130,7 +139,8 @@ public class AppEventCollector extends Collector {
             if (item != null) {
                 Event event = new EventV3().setEvent(eventName);
                 try {
-                    RangersJSONConfig.getInstance().fromJson(RangersJSONConfig.getInstance().toJson(item), Map.class).forEach((key, value) -> event.addParams((String) key, value));
+                    RangersJSONConfig.getInstance().fromJson(RangersJSONConfig.getInstance().toJson(item), Map.class)
+                            .forEach((key, value) -> event.addParams((String) key, value));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -140,6 +150,8 @@ public class AppEventCollector extends Collector {
         sendEvents(header, events);
     }
 
+    @SuppressWarnings("AliDeprecation")
+    @Override
     @Deprecated
     public void sendProfiles(String userUniqueId, int appId, List<ProfileMethod> profileModes, List<Map<String, Object>> profiles) {
         Header header = new HeaderV3.Builder().setAppId(appId).setUserUniqueId(userUniqueId).build();
@@ -160,6 +172,7 @@ public class AppEventCollector extends Collector {
         send(message);
     }
 
+    @Override
     public void sendEvents(Header header, List<Event> events) {
         Message message = new AppMessage();
         message.setUserUniqueId(header.getUserUniqueId());
