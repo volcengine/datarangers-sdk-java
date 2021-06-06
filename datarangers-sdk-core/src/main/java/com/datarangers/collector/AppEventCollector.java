@@ -77,10 +77,6 @@ public class AppEventCollector extends Collector {
         sendEvents(header, events);
     }
 
-    private void sendEvents(Header header, EventsBuilder builder) {
-        sendEvents(header, builder.build());
-    }
-
     private void profile(String userUniqueId, int appId, ProfileMethod method, Map<String, Object> eventParams) {
         if (eventParams == null) {
             logger.error("userUniqueId=" + userUniqueId + ",appId=" + appId + ",eventName=" + method.getMethod() + " params are null");
