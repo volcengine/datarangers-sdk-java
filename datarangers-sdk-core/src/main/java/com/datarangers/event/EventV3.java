@@ -19,6 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author hezhiwei.alden@bytedance.com
+ */
 public class EventV3 implements Event, Serializable {
     private String event;
 
@@ -38,9 +41,13 @@ public class EventV3 implements Event, Serializable {
 
     private Long teaEventIndex;
 
+    @JsonProperty("ab_sdk_version")
+    private String abSdkVersion;
+
     @JsonIgnore
     private Map<String, List<Object>> itemParams = new HashMap<>();
 
+    @Override
     public String getEvent() {
         return event;
     }
@@ -110,10 +117,11 @@ public class EventV3 implements Event, Serializable {
     @Override
     public EventV3 setLocalTimeMs(Long localTimeMs) {
         this.localTimeMs = localTimeMs;
-        this.datetime=LocalDateTime.ofInstant(Instant.ofEpochMilli(localTimeMs), Constants.TIME_ZONE_ID).format(Constants.FULL_DAY);
+        this.datetime = LocalDateTime.ofInstant(Instant.ofEpochMilli(localTimeMs), Constants.TIME_ZONE_ID).format(Constants.FULL_DAY);
         return this;
     }
 
+    @Override
     public String getDatetime() {
         return datetime;
     }
@@ -147,6 +155,16 @@ public class EventV3 implements Event, Serializable {
 
     public EventV3 setTeaEventIndex(Long teaEventIndex) {
         this.teaEventIndex = teaEventIndex;
+        return this;
+    }
+
+    public String getAbSdkVersion() {
+        return abSdkVersion;
+    }
+
+    @Override
+    public EventV3 setAbSdkVersion(String abSdkVersion) {
+        this.abSdkVersion = abSdkVersion;
         return this;
     }
 }
