@@ -10,11 +10,72 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class EventsBuilder {
+/**
+ * @author hezhiwei.alden@bytedance.com
+ */
+public final class EventsBuilder {
     List<Event> eventList = new ArrayList<>();
 
+    public static EventsBuilder getInstance() {
+        return new EventsBuilder();
+    }
+
+    /**
+     * 功能描述: 增加事件
+     *
+     * @param eventName   事件名
+     * @param eventParams 事件参数
+     * @return: com.datarangers.event.EventsBuilder
+     * @date: 2021/3/5 14:56
+     */
     public EventsBuilder addEvent(String eventName, Map<String, Object> eventParams) {
         Event event = new EventV3().setEvent(eventName).setParams(eventParams);
+        eventList.add(event);
+        return this;
+    }
+
+    /**
+     * 功能描述: 增加事件
+     *
+     * @param eventName   事件名
+     * @param eventParams 事件参数
+     * @param abVersion   ab version
+     * @return: com.datarangers.event.EventsBuilder
+     * @date: 2021/3/5 14:56
+     */
+    public EventsBuilder addEvent(String eventName, Map<String, Object> eventParams, String abVersion) {
+        Event event = new EventV3().setEvent(eventName).setParams(eventParams).setAbSdkVersion(abVersion);
+        eventList.add(event);
+        return this;
+    }
+
+    /**
+     * 功能描述: 增加事件
+     *
+     * @param eventName   事件名
+     * @param eventParams 事件参数
+     * @param localTimeMs 事件发生的时间
+     * @return: com.datarangers.event.EventsBuilder
+     * @date: 2021/3/5 14:56
+     */
+    public EventsBuilder addEvent(String eventName, Map<String, Object> eventParams, long localTimeMs) {
+        Event event = new EventV3().setEvent(eventName).setParams(eventParams).setLocalTimeMs(localTimeMs);
+        eventList.add(event);
+        return this;
+    }
+
+    /**
+     * 功能描述: 增加事件
+     *
+     * @param eventName   事件名
+     * @param eventParams 事件参数
+     * @param localTimeMs 事件发生的时间
+     * @param abVersion   ab version
+     * @return: com.datarangers.event.EventsBuilder
+     * @date: 2021/3/5 14:56
+     */
+    public EventsBuilder addEvent(String eventName, Map<String, Object> eventParams, long localTimeMs, String abVersion) {
+        Event event = new EventV3().setEvent(eventName).setParams(eventParams).setLocalTimeMs(localTimeMs).setAbSdkVersion(abVersion);
         eventList.add(event);
         return this;
     }

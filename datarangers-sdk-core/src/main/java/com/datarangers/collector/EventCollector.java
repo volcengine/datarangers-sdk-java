@@ -32,6 +32,19 @@ public interface EventCollector {
     void sendEvent(String userUniqueId, int appId, Map<String, Object> custom, String eventName, Map<String, Object> eventParams);
 
     /**
+     * 功能描述: 异步发送事件
+     *
+     * @param appId        应用id
+     * @param custom       用户自定义公共参数
+     * @param eventName    事件名称
+     * @param eventParams  事件参数
+     * @param userUniqueId 用户uuid
+     * @param localTimeMs  事件发生时间，毫秒
+     * @return: void
+     * @date: 2020/8/26 12:24
+     */
+    void sendEvent(String userUniqueId, int appId, Map<String, Object> custom, String eventName, Map<String, Object> eventParams,long localTimeMs);
+    /**
      * 功能描述: 批量发送事件
      *
      * @param header 事件的公共属性，可以通过调用HeaderV3.Builder().build()构建一个header
@@ -53,6 +66,17 @@ public interface EventCollector {
     void sendEvent(Header header, String eventName, Map<String, Object> eventParams);
 
     /**
+     * 功能描述: 发送单条事件
+     *
+     * @param header      事件的公共属性，可以通过调用HeaderV3.Builder().build()构建一个header
+     * @param eventName   事件名
+     * @param eventParams 事件参数
+     * @param localTimeMs  事件发生时间，毫秒
+     * @return: void
+     * @date: 2020/9/28 22:00
+     */
+    void sendEvent(Header header, String eventName, Map<String, Object> eventParams,long localTimeMs);
+    /**
      * 功能描述: 批量发送事件
      *
      * @param header    事件的公共属性，可以通过调用HeaderV3.Builder().build()构建一个header
@@ -61,6 +85,7 @@ public interface EventCollector {
      * @return: void
      * @date 2020/12/25 15:59
      */
+    @Deprecated
     void sendEvent(Header header, List<String> eventName, List<Map<String, Object>> eventParams);
 
     /**

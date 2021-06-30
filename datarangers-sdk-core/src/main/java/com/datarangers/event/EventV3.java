@@ -12,12 +12,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author hezhiwei.alden@bytedance.com
+ */
 public class EventV3 implements Event, Serializable {
     private String event;
 
@@ -27,10 +31,8 @@ public class EventV3 implements Event, Serializable {
 
     private Long localTimeMs = System.currentTimeMillis();
 
-    private static final SecureRandom RANDOM = new SecureRandom();
-
     @JsonProperty("datetime")
-    private String datetime = LocalDateTime.now().plusDays(-RANDOM.nextInt(10)).format(Constants.FULL_DAY);
+    private String datetime = LocalDateTime.now().format(Constants.FULL_DAY);
 
     private Integer eventId;
 
@@ -39,9 +41,13 @@ public class EventV3 implements Event, Serializable {
 
     private Long teaEventIndex;
 
+    @JsonProperty("ab_sdk_version")
+    private String abSdkVersion;
+
     @JsonIgnore
     private Map<String, List<Object>> itemParams = new HashMap<>();
 
+    @Override
     public String getEvent() {
         return event;
     }
@@ -108,11 +114,14 @@ public class EventV3 implements Event, Serializable {
         return localTimeMs;
     }
 
+    @Override
     public EventV3 setLocalTimeMs(Long localTimeMs) {
         this.localTimeMs = localTimeMs;
+        this.datetime = LocalDateTime.ofInstant(Instant.ofEpochMilli(localTimeMs), Constants.TIME_ZONE_ID).format(Constants.FULL_DAY);
         return this;
     }
 
+    @Override
     public String getDatetime() {
         return datetime;
     }
@@ -146,6 +155,16 @@ public class EventV3 implements Event, Serializable {
 
     public EventV3 setTeaEventIndex(Long teaEventIndex) {
         this.teaEventIndex = teaEventIndex;
+        return this;
+    }
+
+    public String getAbSdkVersion() {
+        return abSdkVersion;
+    }
+
+    @Override
+    public EventV3 setAbSdkVersion(String abSdkVersion) {
+        this.abSdkVersion = abSdkVersion;
         return this;
     }
 }
