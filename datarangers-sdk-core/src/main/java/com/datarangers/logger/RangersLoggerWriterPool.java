@@ -49,6 +49,9 @@ public class RangersLoggerWriterPool {
     public RangersLoggerWriter getWriter(String uuid) {
         if (WRITERS_POOL.size() == 1) return getOneWriter();
         if (WRITERS_POOL.size() > 0) {
+            if (uuid == null) {
+                return WRITERS_POOL.get(0);
+            }
             return WRITERS_POOL.get(Math.abs(uuid.hashCode()) % size);
         }
         return null;
