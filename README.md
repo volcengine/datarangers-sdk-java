@@ -17,7 +17,7 @@ datarangers-sdk-java是 [DataRangers](https://datarangers.com.cn/) 的用户行�
 </dependency>
 ```
 
-version是sdk的版本号，当前最新的版本为1.4.0-release。
+version是sdk的版本号，当前最新的版本为1.4.2-release。
 
 ### 2. 配置SDK
 DataRangers SDK需要进行一定的参数配置才能够使用，具体需要配置的参数为：
@@ -66,7 +66,7 @@ DataRangers SDK需要进行一定的参数配置才能够使用，具体需要�
 <dependency>
    <groupId>com.datarangers</groupId>
    <artifactId>datarangers-sdk-starter</artifactId>
-   <version>1.4.0-release</version>
+   <version>1.4.2-release</version>
 </dependency>
 ```
 
@@ -204,7 +204,7 @@ void itemSet(int appId, String name, List<Items> items);
 void itemUnset(int appId, String id, String name, List<String> params);
 ```
 
-## 3. 使用示例
+## 使用示例
 1. 发送普通事件
 ```java
 @Resource(name = "appEventCollector")
@@ -249,5 +249,5 @@ eventCollector.sendEvent("user-001", 10000028, null, "set_items", new HashMap<St
 }});
 ```
 
-## 4. 注意事项
+## 注意事项
 * 当前sdk版本没有主动清理日志的功能，需要手动清理日志
