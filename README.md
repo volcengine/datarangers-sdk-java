@@ -1,6 +1,6 @@
 # DataRangers
 ## 项目背景
-datarangers-sdk-java是 [DataRangers](https://datarangers.com.cn/) 的用户行为采集服务端SDK。
+datarangers-sdk-java是 [DataFinder](https://www.volcengine.com/product/datafinder) 的用户行为采集服务端SDK。
 
 服务端埋点支持在客户的服务端进行埋点采集和上报，作为客户端埋点的补充或替代，其支持的典型场景包括：
 1. 客户端埋点+服务端埋点组合：该场景下，服务端埋点一般用来弥补客户端埋点覆盖不到的部分数据，是目前最常见的使用场景。
@@ -77,6 +77,7 @@ datarangers.sdk.enable=true
 # rangers的ip或域名
 datarangers.sdk.domain=http://domain
 # datarangers.sdk.headers为http请求中headers字段内容,必须要添加Host,其他如果需要设置的可以选填
+# Host的配置在安装部署的那台机器上，查看/home/datarangers/DataRangersDeploy/conf_rangers.yml中配置项sdk.report.host
 datarangers.sdk.headers.Host=host
 
 
