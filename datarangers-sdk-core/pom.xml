@@ -5,10 +5,10 @@
     <parent>
         <artifactId>datarangers-sdk</artifactId>
         <groupId>com.datarangers</groupId>
-        <version>1.4.2-release</version>
+        <version>1.4.3-release</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <version>1.4.2-release</version>
+    <version>1.4.3-release</version>
     <packaging>jar</packaging>
     <name>datarangers-server-sdk-core</name>
     <description>A SDK for datarangers user</description>
