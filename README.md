@@ -13,11 +13,11 @@ datarangers-sdk-java是 [DataRangers](https://datarangers.com.cn/) 的用户行�
 <dependency>
   <groupId>com.datarangers</groupId>
   <artifactId>datarangers-sdk-core</artifactId>
-  <version>1.4.2-release</version>
+  <version>1.4.3-release</version>
 </dependency>
 ```
 
-version是sdk的版本号，当前最新的版本为1.4.2-release。
+version是sdk的版本号，当前最新的版本为1.4.3-release。
 
 ### 2. 配置SDK
 DataRangers SDK需要进行一定的参数配置才能够使用，具体需要配置的参数为：
@@ -66,7 +66,7 @@ DataRangers SDK需要进行一定的参数配置才能够使用，具体需要�
 <dependency>
    <groupId>com.datarangers</groupId>
    <artifactId>datarangers-sdk-starter</artifactId>
-   <version>1.4.2-release</version>
+   <version>1.4.3-release</version>
 </dependency>
 ```
 
@@ -93,6 +93,21 @@ datarangers.sdk.eventSavePath=logs/
 datarangers.sdk.eventSaveName=datarangers
 # 最多保存的单个日志的大小,单位MB
 datarangers.sdk.eventSaveMaxFileSize=256
+
+# client是否需要进行ssl证书认证，默认为false，false表示需要进行证书认证，这也是jdk自身的默认标准行为。如果访问https, 需要把证书导入到证书库里面，默认使用的是jdk的证书库，建议客户使用这种方式；如果不想导入的话，可以设置trustDisable为true，sdk会通过设置一个自定义的trustManager跳过认证
+# datarangers.sdk.httpConfig.trustDisable=false
+
+# 自定义证书路径和密码，false表示使用jdk自身的默认路径
+# datarangers.sdk.httpConfig.customKeyTrustEnable=false
+
+# 配置证书
+# datarangers.sdk.httpConfig.keyMaterialPath=xxx
+# datarangers.sdk.httpConfig.keyPassword=xxx
+# datarangers.sdk.httpConfig.storePassword=xxx
+# datarangers.sdk.httpConfig.trustMaterialPath=xxx
+
+# self for selfTrustStrategy, default is all
+# datarangers.sdk.httpConfig.trustStrategy=xxx
 ```
 
 ### 3. 使用SDK

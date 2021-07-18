@@ -6,9 +6,21 @@
  */
 package com.datarangers.util;
 
+import com.datarangers.config.HttpConfig;
 import com.datarangers.config.EventConfig;
 import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.logger.RangersLoggerWriter;
+import java.io.File;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -16,11 +28,18 @@ import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
+import org.apache.hc.client5.http.ssl.TrustSelfSignedStrategy;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
+import org.apache.hc.core5.ssl.SSLContexts;
+import org.apache.hc.core5.ssl.TrustStrategy;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
@@ -33,110 +52,184 @@ import java.util.Map;
 import java.util.UUID;
 
 public class HttpUtils {
-    public static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
-    private static RangersLoggerWriter writer;
 
-    public static void setWriter(final String targetPrefix, final String targetName, int maxSize) {
-        if (writer == null)
-            writer = RangersLoggerWriter.getInstance(targetPrefix, targetName, maxSize);
+  public static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
+  private static RangersLoggerWriter writer;
+
+  public static void setWriter(final String targetPrefix, final String targetName, int maxSize) {
+    if (writer == null) {
+      writer = RangersLoggerWriter.getInstance(targetPrefix, targetName, maxSize);
     }
+  }
 
-    public static void writeFailedMessage(String message) {
-        synchronized (writer) {
-            writer.write(message + "\n");
-        }
+  public static void writeFailedMessage(String message) {
+    synchronized (writer) {
+      writer.write(message + "\n");
     }
+  }
 
-    private static final Integer MAX_TOTAL = 1000;             //连接池最大连接数
-    private static final Integer MAX_PER_ROUTE = 100;          //单个路由默认最大连接数
-    private static Integer REQ_TIMEOUT = 2 * 500;     //请求超时时间ms
-    private static Integer CONN_TIMEOUT = 2 * 500;     //连接超时时间ms
-    private static Integer SOCK_TIMEOUT = 4 * 500;    //读取超时时间ms
+  private static HttpClient httpClient = null;
+  private static volatile Boolean initFlag = false;
 
-    public static void setRequestTimeOut(int timeBase) {
-        REQ_TIMEOUT = timeBase;
-        CONN_TIMEOUT = timeBase;
-        SOCK_TIMEOUT = timeBase * 2;
-    }
-
-    private static HttpClient httpClient = null;
-    private static Boolean initFlag = false;
-
-    public static void createHttpClient() {
+  public static void createHttpClient(
+      HttpConfig httpConfig, HttpClient customHttpClient) {
+    if (!initFlag) {
+      synchronized (initFlag) {
         if (!initFlag) {
-            synchronized (initFlag) {
-                if (!initFlag) {
-                    if (httpClient == null) {
-                        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-                        cm.setMaxTotal(MAX_TOTAL);
-                        cm.setDefaultMaxPerRoute(MAX_PER_ROUTE);
-                        RequestConfig requestConfig = RequestConfig.custom()
-                                .setConnectionRequestTimeout(Timeout.ofMicroseconds(REQ_TIMEOUT))
-                                .setConnectTimeout(Timeout.ofMilliseconds(CONN_TIMEOUT))
-
-                                .setResponseTimeout(Timeout.ofMilliseconds(SOCK_TIMEOUT))
-                                .setCookieSpec("easy")
-                                .build();
-                        httpClient = HttpClients.custom().setRetryStrategy(new DefaultHttpRequestRetryStrategy(3, TimeValue.ofMilliseconds(1000))).setConnectionManager(cm).setDefaultRequestConfig(requestConfig).build();
-                    }
-                    initFlag = true;
-                }
-            }
-        }
-    }
-
-    public static void post(String url, String body, Map<String, String> headers, int count) {
-        HttpPost httpPost = new HttpPost(url);
-        logger.debug(body);
-        CloseableHttpResponse response = null;
-        String requestId = getXRequestID();
-        Map object = null;
-        try {
-            StringEntity entity = new StringEntity(body, ContentType.APPLICATION_JSON);
-            httpPost.setHeaders(EventConfig.headers);
-            httpPost.addHeader(new BasicHeader("X-Request-ID", requestId));
-            httpPost.setEntity(entity);
-            response = (CloseableHttpResponse) httpClient.execute(httpPost);
-            String resultStr = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-            object = RangersJSONConfig.getInstance().fromJson(resultStr, Map.class);
-            if (object != null &&
-                    (object.containsKey("message") && "success".equals(object.get("message").toString())
-                            || (object.containsKey("responses")))) {
-                logger.debug("Send Success:" + url);
-                logger.debug(resultStr);
+          if (httpClient == null) {
+            if (customHttpClient != null) {
+              httpClient = customHttpClient;
             } else {
-                logger.error("HTTP ERROR: " + response.getEntity().toString());
-                logger.error("requestId=" + requestId + ",url=" + url + ",body=" + body + ",header=" + headers + ",result:" + resultStr);
-                writeFailedMessage(body);
+              SSLContext sslContext = createSSLContext(httpConfig);
+              SSLConnectionSocketFactory sslSocketFactory;
+              if (httpConfig.isTrustDisable()) {
+                sslSocketFactory =
+                    new SSLConnectionSocketFactory(sslContext, (s, sslSession) -> true);
+              } else {
+                sslSocketFactory = SSLConnectionSocketFactory.getSocketFactory();
+              }
+
+              PoolingHttpClientConnectionManager cm = PoolingHttpClientConnectionManagerBuilder
+                  .create()
+                  .setMaxConnTotal(httpConfig.getMaxTotal())
+                  .setMaxConnPerRoute(httpConfig.getMaxPerRoute())
+                  .setSSLSocketFactory(sslSocketFactory)
+                  .build();
+              RequestConfig requestConfig = RequestConfig.custom()
+                  .setConnectionRequestTimeout(
+                      Timeout.ofMicroseconds(httpConfig.getRequestTimeout()))
+                  .setConnectTimeout(Timeout.ofMilliseconds(httpConfig.getConnectTimeout()))
+                  .setResponseTimeout(Timeout.ofMilliseconds(httpConfig.getSocketTimeout()))
+                  .setCookieSpec("easy")
+                  .build();
+              httpClient = HttpClients.custom()
+                  .setRetryStrategy(
+                      new DefaultHttpRequestRetryStrategy(3, TimeValue.ofMilliseconds(1000)))
+                  .setConnectionManager(cm)
+                  .setDefaultRequestConfig(requestConfig).build();
             }
-        } catch (IOException e) {
-            if (count > 2) {
-                logger.error(e.toString());
-                writeFailedMessage(body);
-            } else {
-                count++;
-                post(url, body, headers, count);
-            }
-        } catch (ParseException e) {
-            logger.error("Parse Json error:requestId=" + requestId + ",url=" + url + ",body=" + body + ",header=" + headers);
-            writeFailedMessage(body);
-        } finally {
-            try {
-                if (response != null) response.close();
-            } catch (IOException e) {
-                logger.error(e.toString());
-            }
+          }
+          initFlag = true;
         }
+      }
     }
+  }
 
-    public static void post(String url, String body, Map<String, String> headers) {
-        if (body == null) return;
-        post(url, body, headers, 1);
-    }
+  private static SSLContext createSSLContext(
+      HttpConfig httpConfig) {
+    if (httpConfig.isTrustDisable()) {
+      SSLContext sslContext = null;
+      try {
+        sslContext = SSLContext.getInstance("TLS");
+        TrustManager tm = new X509TrustManager() {
+          @Override
+          public void checkClientTrusted(X509Certificate[] chain, String authType)
+              throws CertificateException {
+          }
 
-    public static String getXRequestID() {
-        return UUID.randomUUID().toString()
-                .replaceAll("-", String.valueOf(new SecureRandom().nextInt(10)));
+          @Override
+          public void checkServerTrusted(X509Certificate[] chain, String authType)
+              throws CertificateException {
+          }
+
+          @Override
+          public X509Certificate[] getAcceptedIssuers() {
+            return null;
+          }
+        };
+        sslContext.init((KeyManager[]) null, new TrustManager[]{tm}, (SecureRandom) null);
+        return sslContext;
+      } catch (NoSuchAlgorithmException | KeyManagementException e) {
+        e.printStackTrace();
+        throw new RuntimeException("init ssl error", e);
+      }
     }
+    if (!httpConfig.isCustomKeyTrustEnable()) {
+      return SSLContexts.createDefault();
+    }
+    SSLContextBuilder sslContextBuilder = SSLContextBuilder.create();
+    String keyMaterialPath = httpConfig.getKeyMaterialPath();
+    String keyPassword = httpConfig.getKeyPassword();
+    String storePassword = httpConfig.getStorePassword();
+    String trustMaterialPath = httpConfig.getTrustMaterialPath();
+    TrustStrategy trustStrategy =
+        "self".equalsIgnoreCase(httpConfig.getTrustStrategy())
+            ? new TrustSelfSignedStrategy() : new TrustAllStrategy();
+    try {
+      sslContextBuilder.loadKeyMaterial(new File(keyMaterialPath), storePassword.toCharArray(),
+          keyPassword.toCharArray());
+      sslContextBuilder
+          .loadTrustMaterial(new File(trustMaterialPath), storePassword.toCharArray(),
+              trustStrategy);
+      return sslContextBuilder.build();
+    } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableKeyException | CertificateException | IOException | KeyManagementException e) {
+      e.printStackTrace();
+      throw new RuntimeException("init ssl error", e);
+    }
+  }
+
+
+  public static void post(String url, String body, Map<String, String> headers, int count) {
+    HttpPost httpPost = new HttpPost(url);
+    logger.debug(body);
+    CloseableHttpResponse response = null;
+    String requestId = getXRequestID();
+    Map object = null;
+    try {
+      StringEntity entity = new StringEntity(body, ContentType.APPLICATION_JSON);
+      httpPost.setHeaders(EventConfig.headers);
+      httpPost.addHeader(new BasicHeader("X-Request-ID", requestId));
+      httpPost.setEntity(entity);
+      response = (CloseableHttpResponse) httpClient.execute(httpPost);
+      String resultStr = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+      object = RangersJSONConfig.getInstance().fromJson(resultStr, Map.class);
+      if (object != null &&
+          (object.containsKey("message") && "success".equals(object.get("message").toString())
+              || (object.containsKey("responses")))) {
+        logger.debug("Send Success:" + url);
+        logger.debug(resultStr);
+      } else {
+        logger.error("HTTP ERROR: " + response.getEntity().toString());
+        logger.error(
+            "requestId=" + requestId + ",url=" + url + ",body=" + body + ",header=" + headers
+                + ",result:" + resultStr);
+        writeFailedMessage(body);
+      }
+    } catch (IOException e) {
+      if (count > 2) {
+        logger.error(e.toString());
+        writeFailedMessage(body);
+      } else {
+        count++;
+        post(url, body, headers, count);
+      }
+    } catch (ParseException e) {
+      logger.error(
+          "Parse Json error:requestId=" + requestId + ",url=" + url + ",body=" + body + ",header="
+              + headers);
+      writeFailedMessage(body);
+    } finally {
+      try {
+        if (response != null) {
+          response.close();
+        }
+      } catch (IOException e) {
+        logger.error(e.toString());
+      }
+    }
+  }
+
+  public static void post(String url, String body, Map<String, String> headers) {
+    if (body == null) {
+      return;
+    }
+    post(url, body, headers, 1);
+  }
+
+  public static String getXRequestID() {
+    return UUID.randomUUID().toString()
+        .replaceAll("-", String.valueOf(new SecureRandom().nextInt(10)));
+  }
+
 }
 
