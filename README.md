@@ -19,6 +19,17 @@ datarangers-sdk-java是 [DataRangers](https://datarangers.com.cn/) 的用户行�
 
 version是sdk的版本号，当前最新的版本为1.4.3-release。
 
+火山引擎仓库地址：
+```xml
+<repositories>
+  <repository>
+    <id>bytedance-volcengine</id>
+    <name>bytedance Volcengine</name>
+    <url>https://artifact.bytedance.com/repository/Volcengine</url>
+  </repository>
+</repositories>
+```
+
 ### 2. 配置SDK
 DataRangers SDK需要进行一定的参数配置才能够使用，具体需要配置的参数为：
 * domain：datarangers的域名或者ip，支持http和https，例如为 http://www.datarangers.com，在私有化环境中，需要修改为对应的sdk上报域名或者使用DataRangers服务器的ip地址。

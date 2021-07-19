@@ -7,13 +7,6 @@
     <packaging>jar</packaging>
     <groupId>com.datarangers</groupId>
     <artifactId>datarangers-sdk-starter</artifactId>
-    <distributionManagement>
-        <repository>
-            <id>bintray-bytedancer-Volcengine</id>
-            <name>bytedancer-Volcengine</name>
-            <url>https://api.bintray.com/maven/bytedancer/Volcengine/datarangers-sdk-starter/;publish=1</url>
-        </repository>
-    </distributionManagement>
     <name>datarangers-server-sdk-starter</name>
     <description>A SDK for datarangers user</description>
     <url>https://github.com/volcengine/datarangers-sdk-java</url>

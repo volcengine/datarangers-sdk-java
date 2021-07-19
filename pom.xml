@@ -17,13 +17,6 @@
         <module>datarangers-sdk-core</module>
         <module>datarangers-sdk-starter</module>
     </modules>
-    <distributionManagement>
-        <repository>
-            <id>bintray-bytedancer-Volcengine</id>
-            <name>bytedancer-Volcengine</name>
-            <url>https://api.bintray.com/maven/bytedancer/Volcengine/datarangers-sdk/;publish=1</url>
-        </repository>
-    </distributionManagement>
     <dependencyManagement>
         <dependencies>
             <dependency>

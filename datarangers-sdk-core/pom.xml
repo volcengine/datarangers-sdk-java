@@ -28,13 +28,6 @@
         </developer>
     </developers>
     <artifactId>datarangers-sdk-core</artifactId>
-    <distributionManagement>
-        <repository>
-            <id>bintray-bytedancer-Volcengine</id>
-            <name>bytedancer-Volcengine</name>
-            <url>https://api.bintray.com/maven/bytedancer/Volcengine/datarangers-sdk-core/;publish=1</url>
-        </repository>
-    </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
