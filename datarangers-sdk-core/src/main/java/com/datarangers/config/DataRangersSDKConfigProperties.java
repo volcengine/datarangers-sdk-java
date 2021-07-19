@@ -10,6 +10,7 @@ import com.datarangers.asynccollector.*;
 import com.datarangers.collector.Collector;
 import com.datarangers.logger.RangersFileCleaner;
 import com.datarangers.util.HttpUtils;
+import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.message.BasicHeader;
 import org.slf4j.Logger;
@@ -32,7 +33,13 @@ public class DataRangersSDKConfigProperties {
     public int threadPoolCount = 1;
     public int maxPoolSize = 8;
     public int corePoolSize = 4;
+
+    /**
+     * 该配置过期，请使用httpConfig的配置
+     */
+    @Deprecated
     public int httpTimeout = 500;
+
     public String timeZone = "+8";
     public ZoneOffset timeOffset = null;
     public boolean save = false;
@@ -61,6 +68,10 @@ public class DataRangersSDKConfigProperties {
 
     public boolean hasConsumer = true;
     public boolean hasProducer = true;
+
+    private HttpConfig httpConfig = new HttpConfig();
+
+    private HttpClient customHttpClient;
 
     public boolean isHasConsumer() {
         return hasConsumer;
@@ -246,11 +257,12 @@ public class DataRangersSDKConfigProperties {
     }
 
     public void setCommon() {
-        HttpUtils.setRequestTimeOut(getHttpTimeout());
         EventConfig.saveFlag = save;
         EventConfig.sendFlag = !save;
         if (!save) {
-            HttpUtils.createHttpClient();
+            httpConfig = this.getHttpConfig();
+            httpConfig.initTimeOut(getHttpTimeout());
+            HttpUtils.createHttpClient(this.getHttpConfig(), this.getCustomHttpClient());
             if (EventConfig.SEND_HEADER == null) {
                 EventConfig.SEND_HEADER = getHeaders();
                 EventConfig.SEND_HEADER.put("User-Agent", "DataRangers Java SDK");
@@ -321,6 +333,22 @@ public class DataRangersSDKConfigProperties {
     public DataRangersSDKConfigProperties setUserQueue(CollectorQueue userQueue) {
         this.userQueue = userQueue;
         return this;
+    }
+
+    public HttpConfig getHttpConfig() {
+        return httpConfig;
+    }
+
+    public void setHttpConfig(HttpConfig httpConfig) {
+        this.httpConfig = httpConfig;
+    }
+
+    public HttpClient getCustomHttpClient() {
+        return customHttpClient;
+    }
+
+    public void setCustomHttpClient(HttpClient customHttpClient) {
+        this.customHttpClient = customHttpClient;
     }
 }
 
