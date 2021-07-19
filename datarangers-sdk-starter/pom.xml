@@ -3,17 +3,10 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <version>1.4.2-release</version>
+    <version>1.4.3-release</version>
     <packaging>jar</packaging>
     <groupId>com.datarangers</groupId>
     <artifactId>datarangers-sdk-starter</artifactId>
-    <distributionManagement>
-        <repository>
-            <id>bintray-bytedancer-Volcengine</id>
-            <name>bytedancer-Volcengine</name>
-            <url>https://api.bintray.com/maven/bytedancer/Volcengine/datarangers-sdk-starter/;publish=1</url>
-        </repository>
-    </distributionManagement>
     <name>datarangers-server-sdk-starter</name>
     <description>A SDK for datarangers user</description>
     <url>https://github.com/volcengine/datarangers-sdk-java</url>
@@ -28,7 +21,7 @@
         <dependency>
             <groupId>com.datarangers</groupId>
             <artifactId>datarangers-sdk-core</artifactId>
-            <version>1.4.2-release</version>
+            <version>1.4.3-release</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

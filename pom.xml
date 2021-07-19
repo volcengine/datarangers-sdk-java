@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <properties>
-        <sdk.version>1.4.2-release</sdk.version>
+        <sdk.version>1.4.3-release</sdk.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
@@ -12,18 +12,11 @@
     <groupId>com.datarangers</groupId>
     <artifactId>datarangers-sdk</artifactId>
     <packaging>pom</packaging>
-    <version>1.4.2-release</version>
+    <version>1.4.3-release</version>
     <modules>
         <module>datarangers-sdk-core</module>
         <module>datarangers-sdk-starter</module>
     </modules>
-    <distributionManagement>
-        <repository>
-            <id>bintray-bytedancer-Volcengine</id>
-            <name>bytedancer-Volcengine</name>
-            <url>https://api.bintray.com/maven/bytedancer/Volcengine/datarangers-sdk/;publish=1</url>
-        </repository>
-    </distributionManagement>
     <dependencyManagement>
         <dependencies>
             <dependency>

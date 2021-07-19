@@ -5,10 +5,10 @@
     <parent>
         <artifactId>datarangers-sdk</artifactId>
         <groupId>com.datarangers</groupId>
-        <version>1.4.2-release</version>
+        <version>1.4.3-release</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <version>1.4.2-release</version>
+    <version>1.4.3-release</version>
     <packaging>jar</packaging>
     <name>datarangers-server-sdk-core</name>
     <description>A SDK for datarangers user</description>
@@ -28,13 +28,6 @@
         </developer>
     </developers>
     <artifactId>datarangers-sdk-core</artifactId>
-    <distributionManagement>
-        <repository>
-            <id>bintray-bytedancer-Volcengine</id>
-            <name>bytedancer-Volcengine</name>
-            <url>https://api.bintray.com/maven/bytedancer/Volcengine/datarangers-sdk-core/;publish=1</url>
-        </repository>
-    </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
