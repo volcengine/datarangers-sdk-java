@@ -6,29 +6,54 @@
  */
 package com.datarangers.message;
 
-import com.datarangers.event.Event;
-import com.datarangers.event.Header;
-
 import java.io.Serializable;
-import java.util.List;
 
-public interface Message extends Serializable {
-    void merge();
+/**
+ * 消息
+ */
+public class Message implements Serializable {
 
-    void setUserUniqueId(String uuid);
-    String getUserUniqueId();
+    /**
+     * 消息环境
+     */
+    private MessageEnv messageEnv;
+    /**
+     * 消息类型
+     */
+    private MessageType messageType;
+    /**
+     * 消息内容
+     */
+    private AppMessage appMessage;
 
-    void setAppType(String appType);
+    public MessageEnv getMessageEnv() {
+        return messageEnv;
+    }
 
-    void setHeader(Header header);
+    public void setMessageEnv(MessageEnv messageEnv) {
+        this.messageEnv = messageEnv;
+    }
 
-    void addEvent(Event event);
+    public MessageType getMessageType() {
+        return messageType;
+    }
 
-    void addEvents(List<Event> events);
+    public void setMessageType(MessageType messageType) {
+        this.messageType = messageType;
+    }
 
-    List<Event> getEvents();
+    public AppMessage getAppMessage() {
+        return appMessage;
+    }
 
-    int getAppId();
+    public void setAppMessage(AppMessage appMessage) {
+        this.appMessage = appMessage;
+    }
 
-    String getUrl();
+    public void merge() {
+        if (this.appMessage != null) {
+            this.appMessage.merge();
+        }
+    }
+
 }

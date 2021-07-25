@@ -11,6 +11,7 @@ import com.datarangers.config.EventConfig;
 import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.logger.RangersLoggerWriter;
 import java.io.File;
+import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -23,6 +24,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -170,17 +172,32 @@ public class HttpUtils {
 
 
   public static void post(String url, String body, Map<String, String> headers, int count) {
-    HttpPost httpPost = new HttpPost(url);
+    request("POST", url, body, headers, count);
+  }
+
+  public static void request(String method, String url, String body, Map<String, String> headers) {
+    if (body == null) {
+      return;
+    }
+    request(method, url, body, headers, 1);
+  }
+
+  public static void request(String method, String url, String body, Map<String, String> headers,
+      int count) {
+    HttpUriRequestBase httpRequest = new HttpUriRequestBase(method.toUpperCase(), URI.create(url));
     logger.debug(body);
     CloseableHttpResponse response = null;
     String requestId = getXRequestID();
     Map object = null;
     try {
       StringEntity entity = new StringEntity(body, ContentType.APPLICATION_JSON);
-      httpPost.setHeaders(EventConfig.headers);
-      httpPost.addHeader(new BasicHeader("X-Request-ID", requestId));
-      httpPost.setEntity(entity);
-      response = (CloseableHttpResponse) httpClient.execute(httpPost);
+      httpRequest.addHeader(new BasicHeader("X-Request-ID", requestId));
+      if (headers != null) {
+        headers.entrySet().stream().forEach(
+            entry -> httpRequest.addHeader(new BasicHeader(entry.getKey(), entry.getValue())));
+      }
+      httpRequest.setEntity(entity);
+      response = (CloseableHttpResponse) httpClient.execute(httpRequest);
       String resultStr = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
       object = RangersJSONConfig.getInstance().fromJson(resultStr, Map.class);
       if (object != null &&
@@ -191,8 +208,9 @@ public class HttpUtils {
       } else {
         logger.error("HTTP ERROR: " + response.getEntity().toString());
         logger.error(
-            "requestId=" + requestId + ",url=" + url + ",body=" + body + ",header=" + headers
-                + ",result:" + resultStr);
+            "Parse Json error:requestId={}, method={}, url={}, body={},header={}", requestId, method,
+            url, body,
+            headers);
         writeFailedMessage(body);
       }
     } catch (IOException e) {
@@ -205,8 +223,9 @@ public class HttpUtils {
       }
     } catch (ParseException e) {
       logger.error(
-          "Parse Json error:requestId=" + requestId + ",url=" + url + ",body=" + body + ",header="
-              + headers);
+          "Parse Json error:requestId={}, method={}, url={}, body={},header={}", requestId, method,
+          url, body,
+          headers);
       writeFailedMessage(body);
     } finally {
       try {

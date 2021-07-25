@@ -9,7 +9,9 @@ package com.datarangers.config;
 import com.datarangers.asynccollector.*;
 import com.datarangers.collector.Collector;
 import com.datarangers.logger.RangersFileCleaner;
+import com.datarangers.message.MessageEnv;
 import com.datarangers.util.HttpUtils;
+import java.util.Arrays;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.message.BasicHeader;
@@ -72,6 +74,21 @@ public class DataRangersSDKConfigProperties {
     private HttpConfig httpConfig = new HttpConfig();
 
     private HttpClient customHttpClient;
+
+    /**
+     * saas 或者 privatization(私有化)
+     */
+    private String env = "privatization";
+
+    private List<String> SAAS_DOMAIN_URLS = Arrays.asList(
+        "https://mcs.ctobsnssdk.com",
+        "https://mcs.tobsnssdk.com",
+        "https://mcs.itobsnssdk.com");
+
+    /**
+     * saas openapi 配置地址
+     */
+    private OpenapiConfig openapiConfig = new OpenapiConfig();
 
     public boolean isHasConsumer() {
         return hasConsumer;
@@ -276,6 +293,7 @@ public class DataRangersSDKConfigProperties {
         EventConfig.setUrl(getDomain());
     }
 
+
     public Executor setThreadPool() {
         return Executors.newFixedThreadPool(getCorePoolSize());
     }
@@ -297,7 +315,7 @@ public class DataRangersSDKConfigProperties {
             //有消费者才初始化消费者
             Collector.httpRequestPool = setThreadPool();
             for (int i = 0; i < threadCount; i++) {//必须全部消费同一个队列
-                Collector.httpRequestPool.execute(new Consumer(Collector.collectorContainer));
+                Collector.httpRequestPool.execute(new Consumer(Collector.collectorContainer, this));
             }
         }
         if(hasProducer){
@@ -349,6 +367,29 @@ public class DataRangersSDKConfigProperties {
 
     public void setCustomHttpClient(HttpClient customHttpClient) {
         this.customHttpClient = customHttpClient;
+    }
+
+    public String getEnv() {
+        return env;
+    }
+
+    public void setEnv(String env) {
+        this.env = env;
+    }
+
+    public OpenapiConfig getOpenapiConfig() {
+        return openapiConfig;
+    }
+
+    public void setOpenapiConfig(OpenapiConfig openapiConfig) {
+        this.openapiConfig = openapiConfig;
+    }
+
+    public MessageEnv getMessageEnv() {
+        if ("saas".equalsIgnoreCase(getEnv()) || SAAS_DOMAIN_URLS.contains(getDomain())) {
+            return MessageEnv.SAAS;
+        }
+        return MessageEnv.PRIVATIZATION;
     }
 }
 

@@ -6,17 +6,18 @@
  */
 package com.datarangers.message;
 
-import com.datarangers.config.EventConfig;
 import com.datarangers.event.Event;
 import com.datarangers.event.Header;
 import com.datarangers.event.HeaderV3;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AppMessage implements Message {
+/**
+ * applog 消息
+ */
+public class AppMessage {
     @JsonProperty("app_type")
     private String appType;
 
@@ -41,9 +42,6 @@ public class AppMessage implements Message {
     @JsonProperty("event_v3")
     private List<Event> events = new ArrayList<>();
 
-    @JsonIgnore
-    private String url;
-
     public HeaderV3 getHeader() {
         return header;
     }
@@ -65,18 +63,14 @@ public class AppMessage implements Message {
         this.events.addAll(events);
     }
 
-    @Override
-    public String getUrl() {
-        return EventConfig.getAppUrl();
-    }
 
     public void addEvent(Event event) {
         events.add(event);
     }
 
     public void merge() {
-        if (header.getDeviceId() < 0) {
-            header.setDeviceId(1l);
+        if (header.getDeviceId() !=null && header.getDeviceId() < 0) {
+            header.setDeviceId(1L);
         }
     }
 
