@@ -6,10 +6,14 @@
  */
 package com.datarangers.asynccollector;
 
+import com.datarangers.config.DataRangersSDKConfigProperties;
 import com.datarangers.config.EventConfig;
 import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.logger.RangersLoggerWriterPool;
+import com.datarangers.message.AppMessage;
 import com.datarangers.message.Message;
+import com.datarangers.message.saas.SaasServerAppMessage;
+import com.datarangers.sender.MessageSenderFactory;
 import com.datarangers.util.HttpUtils;
 
 import java.util.List;
@@ -17,9 +21,11 @@ import java.util.List;
 public class Consumer implements Runnable {
     private static RangersLoggerWriterPool pool;
     private CollectorContainer collectorContainer;
+    private DataRangersSDKConfigProperties sdkConfigProperties;
 
-    public Consumer(CollectorContainer collectorContainer) {
+    public Consumer(CollectorContainer collectorContainer, DataRangersSDKConfigProperties sdkConfigProperties) {
         this.collectorContainer = collectorContainer;
+        this.sdkConfigProperties = sdkConfigProperties;
     }
 
     public static void setWriterPool(final List<String> targetPrefixes, String targetNames, int maxSize) {
@@ -38,7 +44,7 @@ public class Consumer implements Runnable {
                 List<Message> messages = collectorContainer.consume();
                 if (messages != null) {
                     messages.forEach(message -> {
-                        HttpUtils.post(EventConfig.getAppUrl(), RangersJSONConfig.getInstance().toJson(message), EventConfig.SEND_HEADER);
+                        MessageSenderFactory.getMessageSender(message).senderMessage(message, this.sdkConfigProperties);
                     });
                 }
             } catch (InterruptedException e) {
@@ -52,7 +58,8 @@ public class Consumer implements Runnable {
             List<Message> messages = collectorContainer.consume();
             if (messages != null) {
                 messages.forEach(message -> {
-                    pool.getWriter(message.getUserUniqueId()).write(RangersJSONConfig.getInstance().toJson(message) + "\n");
+                    AppMessage appMessage = message.getAppMessage();
+                    pool.getWriter(appMessage.getUserUniqueId()).write(RangersJSONConfig.getInstance().toJson(appMessage) + "\n");
                 });
             }
         }

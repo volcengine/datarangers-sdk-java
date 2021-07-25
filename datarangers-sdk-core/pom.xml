@@ -5,10 +5,9 @@
     <parent>
         <artifactId>datarangers-sdk</artifactId>
         <groupId>com.datarangers</groupId>
-        <version>1.4.3-release</version>
+        <version>1.4.5-release</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <version>1.4.3-release</version>
     <packaging>jar</packaging>
     <name>datarangers-server-sdk-core</name>
     <description>A SDK for datarangers user</description>
@@ -27,7 +26,9 @@
             <organizationUrl>https://datarangers.com.cn/</organizationUrl>
         </developer>
     </developers>
+    <groupId>com.datarangers</groupId>
     <artifactId>datarangers-sdk-core</artifactId>
+    <version>1.4.5-release</version>
     <dependencies>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
@@ -74,14 +75,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.0</version>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <encoding>UTF-8</encoding>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
