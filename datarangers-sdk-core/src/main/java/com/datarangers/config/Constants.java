@@ -16,7 +16,7 @@ public class Constants {
     public static final String SDK_VERSION = "datarangers_sdk_1.3.5-release";
     public static DateTimeFormatter FULL_HOUR = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH");
     public static DateTimeFormatter FULL_DAY = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    public static final String APP_LOG_URL = "/sdk/log";
+    public static final String APP_LOG_PATH = "/sdk/log";
     public static final String DEFAULT_USER = "__rangers";
 
     public static final String INIT_ERROR = "sdk config must not be null";

@@ -31,8 +31,8 @@ public class CollectorContainer {
         if (messages == null) {
             return null;
         }
-        messages.forEach(message -> message.getEvents().forEach(event -> {
-            int appId = message.getAppId();
+        messages.forEach(message -> message.getAppMessage().getEvents().forEach(event -> {
+            int appId = message.getAppMessage().getAppId();
             String eventName = event.getEvent();
             String date = event.getDatetime().substring(0, 13);
             if (!SEND_HISTORY.containsKey(date)) {
