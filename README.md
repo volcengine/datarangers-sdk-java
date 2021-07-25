@@ -13,11 +13,11 @@ datarangers-sdk-java是 [DataRangers](https://datarangers.com.cn/) 的用户行�
 <dependency>
   <groupId>com.datarangers</groupId>
   <artifactId>datarangers-sdk-core</artifactId>
-  <version>1.4.3-release</version>
+  <version>1.4.5-release</version>
 </dependency>
 ```
 
-version是sdk的版本号，当前最新的版本为1.4.3-release。
+version是sdk的版本号，当前最新的版本为1.4.5-release。
 
 火山引擎仓库地址：
 ```xml
@@ -32,7 +32,10 @@ version是sdk的版本号，当前最新的版本为1.4.3-release。
 
 ### 2. 配置SDK
 DataRangers SDK需要进行一定的参数配置才能够使用，具体需要配置的参数为：
-* domain：datarangers的域名或者ip，支持http和https，例如为 http://www.datarangers.com，在私有化环境中，需要修改为对应的sdk上报域名或者使用DataRangers服务器的ip地址。
+* domain：datarangers的域名或者ip，支持http和https，例如为 http://www.datarangers.com，在私有化环境中，需要修改为对应的sdk上报域名或者使用DataRangers服务器的ip地址。在saas环境中需要修改成对应的域名：
+    * 中国区：https://mcs.ctobsnssdk.com
+    * sg(新加坡): https://mcs.tobsnssdk.com
+    * va(美东): https://mcs.itobsnssdk.com  
 * save：bool型变量，表示是否保存到文件：
     * true：保存到文件，但是需要配置LogAgent完成事件上报功能,需要额外定义：
     * eventSaveName：保存日志的文件名，需要保证文件的写权限。
@@ -77,7 +80,7 @@ DataRangers SDK需要进行一定的参数配置才能够使用，具体需要�
 <dependency>
    <groupId>com.datarangers</groupId>
    <artifactId>datarangers-sdk-starter</artifactId>
-   <version>1.4.3-release</version>
+   <version>1.4.5-release</version>
 </dependency>
 ```
 
@@ -85,11 +88,23 @@ DataRangers SDK需要进行一定的参数配置才能够使用，具体需要�
 ```properties
 # 使能sdk功能,为false就disable sdk功能
 datarangers.sdk.enable=true
+
+# privatization 表示是私有化环境， saas表示是saas环境，默认是私有化环境。sdk会根据配置的datarangers.sdk.domain自动识别是否是saas环境，该配置可选
+# datarangers.sdk.env=privatization
 # rangers的ip或域名
 datarangers.sdk.domain=http://domain
-# datarangers.sdk.headers为http请求中headers字段内容,必须要添加Host,其他如果需要设置的可以选填
+
+# datarangers.sdk.headers为http请求中headers字段内容,在私有化环境中必须要添加Host，而在saas环境中 不能配置Host,其他如果需要设置的可以选填
 # Host的配置在安装部署的那台机器上，查看/home/datarangers/DataRangersDeploy/conf_rangers.yml中配置项sdk.report.host
 datarangers.sdk.headers.Host=host
+
+# 如果是在saas环境中，需要配置openapi, 私有化环境中可以不配置
+# openapi的domain， 国内: https://analytics.volcengineapi.com，国际是: https://datarangers.com
+# datarangers.sdk.openapiConfig.domain=xxx
+
+# openapi的ak, sk
+# datarangers.sdk.openapiConfig.ak=xxx
+# datarangers.sdk.openapiConfig.sk=xxx
 
 
 # 是否保存到本地,如果需要配合logagent使用需要将其定义为true

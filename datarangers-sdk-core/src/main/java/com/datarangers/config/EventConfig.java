@@ -18,7 +18,7 @@ public class EventConfig {
     public static boolean sendFlag = true;
 
     public static void setUrl(String url) {
-        setAppUrl(url + Constants.APP_LOG_URL);
+        setAppUrl(url + Constants.APP_LOG_PATH);
     }
 
     public static String getAppUrl() {

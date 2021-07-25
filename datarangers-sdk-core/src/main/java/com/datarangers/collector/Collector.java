@@ -28,9 +28,11 @@ public abstract class Collector implements EventCollector {
     public static CollectorContainer collectorContainer;
 
     private boolean enable;
+    protected DataRangersSDKConfigProperties properties;
 
     public Collector(String appType, DataRangersSDKConfigProperties properties) {
         enable = properties.isEnable();
+        this.properties = properties;
     }
 
     public String getAppType() {
