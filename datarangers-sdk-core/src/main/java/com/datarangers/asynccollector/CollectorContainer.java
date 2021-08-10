@@ -6,18 +6,19 @@
  */
 package com.datarangers.asynccollector;
 
+import com.datarangers.event.Event;
 import com.datarangers.message.Message;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.LongAdder;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author hTangle
  */
 public class CollectorContainer {
     private CollectorQueue messageQueue;
-    public static final ConcurrentHashMap<String, ConcurrentHashMap<String, LongAdder>> SEND_HISTORY = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<String, ConcurrentHashMap<String, AtomicLong>> SEND_HISTORY = new ConcurrentHashMap<>();
 
     public CollectorContainer(CollectorQueue messageQueue) {
         this.messageQueue = messageQueue;
@@ -31,20 +32,22 @@ public class CollectorContainer {
         if (messages == null) {
             return null;
         }
-        messages.forEach(message -> message.getAppMessage().getEvents().forEach(event -> {
-            int appId = message.getAppMessage().getAppId();
-            String eventName = event.getEvent();
-            String date = event.getDatetime().substring(0, 13);
-            if (!SEND_HISTORY.containsKey(date)) {
-                SEND_HISTORY.put(date, new ConcurrentHashMap<>());
+        for(Message message:messages){
+            for(Event event:message.getAppMessage().getEvents()){
+                int appId = message.getAppMessage().getAppId();
+                String eventName = event.getEvent();
+                String date = event.getDatetime().substring(0, 13);
+                if (!SEND_HISTORY.containsKey(date)) {
+                    SEND_HISTORY.put(date, new ConcurrentHashMap<String, AtomicLong>());
+                }
+                String key = appId + "-" + eventName;
+                ConcurrentHashMap<String, AtomicLong> map = SEND_HISTORY.get(date);
+                if (!map.containsKey(key)) {
+                    map.put(key, new AtomicLong());
+                }
+                map.get(key).incrementAndGet();
             }
-            String key = appId + "-" + eventName;
-            ConcurrentHashMap<String, LongAdder> map = SEND_HISTORY.get(date);
-            if (!map.containsKey(key)) {
-                map.put(key, new LongAdder());
-            }
-            map.get(key).increment();
-        }));
+        }
         return messages;
     }
 

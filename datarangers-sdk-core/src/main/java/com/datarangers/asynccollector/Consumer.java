@@ -12,9 +12,7 @@ import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.logger.RangersLoggerWriterPool;
 import com.datarangers.message.AppMessage;
 import com.datarangers.message.Message;
-import com.datarangers.message.saas.SaasServerAppMessage;
 import com.datarangers.sender.MessageSenderFactory;
-import com.datarangers.util.HttpUtils;
 
 import java.util.List;
 
@@ -43,9 +41,9 @@ public class Consumer implements Runnable {
             try {
                 List<Message> messages = collectorContainer.consume();
                 if (messages != null) {
-                    messages.forEach(message -> {
+                    for(Message message:messages){
                         MessageSenderFactory.getMessageSender(message).senderMessage(message, this.sdkConfigProperties);
-                    });
+                    }
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -57,10 +55,10 @@ public class Consumer implements Runnable {
         while (true) {
             List<Message> messages = collectorContainer.consume();
             if (messages != null) {
-                messages.forEach(message -> {
+                for(Message message:messages){
                     AppMessage appMessage = message.getAppMessage();
                     pool.getWriter(appMessage.getUserUniqueId()).write(RangersJSONConfig.getInstance().toJson(appMessage) + "\n");
-                });
+                }
             }
         }
     }

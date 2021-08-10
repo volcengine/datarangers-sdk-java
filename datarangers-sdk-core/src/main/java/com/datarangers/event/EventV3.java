@@ -11,12 +11,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
-import java.time.Instant;
-import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author hezhiwei.alden@bytedance.com
@@ -31,7 +32,7 @@ public class EventV3 implements Event, Serializable {
     private Long localTimeMs = System.currentTimeMillis();
 
     @JsonProperty("datetime")
-    private String datetime = LocalDateTime.now().format(Constants.FULL_DAY);
+    private String datetime = new SimpleDateFormat(Constants.FULL_DAY).format(new Date());
 
     private Integer eventId;
 
@@ -64,25 +65,32 @@ public class EventV3 implements Event, Serializable {
     @Override
     public EventV3 setParams(Map<String, Object> params) {
         if (params != null) {
-            params.forEach((key, value) -> {
+            for(Entry<String, Object> entry: params.entrySet()){
+                String key = entry.getKey();
+                Object value = entry.getValue();
                 if (value instanceof Item) {
                     Map<String, Object> itemMap = new HashMap<>();
                     itemMap.put("id", ((Item) value).getItemId());
                     String name = ((Item) value).getItemName();
-                    List<Object> list = itemParams.getOrDefault(name, new ArrayList<>());
+                    List<Object> list = itemParams.get(name);
+                    if(list == null){
+                        list = new ArrayList<>();
+                    }
                     list.add(itemMap);
                     itemParams.put(name, list);
                 } else {
                     this.params.put(key, value);
                 }
-            });
+            }
             if (itemParams.size() > 0) {
                 List<Object> itemP = new ArrayList<>();
-                itemParams.forEach((key, value) -> {
+                for (Entry<String, List<Object>> entry : itemParams.entrySet()) {
+                    String key = entry.getKey();
+                    List<Object> value = entry.getValue();
                     Map<String, List<Object>> res = new HashMap<>();
                     res.put(key, value);
                     itemP.add(res);
-                });
+                }
                 this.params.put("__items", itemP);
             }
         }
@@ -116,7 +124,9 @@ public class EventV3 implements Event, Serializable {
     @Override
     public EventV3 setLocalTimeMs(Long localTimeMs) {
         this.localTimeMs = localTimeMs;
-        this.datetime = LocalDateTime.ofInstant(Instant.ofEpochMilli(localTimeMs), Constants.TIME_ZONE_ID).format(Constants.FULL_DAY);
+        SimpleDateFormat sdf = new SimpleDateFormat(Constants.FULL_DAY);
+        sdf.setTimeZone(Constants.TIME_ZONE_ID);
+        this.datetime = sdf.format(new Date(localTimeMs));
         return this;
     }
 

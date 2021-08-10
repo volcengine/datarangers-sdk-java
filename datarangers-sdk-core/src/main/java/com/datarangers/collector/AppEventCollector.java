@@ -18,6 +18,7 @@ import com.datarangers.profile.ProfileMethod;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author hTangle
@@ -122,7 +123,9 @@ public class AppEventCollector extends Collector {
   @Override
   public void profileUnset(String userUniqueId, int appId, List<String> params) {
     Map<String, Object> eventParams = new HashMap<>();
-    params.forEach(p -> eventParams.put(p, "java"));
+    for (String p : params) {
+      eventParams.put(p, "java");
+    }
     profile(userUniqueId, appId, ProfileMethod.UNSET, eventParams);
   }
 
@@ -142,7 +145,9 @@ public class AppEventCollector extends Collector {
         .build();
     List<Event> events = new ArrayList<>();
     Map<String, Object> eventParams = new HashMap<>();
-    params.forEach(p -> eventParams.put(p, ""));
+    for (String p : params) {
+      eventParams.put(p, "");
+    }
     events.add(new EventV3().
         setEvent(ItemMethod.UNSET.toString()).
         addParams("item_id", id).addParams("item_name", name).setParams(eventParams));
@@ -165,9 +170,14 @@ public class AppEventCollector extends Collector {
       if (item != null) {
         Event event = new EventV3().setEvent(eventName);
         try {
-          RangersJSONConfig.getInstance()
-              .fromJson(RangersJSONConfig.getInstance().toJson(item), Map.class)
-              .forEach((key, value) -> event.addParams((String) key, value));
+          Map<String, Object> map = RangersJSONConfig.getInstance()
+              .fromJson(RangersJSONConfig.getInstance().toJson(item), Map.class);
+
+          for (Entry<String, Object> entry : map.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            event.addParams(key, value);
+          }
         } catch (IOException e) {
           e.printStackTrace();
         }

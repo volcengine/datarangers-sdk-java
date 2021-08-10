@@ -3,7 +3,8 @@ package com.datarangers.event;
 import com.datarangers.config.Constants;
 import com.datarangers.config.RangersJSONConfig;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @Author zhangpeng.spin@bytedance.com
@@ -19,7 +20,7 @@ public class SaasServerEvent {
   private Long localTimeMs = System.currentTimeMillis();
 
   @JsonProperty("datetime")
-  private String datetime = LocalDateTime.now().format(Constants.FULL_DAY);
+  private String datetime = new SimpleDateFormat(Constants.FULL_DAY).format(new Date());
 
   private Long teaEventIndex;
 

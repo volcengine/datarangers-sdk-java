@@ -14,7 +14,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +61,7 @@ public class RangersLoggerWriter implements RangersFileWriter {
         // 如果文件存在且大于限制大小
         if (output.exists() && output.length() / 1024 / 1024 > maxSize) {
             //文件名应该一直叫targetName
-            String currentHour = targetName + "." + LocalDateTime.now().format(Constants.FULL_HOUR);
+            String currentHour = targetName + "." + new SimpleDateFormat(Constants.FULL_HOUR).format(new Date());
             if (currentHour.equals(currentName)) {
                 //如果文件当前hour相同
                 //如果大于,需要将文件重命名
@@ -104,7 +105,7 @@ public class RangersLoggerWriter implements RangersFileWriter {
         if (this.currentIndex == 0) this.currentIndex++;
         fullTarget = this.targetPrefix + "/" + this.targetName;
         this.output = new File(fullTarget);
-        currentName = targetName + "." + LocalDateTime.now().format(Constants.FULL_HOUR);
+        currentName = targetName + "." + new SimpleDateFormat(Constants.FULL_HOUR).format(new Date());
         try {
             stream = new FileOutputStream(output, true);
         } catch (FileNotFoundException e) {
@@ -119,7 +120,7 @@ public class RangersLoggerWriter implements RangersFileWriter {
     }
 
     private int setCurrentIndex() {
-        String current = LocalDateTime.now().format(Constants.FULL_HOUR);
+        String current = new SimpleDateFormat(Constants.FULL_HOUR).format(new Date());
         String full = targetName + "-" + current + "-";
         int number = 0;
         for (File f : new File(targetPrefix).listFiles()) {

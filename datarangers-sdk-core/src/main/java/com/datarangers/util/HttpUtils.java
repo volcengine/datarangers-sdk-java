@@ -18,8 +18,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Map.Entry;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import org.apache.hc.client5.http.classic.HttpClient;
@@ -86,7 +89,12 @@ public class HttpUtils {
               SSLConnectionSocketFactory sslSocketFactory;
               if (httpConfig.isTrustDisable()) {
                 sslSocketFactory =
-                    new SSLConnectionSocketFactory(sslContext, (s, sslSession) -> true);
+                    new SSLConnectionSocketFactory(sslContext, new HostnameVerifier() {
+                      @Override
+                      public boolean verify(String s, SSLSession sslSession) {
+                        return true;
+                      }
+                    });
               } else {
                 sslSocketFactory = SSLConnectionSocketFactory.getSocketFactory();
               }
@@ -193,8 +201,9 @@ public class HttpUtils {
       StringEntity entity = new StringEntity(body, ContentType.APPLICATION_JSON);
       httpRequest.addHeader(new BasicHeader("X-Request-ID", requestId));
       if (headers != null) {
-        headers.entrySet().stream().forEach(
-            entry -> httpRequest.addHeader(new BasicHeader(entry.getKey(), entry.getValue())));
+        for(Entry<String,String> entry:headers.entrySet()){
+          httpRequest.addHeader(new BasicHeader(entry.getKey(), entry.getValue()));
+        }
       }
       httpRequest.setEntity(entity);
       response = (CloseableHttpResponse) httpClient.execute(httpRequest);

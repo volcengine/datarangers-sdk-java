@@ -10,7 +10,6 @@ import com.datarangers.message.Message;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @Author zhangpeng.spin@bytedance.com
@@ -38,8 +37,9 @@ public class SaasServerAppMessage {
     this.setHeader(appMessage.getHeader());
     List<Event> appEvents = appMessage.getEvents();
     if (appEvents != null) {
-      events.addAll(appEvents.stream().map(n -> new SaasServerEvent((EventV3) n))
-          .collect(Collectors.toList()));
+      for(Event event:appEvents){
+        events.add(new SaasServerEvent((EventV3) event));
+      }
     }
   }
 

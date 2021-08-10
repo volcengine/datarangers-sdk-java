@@ -13,7 +13,8 @@ import com.datarangers.config.RangersJSONConfig;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public class CollectorCounter implements Runnable {
                 put("history", CollectorContainer.SEND_HISTORY);
                 put("queue_length", Collector.collectorContainer.size());
             }};
-            stream.write((LocalDateTime.now().format(Constants.FULL_DAY) + " " + RangersJSONConfig.getInstance().toJson(status) + "\n").getBytes());
+            stream.write((new SimpleDateFormat(Constants.FULL_DAY).format(new Date()) + " " + RangersJSONConfig.getInstance().toJson(status) + "\n").getBytes());
             stream.flush();
         } catch (IOException e) {
             e.printStackTrace();

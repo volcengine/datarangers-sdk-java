@@ -12,13 +12,13 @@ import com.datarangers.logger.RangersFileCleaner;
 import com.datarangers.message.MessageEnv;
 import com.datarangers.util.HttpUtils;
 import java.util.Arrays;
+import java.util.Map.Entry;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +43,6 @@ public class DataRangersSDKConfigProperties {
     public int httpTimeout = 500;
 
     public String timeZone = "+8";
-    public ZoneOffset timeOffset = null;
     public boolean save = false;
     public int threadCount = 1;
     public int queueSize = 10240;
@@ -243,14 +242,6 @@ public class DataRangersSDKConfigProperties {
         this.threadPoolCount = threadPoolCount;
     }
 
-    public ZoneOffset getTimeOffset() {
-        return timeOffset;
-    }
-
-    public void setTimeOffset(ZoneOffset timeOffset) {
-        this.timeOffset = timeOffset;
-    }
-
     public boolean isSave() {
         return save;
     }
@@ -261,11 +252,6 @@ public class DataRangersSDKConfigProperties {
 
     public String getTimeZone() {
         return timeZone;
-    }
-
-    public void setTimeZone(String timeZone) {
-        timeOffset = ZoneOffset.of(timeZone);
-        this.timeZone = timeZone;
     }
 
     public void setLogger() {
@@ -285,7 +271,9 @@ public class DataRangersSDKConfigProperties {
                 EventConfig.SEND_HEADER.put("User-Agent", "DataRangers Java SDK");
                 EventConfig.SEND_HEADER.put("Content-Type", "application/json");
                 List<Header> headerList = new ArrayList<>();
-                EventConfig.SEND_HEADER.forEach((key, value) -> headerList.add(new BasicHeader(key, value)));
+                for (Entry<String, String> entry : EventConfig.SEND_HEADER.entrySet()) {
+                    headerList.add(new BasicHeader(entry.getKey(), entry.getValue()));
+                }
                 EventConfig.headers = headerList.toArray(new Header[0]);
             }
         }
