@@ -215,7 +215,7 @@ public class HttpUtils {
       }
     } catch (IOException e) {
       if (count > 2) {
-        logger.error(e.toString());
+        logger.error(e.toString(), e);
         writeFailedMessage(body);
       } else {
         count++;
@@ -233,7 +233,7 @@ public class HttpUtils {
           response.close();
         }
       } catch (IOException e) {
-        logger.error(e.toString());
+        logger.error(e.toString(), e);
       }
     }
   }
