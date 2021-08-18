@@ -13,11 +13,11 @@ datarangers-sdk-java是 [DataRangers](https://datarangers.com.cn/) 的用户行�
 <dependency>
   <groupId>com.datarangers</groupId>
   <artifactId>datarangers-sdk-core</artifactId>
-  <version>1.4.6-release-tmp</version>
+  <version>1.4.6-release</version>
 </dependency>
 ```
 
-version是sdk的版本号，当前最新的版本为1.4.6-release-tmp。
+version是sdk的版本号，当前最新的版本为1.4.6-release。
 
 火山引擎仓库地址：
 ```xml
@@ -80,7 +80,7 @@ DataRangers SDK需要进行一定的参数配置才能够使用，具体需要�
 <dependency>
    <groupId>com.datarangers</groupId>
    <artifactId>datarangers-sdk-starter</artifactId>
-   <version>1.4.6-release-tmp</version>
+   <version>1.4.6-release</version>
 </dependency>
 ```
 
@@ -134,6 +134,17 @@ datarangers.sdk.eventSaveMaxFileSize=256
 
 # self for selfTrustStrategy, default is all
 # datarangers.sdk.httpConfig.trustStrategy=xxx
+
+# http 超时配置
+# http request timeout， 单位是毫秒
+# datarangers.sdk.httpConfig.requestTimeout=10000
+# http connect timeout， 单位是毫秒
+# datarangers.sdk.httpConfig.connectTimeout=10000
+# http socket timeout， 单位是毫秒
+# datarangers.sdk.httpConfig.socketTimeout=20000
+# http keep alive time, 单位是秒
+# datarangers.sdk.httpConfig.keepAliveTimeout=180
+
 ```
 
 ### 3. 使用SDK
