@@ -102,6 +102,7 @@ public class HttpUtils {
                       Timeout.ofMicroseconds(httpConfig.getRequestTimeout()))
                   .setConnectTimeout(Timeout.ofMilliseconds(httpConfig.getConnectTimeout()))
                   .setResponseTimeout(Timeout.ofMilliseconds(httpConfig.getSocketTimeout()))
+                  .setConnectionKeepAlive(TimeValue.ofSeconds(httpConfig.getKeepAliveTimeout()))
                   .setCookieSpec("easy")
                   .build();
               httpClient = HttpClients.custom()
