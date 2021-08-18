@@ -21,6 +21,7 @@ public class HttpConfig {
   private Integer requestTimeout;
   private Integer connectTimeout;
   private Integer socketTimeout;
+  private Integer keepAliveTimeout;
 
   /**
    * 是否需要自定义配置key, store 路径和密码
@@ -130,6 +131,11 @@ public class HttpConfig {
     if (socketTimeout == null) {
       socketTimeout = timeBase * 2;
     }
+
+    if(keepAliveTimeout == null) {
+      // 3分钟
+      keepAliveTimeout = 3 * 60;
+    }
   }
 
   public Integer getMaxTotal() {
@@ -142,5 +148,13 @@ public class HttpConfig {
 
   public void setMaxPerRoute(Integer maxPerRoute) {
     this.maxPerRoute = maxPerRoute;
+  }
+
+  public Integer getKeepAliveTimeout() {
+    return keepAliveTimeout;
+  }
+
+  public void setKeepAliveTimeout(Integer keepAliveTimeout) {
+    this.keepAliveTimeout = keepAliveTimeout;
   }
 }
