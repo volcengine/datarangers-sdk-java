@@ -102,6 +102,7 @@ public class HttpUtils {
                       Timeout.ofMicroseconds(httpConfig.getRequestTimeout()))
                   .setConnectTimeout(Timeout.ofMilliseconds(httpConfig.getConnectTimeout()))
                   .setResponseTimeout(Timeout.ofMilliseconds(httpConfig.getSocketTimeout()))
+                  .setConnectionKeepAlive(TimeValue.ofSeconds(httpConfig.getKeepAliveTimeout()))
                   .setCookieSpec("easy")
                   .build();
               httpClient = HttpClients.custom()
@@ -215,7 +216,7 @@ public class HttpUtils {
       }
     } catch (IOException e) {
       if (count > 2) {
-        logger.error(e.toString());
+        logger.error(e.toString(), e);
         writeFailedMessage(body);
       } else {
         count++;
@@ -233,7 +234,7 @@ public class HttpUtils {
           response.close();
         }
       } catch (IOException e) {
-        logger.error(e.toString());
+        logger.error(e.toString(), e);
       }
     }
   }
