@@ -302,5 +302,20 @@ eventCollector.sendEvent("user-001", 10000028, null, "set_items", new HashMap<St
 }});
 ```
 
+5. 使用header上报事件
+```java
+// 可以设置userUniqueId和deviceId等，具体字段可以查看Header类
+Map<String, Object> custom = new HashMap<String,Object>();
+Map<String, Object> eventParams = new HashMap<String,Object>();
+Header header = new HeaderV3.Builder()
+    .setCustom(custom)
+    .setAppId(10000000)
+    .setUserUniqueId("uuid-1")
+    .setDeviceId(1231232131313123L)
+    .build();
+        
+appEventCollector.sendEvent(header, "test_event_java_sdk_header", eventParams);
+```
+
 ## 注意事项
 * 当前sdk版本没有主动清理日志的功能，需要手动清理日志
