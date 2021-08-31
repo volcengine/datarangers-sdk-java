@@ -13,11 +13,11 @@ datarangers-sdk-java是 [DataRangers](https://datarangers.com.cn/) 的用户行�
 <dependency>
   <groupId>com.datarangers</groupId>
   <artifactId>datarangers-sdk-core</artifactId>
-  <version>1.4.5-release</version>
+  <version>1.4.6-release</version>
 </dependency>
 ```
 
-version是sdk的版本号，当前最新的版本为1.4.5-release。
+version是sdk的版本号，当前最新的版本为1.4.6-release。
 
 火山引擎仓库地址：
 ```xml
@@ -80,7 +80,7 @@ DataRangers SDK需要进行一定的参数配置才能够使用，具体需要�
 <dependency>
    <groupId>com.datarangers</groupId>
    <artifactId>datarangers-sdk-starter</artifactId>
-   <version>1.4.5-release</version>
+   <version>1.4.6-release</version>
 </dependency>
 ```
 
@@ -134,6 +134,17 @@ datarangers.sdk.eventSaveMaxFileSize=256
 
 # self for selfTrustStrategy, default is all
 # datarangers.sdk.httpConfig.trustStrategy=xxx
+
+# http 超时配置
+# http request timeout， 单位是毫秒
+# datarangers.sdk.httpConfig.requestTimeout=10000
+# http connect timeout， 单位是毫秒
+# datarangers.sdk.httpConfig.connectTimeout=10000
+# http socket timeout， 单位是毫秒
+# datarangers.sdk.httpConfig.socketTimeout=20000
+# http keep alive time, 单位是秒
+# datarangers.sdk.httpConfig.keepAliveTimeout=180
+
 ```
 
 ### 3. 使用SDK
@@ -289,6 +300,21 @@ eventCollector.sendEvent("user-001", 10000028, null, "set_items", new HashMap<St
     put("param3", items.get(1));
     put("param4", items.get(2));
 }});
+```
+
+5. 使用header上报事件
+```java
+// 可以设置userUniqueId和deviceId等，具体字段可以查看Header类
+Map<String, Object> custom = new HashMap<String,Object>();
+Map<String, Object> eventParams = new HashMap<String,Object>();
+Header header = new HeaderV3.Builder()
+    .setCustom(custom)
+    .setAppId(10000000)
+    .setUserUniqueId("uuid-1")
+    .setDeviceId(1231232131313123L)
+    .build();
+        
+appEventCollector.sendEvent(header, "test_event_java_sdk_header", eventParams);
 ```
 
 ## 注意事项
