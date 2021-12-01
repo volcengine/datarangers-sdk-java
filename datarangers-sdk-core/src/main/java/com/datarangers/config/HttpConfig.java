@@ -142,6 +142,10 @@ public class HttpConfig {
     return maxTotal;
   }
 
+  public void setMaxTotal(Integer maxTotal) {
+    this.maxTotal = maxTotal;
+  }
+
   public Integer getMaxPerRoute() {
     return maxPerRoute;
   }

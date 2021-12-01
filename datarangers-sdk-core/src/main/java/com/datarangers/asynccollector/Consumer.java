@@ -12,13 +12,14 @@ import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.logger.RangersLoggerWriterPool;
 import com.datarangers.message.AppMessage;
 import com.datarangers.message.Message;
-import com.datarangers.message.saas.SaasServerAppMessage;
 import com.datarangers.sender.MessageSenderFactory;
-import com.datarangers.util.HttpUtils;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Consumer implements Runnable {
+    private static final Logger logger = LoggerFactory.getLogger(Consumer.class);
     private static RangersLoggerWriterPool pool;
     private CollectorContainer collectorContainer;
     private DataRangersSDKConfigProperties sdkConfigProperties;
@@ -47,31 +48,42 @@ public class Consumer implements Runnable {
                         MessageSenderFactory.getMessageSender(message).senderMessage(message, this.sdkConfigProperties);
                     });
                 }
-            } catch (InterruptedException e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
+                logger.error("consumer send error", e);
             }
         }
     }
 
     private void write() throws Exception {
         while (true) {
-            List<Message> messages = collectorContainer.consume();
-            if (messages != null) {
-                messages.forEach(message -> {
-                    AppMessage appMessage = message.getAppMessage();
-                    pool.getWriter(appMessage.getUserUniqueId()).write(RangersJSONConfig.getInstance().toJson(appMessage) + "\n");
-                });
+            try {
+                List<Message> messages = collectorContainer.consume();
+                if (messages != null) {
+                    messages.forEach(message -> {
+                        AppMessage appMessage = message.getAppMessage();
+                        pool.getWriter(appMessage.getUserUniqueId()).write(RangersJSONConfig.getInstance().toJson(appMessage) + "\n");
+                    });
+                }
+            }catch (Throwable e){
+                logger.error("consumer write error", e);
             }
+
         }
     }
 
     @Override
     public void run() {
         try {
-            if (EventConfig.saveFlag) write();
-            else send();
+            if (EventConfig.saveFlag) {
+                write();
+            }
+            else {
+                send();
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error("consumer run error", e);
         }
     }
 }
