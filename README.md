@@ -145,6 +145,12 @@ datarangers.sdk.eventSaveMaxFileSize=256
 # http keep alive time, 单位是秒
 # datarangers.sdk.httpConfig.keepAliveTimeout=180
 
+# http 连接配置
+# 连接池最大连接数
+# datarangers.sdk.httpConfig.maxTotal=1000
+# 每一个 host 的最大连接数
+# datarangers.sdk.httpConfig.maxPerRoute=100
+
 ```
 
 ### 3. 使用SDK
