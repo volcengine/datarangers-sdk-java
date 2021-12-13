@@ -15,6 +15,12 @@
         <module>datarangers-sdk-core</module>
         <module>datarangers-sdk-starter</module>
     </modules>
+    <distributionManagement>
+        <repository>
+            <id>bytedance-Volcengine</id>
+            <url>https://artifact-maven.byted.org/repository/Volcengine</url>
+        </repository>
+    </distributionManagement>
     <dependencyManagement>
         <dependencies>
             <dependency>

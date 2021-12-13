@@ -29,6 +29,12 @@
     <groupId>com.datarangers</groupId>
     <artifactId>datarangers-sdk-core</artifactId>
     <version>1.4.8-release</version>
+    <distributionManagement>
+        <repository>
+            <id>bytedance-Volcengine</id>
+            <url>https://artifact-maven.byted.org/repository/Volcengine</url>
+        </repository>
+    </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
