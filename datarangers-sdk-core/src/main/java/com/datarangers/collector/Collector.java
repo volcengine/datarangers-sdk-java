@@ -10,7 +10,9 @@ import com.datarangers.asynccollector.CollectorContainer;
 import com.datarangers.config.DataRangersSDKConfigProperties;
 import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.message.Message;
+import com.datarangers.message.MessageEnv;
 import com.datarangers.util.HttpUtils;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,52 +23,72 @@ import java.util.concurrent.ScheduledExecutorService;
  * @author taojian
  */
 public abstract class Collector implements EventCollector {
-    private String appType;
-    public static final Logger logger = LoggerFactory.getLogger("DatarangersLog");
-    public static Executor httpRequestPool = null;
-    public static ScheduledExecutorService scheduled = null;
-    public static CollectorContainer collectorContainer;
 
-    private boolean enable;
-    protected DataRangersSDKConfigProperties properties;
+  private String appType;
+  public static final Logger logger = LoggerFactory.getLogger("DatarangersLog");
+  public static Executor httpRequestPool = null;
+  public static ScheduledExecutorService scheduled = null;
+  public static CollectorContainer collectorContainer;
 
-    public Collector(String appType, DataRangersSDKConfigProperties properties) {
-        enable = properties.isEnable();
-        this.properties = properties;
+  private boolean enable;
+  protected DataRangersSDKConfigProperties properties;
+
+  public Collector(String appType, DataRangersSDKConfigProperties properties) {
+    enable = properties.isEnable();
+    this.properties = properties;
+  }
+
+  public String getAppType() {
+    return appType;
+  }
+
+  public Collector setAppType(String appType) {
+    this.appType = appType;
+    return this;
+  }
+
+  public void send(Message message) {
+    sendMessage(message);
+  }
+
+  protected void sendMessage(Message message) {
+    if (!enable) {
+      return;
     }
+    message.merge();
+    String sendMessage;
 
-    public String getAppType() {
-        return appType;
-    }
-
-    public Collector setAppType(String appType) {
-        this.appType = appType;
-        return this;
-    }
-
-    public void send(Message message) {
-        sendMessage(message);
-    }
-
-    protected void sendMessage(Message message) {
-        if(!enable) {
-            return;
+    validate(message);
+    sendMessage = RangersJSONConfig.getInstance().toJson(message);
+    if (collectorContainer.getMessageQueue() != null) {
+      try {
+        if (!collectorContainer.produce(message)) {
+          //队列满了,需要保存到log
+          logger.error("datarangers send Queue reach max length");
+          HttpUtils.writeFailedMessage(sendMessage);
         }
-        message.merge();
-        String sendMessage;
-        sendMessage = RangersJSONConfig.getInstance().toJson(message);
-        if (collectorContainer.getMessageQueue() != null) {
-            try {
-                if (!collectorContainer.produce(message)) {
-                    //队列满了,需要保存到log
-                    logger.error("datarangers send Queue reach max length");
-                    HttpUtils.writeFailedMessage(sendMessage);
-                }
-            }  catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            HttpUtils.writeFailedMessage(sendMessage);
-        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    } else {
+      HttpUtils.writeFailedMessage(sendMessage);
     }
+  }
+
+  /**
+   * message 检查
+   */
+  private void validate(Message message) {
+    // 当前只有saas需要校验下appkey
+    if (this.properties.getMessageEnv() != MessageEnv.SAAS) {
+      return;
+    }
+
+    Integer appId = message.getAppMessage().getAppId();
+    Map<Integer, String> appKeys = this.properties.getAppKeys();
+    String appKey = appKeys.get(appId);
+    if (appKey == null) {
+      throw new IllegalArgumentException("App key cannot be empty. app_id: " + appId);
+    }
+  }
 }
