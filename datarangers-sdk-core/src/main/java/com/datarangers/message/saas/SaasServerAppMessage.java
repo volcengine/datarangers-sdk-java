@@ -41,6 +41,8 @@ public class SaasServerAppMessage {
       events.addAll(appEvents.stream().map(n -> new SaasServerEvent((EventV3) n))
           .collect(Collectors.toList()));
     }
+    this.getHeader().setAid(null);
+    this.getHeader().setAppId(null);
   }
 
   public User getUser() {

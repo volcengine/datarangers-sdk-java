@@ -45,7 +45,7 @@ public class Consumer implements Runnable {
                 List<Message> messages = collectorContainer.consume();
                 if (messages != null) {
                     messages.forEach(message -> {
-                        MessageSenderFactory.getMessageSender(message).senderMessage(message, this.sdkConfigProperties);
+                        MessageSenderFactory.getMessageSender(message).send(message, this.sdkConfigProperties);
                     });
                 }
             } catch (Throwable e) {
