@@ -75,6 +75,8 @@ public class DataRangersSDKConfigProperties {
 
     private HttpClient customHttpClient;
 
+    private Map<Integer, String> appKeys = new HashMap<>();
+
     /**
      * saas 或者 privatization(私有化)
      */
@@ -390,6 +392,14 @@ public class DataRangersSDKConfigProperties {
             return MessageEnv.SAAS;
         }
         return MessageEnv.PRIVATIZATION;
+    }
+
+    public Map<Integer, String> getAppKeys() {
+        return appKeys;
+    }
+
+    public void setAppKeys(Map<Integer, String> appKeys) {
+        this.appKeys = appKeys;
     }
 }
 
