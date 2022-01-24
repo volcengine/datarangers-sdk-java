@@ -12,6 +12,7 @@ public interface MessageSender {
   /**
    * 发送消息
    * @param message
+   * @param sdkConfigProperties
    */
-  void senderMessage(Message message, DataRangersSDKConfigProperties sdkConfigProperties);
+  void send(Message message, DataRangersSDKConfigProperties sdkConfigProperties);
 }

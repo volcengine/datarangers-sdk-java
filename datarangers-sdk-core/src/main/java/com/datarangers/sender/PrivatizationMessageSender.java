@@ -13,7 +13,7 @@ import com.datarangers.util.HttpUtils;
 public class PrivatizationMessageSender implements MessageSender {
 
   @Override
-  public void senderMessage(Message message, DataRangersSDKConfigProperties sdkConfigProperties) {
+  public void send(Message message, DataRangersSDKConfigProperties sdkConfigProperties) {
     Object sendMessage = message.getAppMessage();
     HttpUtils.post(EventConfig.getAppUrl(), RangersJSONConfig.getInstance().toJson(sendMessage), EventConfig.SEND_HEADER);
   }

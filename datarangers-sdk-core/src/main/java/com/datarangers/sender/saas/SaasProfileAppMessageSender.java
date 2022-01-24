@@ -22,7 +22,7 @@ public class SaasProfileAppMessageSender implements MessageSender {
   private String path = "/dataprofile/openapi/v1/%s/users/%s/attributes";
 
   @Override
-  public void senderMessage(Message message, DataRangersSDKConfigProperties sdkConfigProperties) {
+  public void send(Message message, DataRangersSDKConfigProperties sdkConfigProperties) {
     SaasProfileAppMessage sendMessage = new SaasProfileAppMessage(message);
     String body = RangersJSONConfig.getInstance().toJson(sendMessage);
 

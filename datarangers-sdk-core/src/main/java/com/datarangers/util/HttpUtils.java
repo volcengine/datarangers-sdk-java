@@ -207,7 +207,7 @@ public class HttpUtils {
         logger.debug("Send Success:" + url);
         logger.debug(resultStr);
       } else {
-        logger.error("HTTP ERROR: " + response.getEntity().toString());
+        logger.error("HTTP ERROR: " + resultStr);
         logger.error(
             "Parse Json error:requestId={}, method={}, url={}, body={},header={}", requestId, method,
             url, body,
