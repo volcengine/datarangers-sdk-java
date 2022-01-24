@@ -13,11 +13,11 @@ datarangers-sdk-java是 [DataRangers](https://datarangers.com.cn/) 的用户行�
 <dependency>
   <groupId>com.datarangers</groupId>
   <artifactId>datarangers-sdk-core</artifactId>
-  <version>1.4.8-release</version>
+  <version>1.4.9-release</version>
 </dependency>
 ```
 
-version是sdk的版本号，当前最新的版本为1.4.8-release。
+version是sdk的版本号，当前最新的版本为1.4.9-release。
 
 火山引擎仓库地址：
 ```xml
@@ -80,7 +80,7 @@ DataRangers SDK需要进行一定的参数配置才能够使用，具体需要�
 <dependency>
    <groupId>com.datarangers</groupId>
    <artifactId>datarangers-sdk-starter</artifactId>
-   <version>1.4.8-release</version>
+   <version>1.4.9-release</version>
 </dependency>
 ```
 
@@ -97,6 +97,9 @@ datarangers.sdk.domain=http://domain
 # datarangers.sdk.headers为http请求中headers字段内容,在私有化环境中必须要添加Host，而在saas环境中 不能配置Host,其他如果需要设置的可以选填
 # Host的配置在安装部署的那台机器上，查看/home/datarangers/DataRangersDeploy/conf_rangers.yml中配置项sdk.report.host
 datarangers.sdk.headers.Host=host
+
+# 如果在saas环境中，需要配置appkey
+# datarangers.sdk.appKeys.${appId}=xxx
 
 # 如果是在saas环境中，需要配置openapi, 私有化环境中可以不配置
 # openapi的domain， 国内: https://analytics.volcengineapi.com，国际是: https://datarangers.com

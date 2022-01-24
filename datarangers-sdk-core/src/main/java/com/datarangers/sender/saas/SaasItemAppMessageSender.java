@@ -25,7 +25,7 @@ public class SaasItemAppMessageSender implements MessageSender {
   private static final String path = "/dataprofile/openapi/v1/%s/items/%s/%s/attributes";
 
   @Override
-  public void senderMessage(Message message, DataRangersSDKConfigProperties sdkConfigProperties) {
+  public void send(Message message, DataRangersSDKConfigProperties sdkConfigProperties) {
     AppMessage appMessage = message.getAppMessage();
     List<Event> events = appMessage.getEvents();
 
