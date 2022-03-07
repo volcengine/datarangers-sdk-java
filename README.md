@@ -25,7 +25,7 @@ version是sdk的版本号，当前最新的版本为1.4.9-release。
   <repository>
     <id>bytedance-volcengine</id>
     <name>bytedance Volcengine</name>
-    <url>https://artifact.bytedance.com/repository/Volcengine</url>
+    <url>https://artifact.bytedance.com/repository/Volcengine/</url>
   </repository>
 </repositories>
 ```
