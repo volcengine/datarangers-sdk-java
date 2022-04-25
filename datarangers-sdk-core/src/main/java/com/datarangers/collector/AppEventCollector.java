@@ -6,6 +6,7 @@
  */
 package com.datarangers.collector;
 
+import com.datarangers.asynccollector.Consumer;
 import com.datarangers.config.Constants;
 import com.datarangers.config.DataRangersSDKConfigProperties;
 import com.datarangers.config.RangersJSONConfig;
@@ -16,6 +17,7 @@ import com.datarangers.message.MessageType;
 import com.datarangers.profile.ItemMethod;
 import com.datarangers.profile.ProfileMethod;
 
+import com.datarangers.sender.Callback;
 import java.io.IOException;
 import java.util.*;
 
@@ -25,10 +27,16 @@ import java.util.*;
 public class AppEventCollector extends Collector {
 
   public AppEventCollector(String appType, DataRangersSDKConfigProperties properties) {
-    super(appType, properties);
-    setAppType(appType);
+    this(appType, properties, null);
+  }
+
+  public AppEventCollector(String appType, DataRangersSDKConfigProperties properties, Callback cb) {
+    super(appType, properties, cb);
     if (properties != null) {
       properties.init();
+
+      // 设置同步发送的consumer，队列满的时候使用
+      setConsumer(new Consumer(Collector.collectorContainer, this.properties));
     } else {
       System.out.println(Constants.INIT_ERROR);
     }

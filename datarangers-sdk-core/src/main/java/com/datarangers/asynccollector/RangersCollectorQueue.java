@@ -58,12 +58,18 @@ public class RangersCollectorQueue implements CollectorQueue {
     }
 
     @Override
-    public boolean offer(Message t) throws InterruptedException {
-        return queue.offer(t);
+    public void put(Message t) throws InterruptedException {
+        queue.put(t);
     }
 
     @Override
     public int size() {
         return queue.size();
     }
+
+    @Override
+    public Message poll() {
+        return queue.poll();
+    }
+
 }
