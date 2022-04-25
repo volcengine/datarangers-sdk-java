@@ -7,16 +7,18 @@
 package com.datarangers.collector;
 
 import com.datarangers.asynccollector.CollectorContainer;
+import com.datarangers.asynccollector.Consumer;
 import com.datarangers.config.DataRangersSDKConfigProperties;
 import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.message.Message;
 import com.datarangers.message.MessageEnv;
-import com.datarangers.util.HttpUtils;
+import com.datarangers.sender.Callback;
+import com.datarangers.sender.Callback.FailedData;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
@@ -26,16 +28,21 @@ public abstract class Collector implements EventCollector {
 
   private String appType;
   public static final Logger logger = LoggerFactory.getLogger("DatarangersLog");
-  public static Executor httpRequestPool = null;
+  public static ExecutorService httpRequestPool = null;
   public static ScheduledExecutorService scheduled = null;
   public static CollectorContainer collectorContainer;
 
   private boolean enable;
   protected DataRangersSDKConfigProperties properties;
+  protected Callback callback;
+  protected Consumer consumer = null;
 
-  public Collector(String appType, DataRangersSDKConfigProperties properties) {
-    enable = properties.isEnable();
+  public Collector(String appType, DataRangersSDKConfigProperties properties, Callback cb) {
+    this.appType = appType;
+    this.enable = properties.isEnable();
     this.properties = properties;
+    this.callback = cb;
+    this.properties.setCallback(this.getCallback());
   }
 
   public String getAppType() {
@@ -59,19 +66,36 @@ public abstract class Collector implements EventCollector {
     String sendMessage;
 
     validate(message);
-    sendMessage = RangersJSONConfig.getInstance().toJson(message);
+    sendMessage = RangersJSONConfig.getInstance().toJson(message.getAppMessage());
+    if (this.properties.isSync()) {
+      syncSendMessage(message, sendMessage);
+    } else {
+      asyncSendMessage(message, sendMessage);
+    }
+  }
+
+  private void syncSendMessage(Message message, String sendMessage) {
+    try {
+      this.consumer.flush(message);
+    } catch (Exception e) {
+      e.printStackTrace();
+      logger.error("sync send message error", e);
+      getCallback().onFailed(new FailedData(sendMessage, e.getMessage(), e));
+    }
+  }
+
+  private void asyncSendMessage(Message message, String sendMessage) {
     if (collectorContainer.getMessageQueue() != null) {
       try {
-        if (!collectorContainer.produce(message)) {
-          //队列满了,需要保存到log
-          logger.error("datarangers send Queue reach max length");
-          HttpUtils.writeFailedMessage(sendMessage);
-        }
+        collectorContainer.produce(message);
       } catch (Exception e) {
         e.printStackTrace();
+        logger.error("async send message error", e);
+        getCallback().onFailed(new FailedData(sendMessage, e.getMessage(), e));
       }
     } else {
-      HttpUtils.writeFailedMessage(sendMessage);
+      logger.error("getMessageQueue is null");
+      getCallback().onFailed(new FailedData(sendMessage, "getMessageQueue is null"));
     }
   }
 
@@ -90,5 +114,21 @@ public abstract class Collector implements EventCollector {
     if (appKey == null) {
       throw new IllegalArgumentException("App key cannot be empty. app_id: " + appId);
     }
+  }
+
+  public Callback getCallback() {
+    return callback;
+  }
+
+  public void setCallback(Callback callback) {
+    this.callback = callback;
+  }
+
+  public Consumer getConsumer() {
+    return consumer;
+  }
+
+  public void setConsumer(Consumer consumer) {
+    this.consumer = consumer;
   }
 }

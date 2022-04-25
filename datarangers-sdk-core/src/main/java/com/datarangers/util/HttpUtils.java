@@ -10,6 +10,8 @@ import com.datarangers.config.HttpConfig;
 import com.datarangers.config.EventConfig;
 import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.logger.RangersLoggerWriter;
+import com.datarangers.sender.Callback;
+import com.datarangers.sender.Callback.FailedData;
 import java.io.File;
 import java.net.URI;
 import java.security.KeyManagementException;
@@ -56,25 +58,13 @@ import java.util.UUID;
 public class HttpUtils {
 
   public static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
-  private static RangersLoggerWriter writer;
-
-  public static void setWriter(final String targetPrefix, final String targetName, int maxSize) {
-    if (writer == null) {
-      writer = RangersLoggerWriter.getInstance(targetPrefix, targetName, maxSize);
-    }
-  }
-
-  public static void writeFailedMessage(String message) {
-    synchronized (writer) {
-      writer.write(message + "\n");
-    }
-  }
+  private static Callback callback = null;
 
   private static HttpClient httpClient = null;
   private static volatile Boolean initFlag = false;
 
   public static void createHttpClient(
-      HttpConfig httpConfig, HttpClient customHttpClient) {
+      HttpConfig httpConfig, HttpClient customHttpClient, Callback callback) {
     if (!initFlag) {
       synchronized (initFlag) {
         if (!initFlag) {
@@ -113,6 +103,7 @@ public class HttpUtils {
             }
           }
           initFlag = true;
+          HttpUtils.callback = callback;
         }
       }
     }
@@ -212,12 +203,12 @@ public class HttpUtils {
             "Parse Json error:requestId={}, method={}, url={}, body={},header={}", requestId, method,
             url, body,
             headers);
-        writeFailedMessage(body);
+        callback.onFailed(new FailedData(body,"HTTP ERROR: " + resultStr));
       }
     } catch (IOException e) {
       if (count > 2) {
         logger.error(e.toString(), e);
-        writeFailedMessage(body);
+        callback.onFailed(new FailedData(body,e.toString(), e));
       } else {
         count++;
         post(url, body, headers, count);
@@ -227,7 +218,7 @@ public class HttpUtils {
           "Parse Json error:requestId={}, method={}, url={}, body={},header={}", requestId, method,
           url, body,
           headers);
-      writeFailedMessage(body);
+      callback.onFailed(new FailedData(body, e.toString(), e));
     } finally {
       try {
         if (response != null) {

@@ -31,6 +31,12 @@ public interface CollectorQueue {
      * @return: boolean 是否发送成功
      * @date: 2021/2/7 15:52
      */
-    boolean offer(Message t)throws InterruptedException;
+    void put(Message t)throws InterruptedException;
     int size();
+
+    /**
+     * 遍历队列
+     * @return
+     */
+    Message poll();
 }
