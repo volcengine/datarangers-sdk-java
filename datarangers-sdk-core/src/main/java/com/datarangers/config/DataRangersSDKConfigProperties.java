@@ -10,6 +10,8 @@ import com.datarangers.asynccollector.*;
 import com.datarangers.collector.Collector;
 import com.datarangers.logger.RangersFileCleaner;
 import com.datarangers.message.MessageEnv;
+import com.datarangers.sender.Callback;
+import com.datarangers.sender.callback.LoggingCallback;
 import com.datarangers.util.HttpUtils;
 import java.util.Arrays;
 import org.apache.hc.client5.http.classic.HttpClient;
@@ -29,377 +31,430 @@ import java.util.concurrent.*;
  * @author hTangle
  */
 public class DataRangersSDKConfigProperties {
-    public static final Logger logger = LoggerFactory.getLogger(DataRangersSDKConfigProperties.class);
-    public Map<String, String> headers;
-    public String domain;
-    public int threadPoolCount = 1;
-    public int maxPoolSize = 8;
-    public int corePoolSize = 4;
 
-    /**
-     * 该配置过期，请使用httpConfig的配置
-     */
-    @Deprecated
-    public int httpTimeout = 500;
+  public static final Logger logger = LoggerFactory.getLogger(DataRangersSDKConfigProperties.class);
+  public Map<String, String> headers;
+  public String domain;
+  public int threadPoolCount = 1;
+  public int maxPoolSize = 8;
+  public int corePoolSize = 4;
 
-    public String timeZone = "+8";
-    public ZoneOffset timeOffset = null;
-    public boolean save = false;
-    public int threadCount = 1;
-    public int queueSize = 10240;
-    public boolean send = true;
+  /**
+   * 该配置过期，请使用httpConfig的配置
+   */
+  @Deprecated
+  public int httpTimeout = 500;
 
-    public boolean isEnable() {
-        return enable;
+  public String timeZone = "+8";
+  public ZoneOffset timeOffset = null;
+  public boolean save = false;
+  public int threadCount = 1;
+  public int queueSize = 10240;
+  public boolean send = true;
+
+  public boolean isEnable() {
+    return enable;
+  }
+
+  public void setEnable(boolean enable) {
+    this.enable = enable;
+  }
+
+  public boolean enable = true;
+
+  public String eventSavePath = "logs/";
+  public List<String> eventFilePaths;
+  public String eventSaveName = "datarangers.log";
+  public int eventSaveMaxHistory = 20;
+  public int eventSaveMaxFileSize = 100;
+  public int eventSaveMaxDays = 5;
+
+  public CollectorQueue userQueue;
+
+  public boolean hasConsumer = true;
+  public boolean hasProducer = true;
+
+  private HttpConfig httpConfig = new HttpConfig();
+
+  private HttpClient customHttpClient;
+
+  private Map<Integer, String> appKeys = new HashMap<>();
+
+  /**
+   * saas 或者 privatization(私有化)
+   */
+  private String env = "privatization";
+
+  private List<String> SAAS_DOMAIN_URLS = Arrays.asList(
+      "https://mcs.ctobsnssdk.com",
+      "https://mcs.tobsnssdk.com",
+      "https://mcs.itobsnssdk.com");
+
+  /**
+   * saas openapi 配置地址
+   */
+  private OpenapiConfig openapiConfig = new OpenapiConfig();
+
+  private Callback callback;
+
+  /**
+   * 同步还是异步发送，默认是异步发送
+   */
+  private boolean sync;
+
+  public boolean isSync() {
+    return sync;
+  }
+
+  public void setSync(boolean sync) {
+    this.sync = sync;
+  }
+
+  public Callback getCallback() {
+    return callback;
+  }
+
+  public void setCallback(Callback callback) {
+    this.callback = callback;
+  }
+
+  public boolean isHasConsumer() {
+    return hasConsumer;
+  }
+
+  public DataRangersSDKConfigProperties setHasConsumer(boolean hasConsumer) {
+    this.hasConsumer = hasConsumer;
+    return this;
+  }
+
+  public boolean isHasProducer() {
+    return hasProducer;
+  }
+
+  public DataRangersSDKConfigProperties setHasProducer(boolean hasProducer) {
+    this.hasProducer = hasProducer;
+    return this;
+  }
+
+  public int getHttpTimeout() {
+    return httpTimeout;
+  }
+
+  public DataRangersSDKConfigProperties setHttpTimeout(int httpTimeout) {
+    this.httpTimeout = httpTimeout;
+    return this;
+  }
+
+  public List<String> getEventFilePaths() {
+    if (eventFilePaths == null) {
+      eventFilePaths = new ArrayList<>();
+      eventFilePaths.add(eventSavePath);
     }
+    return eventFilePaths;
+  }
 
-    public void setEnable(boolean enable) {
-        this.enable = enable;
+  public int getEventSaveMaxDays() {
+    return eventSaveMaxDays;
+  }
+
+  public DataRangersSDKConfigProperties setEventSaveMaxDays(int eventSaveMaxDays) {
+    this.eventSaveMaxDays = eventSaveMaxDays;
+    return this;
+  }
+
+  public DataRangersSDKConfigProperties setEventFilePaths(List<String> eventFilePaths) {
+    this.eventFilePaths = eventFilePaths;
+    return this;
+  }
+
+  public String getEventSavePath() {
+    return eventSavePath;
+  }
+
+  public DataRangersSDKConfigProperties setEventSavePath(String eventSavePath) {
+    this.eventSavePath = eventSavePath;
+    return this;
+  }
+
+  public String getEventSaveName() {
+    return eventSaveName;
+  }
+
+  public DataRangersSDKConfigProperties setEventSaveName(String eventSaveName) {
+    this.eventSaveName = eventSaveName;
+    return this;
+  }
+
+  public int getEventSaveMaxHistory() {
+    return eventSaveMaxHistory;
+  }
+
+  public DataRangersSDKConfigProperties setEventSaveMaxHistory(int eventSaveMaxHistory) {
+    this.eventSaveMaxHistory = eventSaveMaxHistory;
+    return this;
+  }
+
+  public int getEventSaveMaxFileSize() {
+    return eventSaveMaxFileSize;
+  }
+
+  public DataRangersSDKConfigProperties setEventSaveMaxFileSize(int eventSaveMaxFileSize) {
+    this.eventSaveMaxFileSize = eventSaveMaxFileSize;
+    return this;
+  }
+
+  public boolean isSend() {
+    return send;
+  }
+
+  public DataRangersSDKConfigProperties setSend(boolean send) {
+    this.send = send;
+    return this;
+  }
+
+  public int getThreadCount() {
+    return threadCount;
+  }
+
+  public void setThreadCount(int threadCount) {
+    this.threadCount = threadCount;
+  }
+
+  public int getQueueSize() {
+    return queueSize;
+  }
+
+  public void setQueueSize(int queueSize) {
+    this.queueSize = queueSize;
+  }
+
+  public int getMaxPoolSize() {
+    return maxPoolSize;
+  }
+
+  public void setMaxPoolSize(int maxPoolSize) {
+    this.maxPoolSize = maxPoolSize;
+  }
+
+  public int getCorePoolSize() {
+    return corePoolSize;
+  }
+
+  public void setCorePoolSize(int corePoolSize) {
+    this.corePoolSize = corePoolSize;
+  }
+
+  public Map<String, String> getHeaders() {
+    if (headers == null) {
+      headers = new HashMap<>();
     }
+    return headers;
+  }
 
-    public boolean enable = true;
+  public void setHeaders(Map<String, String> headers) {
+    this.headers = headers;
+  }
 
-    public String eventSavePath = "logs/";
-    public List<String> eventFilePaths;
-    public String eventSaveName = "datarangers.log";
-    public int eventSaveMaxHistory = 20;
-    public int eventSaveMaxFileSize = 100;
-    public int eventSaveMaxDays = 5;
+  public String getDomain() {
+    return domain;
+  }
 
-    public CollectorQueue userQueue;
+  public void setDomain(String domain) {
+    this.domain = domain;
+  }
 
-    public boolean hasConsumer = true;
-    public boolean hasProducer = true;
+  public int getThreadPoolCount() {
+    return threadPoolCount;
+  }
 
-    private HttpConfig httpConfig = new HttpConfig();
+  public void setThreadPoolCount(int threadPoolCount) {
+    this.threadPoolCount = threadPoolCount;
+  }
 
-    private HttpClient customHttpClient;
+  public ZoneOffset getTimeOffset() {
+    return timeOffset;
+  }
 
-    private Map<Integer, String> appKeys = new HashMap<>();
+  public void setTimeOffset(ZoneOffset timeOffset) {
+    this.timeOffset = timeOffset;
+  }
 
-    /**
-     * saas 或者 privatization(私有化)
-     */
-    private String env = "privatization";
+  public boolean isSave() {
+    return save;
+  }
 
-    private List<String> SAAS_DOMAIN_URLS = Arrays.asList(
-        "https://mcs.ctobsnssdk.com",
-        "https://mcs.tobsnssdk.com",
-        "https://mcs.itobsnssdk.com");
+  public void setSave(boolean save) {
+    this.save = save;
+  }
 
-    /**
-     * saas openapi 配置地址
-     */
-    private OpenapiConfig openapiConfig = new OpenapiConfig();
+  public String getTimeZone() {
+    return timeZone;
+  }
 
-    public boolean isHasConsumer() {
-        return hasConsumer;
+  public void setTimeZone(String timeZone) {
+    timeOffset = ZoneOffset.of(timeZone);
+    this.timeZone = timeZone;
+  }
+
+  public void setLogger() {
+    Consumer.setWriterPool(getEventFilePaths(), getEventSaveName(), getEventSaveMaxFileSize());
+    if (callback == null) {
+      setCallback(new LoggingCallback(getEventSavePath(), "error-" + getEventSaveName(),
+          getEventSaveMaxFileSize()));
     }
+  }
 
-    public DataRangersSDKConfigProperties setHasConsumer(boolean hasConsumer) {
-        this.hasConsumer = hasConsumer;
-        return this;
+  public void setCommon() {
+    EventConfig.saveFlag = save;
+    EventConfig.sendFlag = !save;
+    if (!save) {
+      httpConfig = this.getHttpConfig();
+      if (httpConfig.getMaxPerRoute() < this.getThreadCount()) {
+        httpConfig.setMaxPerRoute(this.getThreadCount());
+      }
+      if (httpConfig.getMaxTotal() < httpConfig.getMaxPerRoute()) {
+        httpConfig.setMaxTotal(httpConfig.getMaxPerRoute());
+      }
+      httpConfig.initTimeOut(getHttpTimeout());
+      HttpUtils
+          .createHttpClient(this.getHttpConfig(), this.getCustomHttpClient(), this.getCallback());
+      if (EventConfig.SEND_HEADER == null) {
+        EventConfig.SEND_HEADER = getHeaders();
+        EventConfig.SEND_HEADER.put("User-Agent", "DataRangers Java SDK");
+        EventConfig.SEND_HEADER.put("Content-Type", "application/json");
+        List<Header> headerList = new ArrayList<>();
+        EventConfig.SEND_HEADER
+            .forEach((key, value) -> headerList.add(new BasicHeader(key, value)));
+        EventConfig.headers = headerList.toArray(new Header[0]);
+      }
     }
+    setConsumer(getThreadCount());
+    EventConfig.setUrl(getDomain());
+  }
 
-    public boolean isHasProducer() {
-        return hasProducer;
+
+  public ExecutorService setThreadPool() {
+    return Executors.newFixedThreadPool(getCorePoolSize());
+  }
+
+  public void setConsumer(int threadCount) {
+    if (EventConfig.saveFlag) {
+      threadCount = 1;
+      logger.info("Start LogAgent Mode");
+    } else {
+      logger.info("Start Http Mode");
     }
-
-    public DataRangersSDKConfigProperties setHasProducer(boolean hasProducer) {
-        this.hasProducer = hasProducer;
-        return this;
+    if (userQueue == null) {
+      Collector.collectorContainer = new CollectorContainer(
+          RangersCollectorQueue.getInstance(getQueueSize()));
+    } else {
+      //如果客户自定义了queue，则需要替换为客户自定义queue
+      Collector.collectorContainer = new CollectorContainer(userQueue);
     }
-
-    public int getHttpTimeout() {
-        return httpTimeout;
+    if ((!sync) && hasConsumer && Collector.httpRequestPool == null) {
+      //有消费者才初始化消费者
+      Collector.httpRequestPool = setThreadPool();
+      for (int i = 0; i < threadCount; i++) {//必须全部消费同一个队列
+        Collector.httpRequestPool.execute(new Consumer(Collector.collectorContainer, this));
+      }
     }
-
-    public DataRangersSDKConfigProperties setHttpTimeout(int httpTimeout) {
-        this.httpTimeout = httpTimeout;
-        return this;
+    if ((!sync) && hasProducer) {
+      //有生产者才需要记录
+      Collector.scheduled = Executors.newSingleThreadScheduledExecutor();
+      Collector.scheduled
+          .scheduleAtFixedRate(new CollectorCounter(getEventSavePath()), 0, 2, TimeUnit.MINUTES);
+      if (EventConfig.saveFlag) {
+        Collector.scheduled.scheduleAtFixedRate(
+            new RangersFileCleaner(getEventFilePaths(), getEventSaveName(), getEventSaveMaxDays()),
+            0, 12, TimeUnit.HOURS);
+      }
     }
-
-    public List<String> getEventFilePaths() {
-        if (eventFilePaths == null) {
-            eventFilePaths = new ArrayList<>();
-            eventFilePaths.add(eventSavePath);
-        }
-        return eventFilePaths;
-    }
-
-    public int getEventSaveMaxDays() {
-        return eventSaveMaxDays;
-    }
-
-    public DataRangersSDKConfigProperties setEventSaveMaxDays(int eventSaveMaxDays) {
-        this.eventSaveMaxDays = eventSaveMaxDays;
-        return this;
-    }
-
-    public DataRangersSDKConfigProperties setEventFilePaths(List<String> eventFilePaths) {
-        this.eventFilePaths = eventFilePaths;
-        return this;
-    }
-
-    public String getEventSavePath() {
-        return eventSavePath;
-    }
-
-    public DataRangersSDKConfigProperties setEventSavePath(String eventSavePath) {
-        this.eventSavePath = eventSavePath;
-        return this;
-    }
-
-    public String getEventSaveName() {
-        return eventSaveName;
-    }
-
-    public DataRangersSDKConfigProperties setEventSaveName(String eventSaveName) {
-        this.eventSaveName = eventSaveName;
-        return this;
-    }
-
-    public int getEventSaveMaxHistory() {
-        return eventSaveMaxHistory;
-    }
-
-    public DataRangersSDKConfigProperties setEventSaveMaxHistory(int eventSaveMaxHistory) {
-        this.eventSaveMaxHistory = eventSaveMaxHistory;
-        return this;
-    }
-
-    public int getEventSaveMaxFileSize() {
-        return eventSaveMaxFileSize;
-    }
-
-    public DataRangersSDKConfigProperties setEventSaveMaxFileSize(int eventSaveMaxFileSize) {
-        this.eventSaveMaxFileSize = eventSaveMaxFileSize;
-        return this;
-    }
-
-    public boolean isSend() {
-        return send;
-    }
-
-    public DataRangersSDKConfigProperties setSend(boolean send) {
-        this.send = send;
-        return this;
-    }
-
-    public int getThreadCount() {
-        return threadCount;
-    }
-
-    public void setThreadCount(int threadCount) {
-        this.threadCount = threadCount;
-    }
-
-    public int getQueueSize() {
-        return queueSize;
-    }
-
-    public void setQueueSize(int queueSize) {
-        this.queueSize = queueSize;
-    }
-
-    public int getMaxPoolSize() {
-        return maxPoolSize;
-    }
-
-    public void setMaxPoolSize(int maxPoolSize) {
-        this.maxPoolSize = maxPoolSize;
-    }
-
-    public int getCorePoolSize() {
-        return corePoolSize;
-    }
-
-    public void setCorePoolSize(int corePoolSize) {
-        this.corePoolSize = corePoolSize;
-    }
-
-    public Map<String, String> getHeaders() {
-        if (headers == null) {
-            headers = new HashMap<>();
-        }
-        return headers;
-    }
-
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
-    public int getThreadPoolCount() {
-        return threadPoolCount;
-    }
-
-    public void setThreadPoolCount(int threadPoolCount) {
-        this.threadPoolCount = threadPoolCount;
-    }
-
-    public ZoneOffset getTimeOffset() {
-        return timeOffset;
-    }
-
-    public void setTimeOffset(ZoneOffset timeOffset) {
-        this.timeOffset = timeOffset;
-    }
-
-    public boolean isSave() {
-        return save;
-    }
-
-    public void setSave(boolean save) {
-        this.save = save;
-    }
-
-    public String getTimeZone() {
-        return timeZone;
-    }
-
-    public void setTimeZone(String timeZone) {
-        timeOffset = ZoneOffset.of(timeZone);
-        this.timeZone = timeZone;
-    }
-
-    public void setLogger() {
-        Consumer.setWriterPool(getEventFilePaths(), getEventSaveName(), getEventSaveMaxFileSize());
-        HttpUtils.setWriter(getEventSavePath(), "error-" + getEventSaveName(), getEventSaveMaxFileSize());
-    }
-
-    public void setCommon() {
-        EventConfig.saveFlag = save;
-        EventConfig.sendFlag = !save;
-        if (!save) {
-            httpConfig = this.getHttpConfig();
-            httpConfig.initTimeOut(getHttpTimeout());
-            HttpUtils.createHttpClient(this.getHttpConfig(), this.getCustomHttpClient());
-            if (EventConfig.SEND_HEADER == null) {
-                EventConfig.SEND_HEADER = getHeaders();
-                EventConfig.SEND_HEADER.put("User-Agent", "DataRangers Java SDK");
-                EventConfig.SEND_HEADER.put("Content-Type", "application/json");
-                List<Header> headerList = new ArrayList<>();
-                EventConfig.SEND_HEADER.forEach((key, value) -> headerList.add(new BasicHeader(key, value)));
-                EventConfig.headers = headerList.toArray(new Header[0]);
-            }
-        }
-        setConsumer(getThreadCount());
-        EventConfig.setUrl(getDomain());
-    }
+    logger.info("Start DataRangers Cleaner/Record Thread");
+  }
 
 
-    public Executor setThreadPool() {
-        return Executors.newFixedThreadPool(getCorePoolSize());
-    }
+  public static volatile Boolean IS_INIT = false;
 
-    public void setConsumer(int threadCount) {
-        if (EventConfig.saveFlag) {
-            threadCount = 1;
-            logger.info("Start LogAgent Mode");
-        } else {
-            logger.info("Start Http Mode");
-        }
-        if (userQueue == null) {
-            Collector.collectorContainer = new CollectorContainer(RangersCollectorQueue.getInstance(getQueueSize()));
-        } else {
-            //如果客户自定义了queue，则需要替换为客户自定义queue
-            Collector.collectorContainer = new CollectorContainer(userQueue);
-        }
-        if (hasConsumer && Collector.httpRequestPool == null) {
-            //有消费者才初始化消费者
-            Collector.httpRequestPool = setThreadPool();
-            for (int i = 0; i < threadCount; i++) {//必须全部消费同一个队列
-                Collector.httpRequestPool.execute(new Consumer(Collector.collectorContainer, this));
-            }
-        }
-        if(hasProducer){
-            //有生产者才需要记录
-            Collector.scheduled = Executors.newSingleThreadScheduledExecutor();
-            Collector.scheduled.scheduleAtFixedRate(new CollectorCounter(getEventSavePath()), 0, 2, TimeUnit.MINUTES);
-            if (EventConfig.saveFlag) {
-                Collector.scheduled.scheduleAtFixedRate(new RangersFileCleaner(getEventFilePaths(), getEventSaveName(), getEventSaveMaxDays()), 0, 12, TimeUnit.HOURS);
-            }
-        }
-        logger.info("Start DataRangers Cleaner/Record Thread");
-    }
-
-
-    public static volatile Boolean IS_INIT = false;
-
-    public void init() {
+  public void init() {
+    if (!IS_INIT) {
+      synchronized (DataRangersSDKConfigProperties.class) {
         if (!IS_INIT) {
-            synchronized (DataRangersSDKConfigProperties.class) {
-                if (!IS_INIT) {
-                    setLogger();
-                    setCommon();
-                    IS_INIT = true;
-                }
-            }
+          setLogger();
+          setCommon();
+          setHook();
+          IS_INIT = true;
         }
+      }
     }
+  }
 
-    public CollectorQueue getUserQueue() {
-        return userQueue;
-    }
+  public CollectorQueue getUserQueue() {
+    return userQueue;
+  }
 
-    public DataRangersSDKConfigProperties setUserQueue(CollectorQueue userQueue) {
-        this.userQueue = userQueue;
-        return this;
-    }
+  public DataRangersSDKConfigProperties setUserQueue(CollectorQueue userQueue) {
+    this.userQueue = userQueue;
+    return this;
+  }
 
-    public HttpConfig getHttpConfig() {
-        return httpConfig;
-    }
+  public HttpConfig getHttpConfig() {
+    return httpConfig;
+  }
 
-    public void setHttpConfig(HttpConfig httpConfig) {
-        this.httpConfig = httpConfig;
-    }
+  public void setHttpConfig(HttpConfig httpConfig) {
+    this.httpConfig = httpConfig;
+  }
 
-    public HttpClient getCustomHttpClient() {
-        return customHttpClient;
-    }
+  public HttpClient getCustomHttpClient() {
+    return customHttpClient;
+  }
 
-    public void setCustomHttpClient(HttpClient customHttpClient) {
-        this.customHttpClient = customHttpClient;
-    }
+  public void setCustomHttpClient(HttpClient customHttpClient) {
+    this.customHttpClient = customHttpClient;
+  }
 
-    public String getEnv() {
-        return env;
-    }
+  public String getEnv() {
+    return env;
+  }
 
-    public void setEnv(String env) {
-        this.env = env;
-    }
+  public void setEnv(String env) {
+    this.env = env;
+  }
 
-    public OpenapiConfig getOpenapiConfig() {
-        return openapiConfig;
-    }
+  public OpenapiConfig getOpenapiConfig() {
+    return openapiConfig;
+  }
 
-    public void setOpenapiConfig(OpenapiConfig openapiConfig) {
-        this.openapiConfig = openapiConfig;
-    }
+  public void setOpenapiConfig(OpenapiConfig openapiConfig) {
+    this.openapiConfig = openapiConfig;
+  }
 
-    public MessageEnv getMessageEnv() {
-        if ("saas".equalsIgnoreCase(getEnv()) || SAAS_DOMAIN_URLS.contains(getDomain())) {
-            return MessageEnv.SAAS;
-        }
-        return MessageEnv.PRIVATIZATION;
+  public MessageEnv getMessageEnv() {
+    if ("saas".equalsIgnoreCase(getEnv()) || SAAS_DOMAIN_URLS.contains(getDomain())) {
+      return MessageEnv.SAAS;
     }
+    return MessageEnv.PRIVATIZATION;
+  }
 
-    public Map<Integer, String> getAppKeys() {
-        return appKeys;
-    }
+  public Map<Integer, String> getAppKeys() {
+    return appKeys;
+  }
 
-    public void setAppKeys(Map<Integer, String> appKeys) {
-        this.appKeys = appKeys;
-    }
+  public void setAppKeys(Map<Integer, String> appKeys) {
+    this.appKeys = appKeys;
+  }
+
+  private void setHook() {
+    DataRangersSDKConfigProperties properties = this;
+    Runtime.getRuntime().addShutdownHook(new Thread(
+        () -> {
+          if(Collector.httpRequestPool != null){
+            Collector.httpRequestPool.shutdown();
+          }
+
+          new Consumer(Collector.collectorContainer, properties).flush();
+        }));
+
+  }
 }
 

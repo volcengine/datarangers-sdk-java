@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <properties>
-        <sdk.version>1.4.9-release</sdk.version>
+        <sdk.version>1.5.0-release</sdk.version>
     </properties>
 
     <groupId>com.datarangers</groupId>
     <artifactId>datarangers-sdk</artifactId>
     <packaging>pom</packaging>
-    <version>1.4.9-release</version>
+    <version>1.5.0-release</version>
     <modules>
         <module>datarangers-sdk-core</module>
         <module>datarangers-sdk-starter</module>

@@ -19,71 +19,119 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Consumer implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(Consumer.class);
-    private static RangersLoggerWriterPool pool;
-    private CollectorContainer collectorContainer;
-    private DataRangersSDKConfigProperties sdkConfigProperties;
 
-    public Consumer(CollectorContainer collectorContainer, DataRangersSDKConfigProperties sdkConfigProperties) {
-        this.collectorContainer = collectorContainer;
-        this.sdkConfigProperties = sdkConfigProperties;
-    }
+  private static final Logger logger = LoggerFactory.getLogger(Consumer.class);
+  private static RangersLoggerWriterPool pool;
+  private CollectorContainer collectorContainer;
+  private DataRangersSDKConfigProperties sdkConfigProperties;
 
-    public static void setWriterPool(final List<String> targetPrefixes, String targetNames, int maxSize) {
+  public Consumer(CollectorContainer collectorContainer,
+      DataRangersSDKConfigProperties sdkConfigProperties) {
+    this.collectorContainer = collectorContainer;
+    this.sdkConfigProperties = sdkConfigProperties;
+  }
+
+  public static void setWriterPool(final List<String> targetPrefixes, String targetNames,
+      int maxSize) {
+    if (pool == null) {
+      synchronized (Consumer.class) {
         if (pool == null) {
-            synchronized (Consumer.class) {
-                if (pool == null) {
-                    pool = RangersLoggerWriterPool.getInstance(targetPrefixes, targetNames, maxSize);
-                }
-            }
+          pool = RangersLoggerWriterPool.getInstance(targetPrefixes, targetNames, maxSize);
         }
+      }
     }
+  }
 
-    private void send() throws Exception {
-        while (true) {
-            try {
-                List<Message> messages = collectorContainer.consume();
-                if (messages != null) {
-                    messages.forEach(message -> {
-                        MessageSenderFactory.getMessageSender(message).send(message, this.sdkConfigProperties);
-                    });
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
-                logger.error("consumer send error", e);
-            }
+  private void send() throws Exception {
+    while (true) {
+      try {
+        List<Message> messages = collectorContainer.consume();
+        if (messages != null) {
+          messages.forEach(message -> {
+            doSend(message);
+          });
         }
+      } catch (Throwable e) {
+        e.printStackTrace();
+        logger.error("consumer send error", e);
+      }
     }
+  }
 
-    private void write() throws Exception {
-        while (true) {
-            try {
-                List<Message> messages = collectorContainer.consume();
-                if (messages != null) {
-                    messages.forEach(message -> {
-                        AppMessage appMessage = message.getAppMessage();
-                        pool.getWriter(appMessage.getUserUniqueId()).write(RangersJSONConfig.getInstance().toJson(appMessage) + "\n");
-                    });
-                }
-            }catch (Throwable e){
-                logger.error("consumer write error", e);
-            }
-
+  private void write() throws Exception {
+    while (true) {
+      try {
+        List<Message> messages = collectorContainer.consume();
+        if (messages != null) {
+          messages.forEach(message -> {
+            doWrite(message);
+          });
         }
-    }
+      } catch (Throwable e) {
+        logger.error("consumer write error", e);
+      }
 
-    @Override
-    public void run() {
-        try {
-            if (EventConfig.saveFlag) {
-                write();
-            }
-            else {
-                send();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("consumer run error", e);
-        }
     }
+  }
+
+  @Override
+  public void run() {
+    try {
+      if (EventConfig.saveFlag) {
+        write();
+      } else {
+        send();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      logger.error("consumer run error", e);
+    }
+  }
+
+  public void flush() {
+    try {
+      System.out.println("flush message start");
+      logger.info("flush message start");
+      int count = 0;
+      if (collectorContainer.getMessageQueue() != null) {
+        Message message = collectorContainer.getMessageQueue().poll();
+        while (message != null) {
+          count++;
+          message = collectorContainer.handleMessage(message);
+          if (EventConfig.saveFlag) {
+            doWrite(message);
+          } else {
+            doSend(message);
+          }
+          message = collectorContainer.getMessageQueue().poll();
+        }
+      }
+
+      logger.info("flush message success. size: {}", count);
+      System.out.println("flush message success. size: " + count);
+    } catch (Exception e) {
+      e.printStackTrace();
+      logger.error("flush message error", e);
+    }
+  }
+
+  public void flush(Message message) {
+    message = collectorContainer.handleMessage(message);
+    if (EventConfig.saveFlag) {
+      doWrite(message);
+    } else {
+      doSend(message);
+    }
+  }
+
+  private void doSend(Message message) {
+    MessageSenderFactory.getMessageSender(message)
+        .send(message, this.sdkConfigProperties);
+  }
+
+  private void doWrite(Message message) {
+    AppMessage appMessage = message.getAppMessage();
+    pool.getWriter(appMessage.getUserUniqueId())
+        .write(RangersJSONConfig.getInstance().toJson(appMessage) + "\n");
+  }
 }
