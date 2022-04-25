@@ -23,28 +23,15 @@ public class CollectorContainer {
         this.messageQueue = messageQueue;
     }
 
-    public boolean produce(Message message) throws InterruptedException {
-        return messageQueue.offer(message);
+    public void produce(Message message) throws InterruptedException {
+        messageQueue.put(message);
     }
 
     private List<Message> handleMessage(List<Message> messages) throws InterruptedException {
         if (messages == null) {
             return null;
         }
-        messages.forEach(message -> message.getAppMessage().getEvents().forEach(event -> {
-            int appId = message.getAppMessage().getAppId();
-            String eventName = event.getEvent();
-            String date = event.getDatetime().substring(0, 13);
-            if (!SEND_HISTORY.containsKey(date)) {
-                SEND_HISTORY.put(date, new ConcurrentHashMap<>());
-            }
-            String key = appId + "-" + eventName;
-            ConcurrentHashMap<String, LongAdder> map = SEND_HISTORY.get(date);
-            if (!map.containsKey(key)) {
-                map.put(key, new LongAdder());
-            }
-            map.get(key).increment();
-        }));
+        messages.forEach(message -> doHandleMessage(message));
         return messages;
     }
 
@@ -63,4 +50,31 @@ public class CollectorContainer {
     public CollectorQueue getMessageQueue() {
         return messageQueue;
     }
+
+    public Message handleMessage(Message message) {
+        if (message == null) {
+            return null;
+        }
+        doHandleMessage(message);
+        return message;
+    }
+
+    private void doHandleMessage(Message message) {
+        message.getAppMessage().getEvents().forEach(event -> {
+            int appId = message.getAppMessage().getAppId();
+            String eventName = event.getEvent();
+            String date = event.getDatetime().substring(0, 13);
+            if (!SEND_HISTORY.containsKey(date)) {
+                SEND_HISTORY.put(date, new ConcurrentHashMap<>());
+            }
+            String key = appId + "-" + eventName;
+            ConcurrentHashMap<String, LongAdder> map = SEND_HISTORY.get(date);
+            if (!map.containsKey(key)) {
+                map.put(key, new LongAdder());
+            }
+            map.get(key).increment();
+        });
+    }
+
+
 }
