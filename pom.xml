@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <properties>
-        <sdk.version>1.5.0-release</sdk.version>
+        <sdk.version>1.5.1-release</sdk.version>
     </properties>
 
     <groupId>com.datarangers</groupId>
     <artifactId>datarangers-sdk</artifactId>
     <packaging>pom</packaging>
-    <version>1.5.0-release</version>
+    <version>1.5.1-release</version>
     <modules>
         <module>datarangers-sdk-core</module>
         <module>datarangers-sdk-starter</module>
@@ -18,7 +18,7 @@
     <distributionManagement>
         <repository>
             <id>bytedance-Volcengine</id>
-            <url>https://artifact-maven.byted.org/repository/Volcengine</url>
+            <url>https://artifact-maven.byted.org/repository/Volcengine/</url>
         </repository>
     </distributionManagement>
     <dependencyManagement>

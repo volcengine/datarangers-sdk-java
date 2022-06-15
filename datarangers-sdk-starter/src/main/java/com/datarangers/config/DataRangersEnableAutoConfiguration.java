@@ -29,22 +29,18 @@ public class DataRangersEnableAutoConfiguration {
   @Autowired
   private DataRangersSDKConfigPropertiesInfo dataRangersSDKConfigPropertiesInfo;
 
-  @Autowired
-  private Callback callback;
-
-
   @Bean(name = "appEventCollector")
-  public EventCollector defaultAppCollector() {
+  public EventCollector defaultAppCollector(Callback callback) {
     return new AppEventCollector("app", dataRangersSDKConfigPropertiesInfo, callback);
   }
 
   @Bean(name = "webEventCollector")
-  public EventCollector defaultWebCollector() {
+  public EventCollector defaultWebCollector(Callback callback) {
     return new AppEventCollector("web", dataRangersSDKConfigPropertiesInfo, callback);
   }
 
   @Bean(name = "mpEventCollector")
-  public EventCollector defaultMpbCollector() {
+  public EventCollector defaultMpbCollector(Callback callback) {
     return new AppEventCollector("mp", dataRangersSDKConfigPropertiesInfo, callback);
   }
 
