@@ -37,6 +37,7 @@ public class AppEventCollector extends Collector {
 
       // 设置同步发送的consumer，队列满的时候使用
       setConsumer(new Consumer(Collector.collectorContainer, this.properties));
+
     } else {
       System.out.println(Constants.INIT_ERROR);
     }

@@ -8,17 +8,21 @@ package com.datarangers.collector;
 
 import com.datarangers.asynccollector.CollectorContainer;
 import com.datarangers.asynccollector.Consumer;
-import com.datarangers.config.DataRangersSDKConfigProperties;
-import com.datarangers.config.RangersJSONConfig;
+import com.datarangers.config.*;
+import com.datarangers.message.AppMessage;
 import com.datarangers.message.Message;
 import com.datarangers.message.MessageEnv;
 import com.datarangers.sender.Callback;
 import com.datarangers.sender.Callback.FailedData;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
@@ -36,6 +40,7 @@ public abstract class Collector implements EventCollector {
   protected DataRangersSDKConfigProperties properties;
   protected Callback callback;
   protected Consumer consumer = null;
+  protected KafkaProducer kafkaProducer;
 
   public Collector(String appType, DataRangersSDKConfigProperties properties, Callback cb) {
     this.appType = appType;
@@ -43,8 +48,31 @@ public abstract class Collector implements EventCollector {
     this.properties = properties;
     this.callback = cb;
     this.properties.setCallback(this.getCallback());
+    this.initKafkaProducer();
   }
 
+  private void initKafkaProducer(){
+    if(SdkMode.KAFKA != this.properties.getMode()){
+      return;
+    }
+    // 设置过了就不需要再自己创建
+    if(kafkaProducer != null){
+      return;
+    }
+    kafkaProducer = createProducer(this.properties.getKafka());
+  }
+
+  private KafkaProducer<String, String> createProducer(KafkaConfig kafkaConfig) {
+    Properties props = new Properties();
+    props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+    props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+    props.put("bootstrap.servers", kafkaConfig.getBootstrapServers());
+    Map<String, Object> map = kafkaConfig.getProperties();
+    if (map != null && (!map.isEmpty())) {
+      props.putAll(map);
+    }
+    return new KafkaProducer<>(props);
+  }
   public String getAppType() {
     return appType;
   }
@@ -53,6 +81,7 @@ public abstract class Collector implements EventCollector {
     this.appType = appType;
     return this;
   }
+
 
   public void send(Message message) {
     sendMessage(message);
@@ -66,11 +95,38 @@ public abstract class Collector implements EventCollector {
     String sendMessage;
 
     validate(message);
+    if(kafkaProducer != null){
+      // 使用kafka的方式
+      sendByKafka(message.getAppMessage());
+      return;
+    }
     sendMessage = RangersJSONConfig.getInstance().toJson(message.getAppMessage());
     if (this.properties.isSync()) {
       syncSendMessage(message, sendMessage);
     } else {
       asyncSendMessage(message, sendMessage);
+    }
+  }
+
+  private void sendByKafka(AppMessage appMessage) {
+    // kafka sender，header 添加固定的头
+    appMessage.getHeader().setSource(Constants.SDK_SERVER);
+    String sendMessage = RangersJSONConfig.getInstance().toJson(appMessage);
+    try {
+      ProducerRecord producerRecord = new ProducerRecord<>(properties.getKafka().getTopic(), sendMessage);
+      kafkaProducer.send(producerRecord, new org.apache.kafka.clients.producer.Callback() {
+        @Override
+        public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+          if (e != null) {
+            logger.error(String.format("kafka send message error. value: \r\n %s", sendMessage), e);
+            getCallback().onFailed(new FailedData(sendMessage, e.getMessage(), e));
+          }
+        }
+      });
+    } catch (Exception e) {
+      e.printStackTrace();
+      logger.error(String.format("kafka send message error. value: \r\n %s", sendMessage), e);
+      getCallback().onFailed(new FailedData(sendMessage, e.getMessage(), e));
     }
   }
 

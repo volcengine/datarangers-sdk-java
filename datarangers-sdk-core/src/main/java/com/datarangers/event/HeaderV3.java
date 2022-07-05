@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HeaderV3 implements Serializable, Header {
+    @JsonProperty("__source")
+    private String source;
     private Integer aid;
     private String appLanguage;
     private String appName;
@@ -56,6 +58,15 @@ public class HeaderV3 implements Serializable, Header {
     private String clientIp;
 
     protected HeaderV3() {
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public HeaderV3 setSource(String source) {
+        this.source = source;
+        return this;
     }
 
     public HeaderV3 setClientIp(String clientIp) {
@@ -442,6 +453,10 @@ public class HeaderV3 implements Serializable, Header {
             return new Builder();
         }
 
+        public Builder setSource(String source) {
+            headerV3.setSource(source);
+            return this;
+        }
         public Builder setClientIp(String clientIp) {
             headerV3.setClientIp(clientIp);
             return this;
@@ -643,5 +658,7 @@ public class HeaderV3 implements Serializable, Header {
             headerV3.addCustom("__sdk_platform", Constants.SDK_VERSION);
             return this.headerV3;
         }
+
+
     }
 }
