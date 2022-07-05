@@ -13,11 +13,11 @@ datarangers-sdk-java是 [DataRangers](https://datarangers.com.cn/) 的用户行�
 <dependency>
   <groupId>com.datarangers</groupId>
   <artifactId>datarangers-sdk-core</artifactId>
-  <version>1.5.1-release</version>
+  <version>1.5.2-release</version>
 </dependency>
 ```
 
-version是sdk的版本号，当前最新的版本为1.5.1-release。
+version是sdk的版本号，当前最新的版本为1.5.2-release。
 
 火山引擎仓库地址：
 ```xml
@@ -38,13 +38,19 @@ DataRangers SDK需要进行一定的参数配置才能够使用，具体需要�
     * va(美东): https://mcs.itobsnssdk.com  
 * save：bool型变量，表示是否保存到文件：
     * true：保存到文件，但是需要配置LogAgent完成事件上报功能,需要额外定义：
-    * eventSaveName：保存日志的文件名，需要保证文件的写权限。
-    * eventSavePath：保存日志的文件路径，需要保证写权限和创建文件的权限。
-    * eventSaveMaxFileSize：表示需要保存的日志文件的最大文件大小，单位为MB。
-    * eventFilePaths：表示需要保存的日志文件的位置，为一个字符串数组，数组中的每一个值都表示一个路径，用户将日志文件写到不同的文件夹下，可以配合多个LogAgent实例使用。注意：如果定义了该数组，则eventSavePath不会生效。
-* false：使用http模式进行异步上报：
-    * httpTimeout：Http的超时时间，单位为ms。
-    * headers：Map类型，Http请求的Header中的字段，必填为Host ，Host在DataRangers安装中进行定义
+      * eventSaveName：保存日志的文件名，需要保证文件的写权限。
+      * eventSavePath：保存日志的文件路径，需要保证写权限和创建文件的权限。
+      * eventSaveMaxFileSize：表示需要保存的日志文件的最大文件大小，单位为MB。
+      * eventFilePaths：表示需要保存的日志文件的位置，为一个字符串数组，数组中的每一个值都表示一个路径，用户将日志文件写到不同的文件夹下，可以配合多个LogAgent实例使用。注意：如果定义了该数组，则eventSavePath不会生效。
+    * false：使用http模式进行异步上报：
+        * httpTimeout：Http的超时时间，单位为ms。
+        * headers：Map类型，Http请求的Header中的字段，必填为Host ，Host在DataRangers安装中进行定义
+* mode: 枚举值，支持kafka,http,file。建议使用新的该配置。当mode和save同时存在的时候，以mode为准
+  * http 等同于save=false
+  * file 等同于save=true
+  * kafka，支持直接通过kafka进行上报，当使用该模式的时候，需要配置kafka的上报地址：
+    * bootstrapServers： kafka的地址
+    * properties: 是一个map，需要配置的其他的kafka properties。kafkaProducer的参数参考：https://kafka.apache.org/0102/documentation.html#producerconfigs
     
 如果您使用了Spring框架，则可以参考的配置如下：
 ```xml
@@ -80,7 +86,7 @@ DataRangers SDK需要进行一定的参数配置才能够使用，具体需要�
 <dependency>
    <groupId>com.datarangers</groupId>
    <artifactId>datarangers-sdk-starter</artifactId>
-   <version>1.5.1-release</version>
+   <version>1.5.2-release</version>
 </dependency>
 ```
 
@@ -154,6 +160,20 @@ datarangers.sdk.eventSaveMaxFileSize=256
 # 每一个 host 的最大连接数
 # datarangers.sdk.httpConfig.maxPerRoute=100
 
+# kafka 配置
+# 设置模式为kafka
+# datarangers.sdk.mode=kafka
+
+# 配置发送的kafka topic，没有配置时，使用默认sdk_origin_event，
+# datarangers.sdk.kafka.topic=sdk_origin_event
+
+# 配置发送的地址,ip需要替换成真实的ip
+# datarangers.sdk.kafka.bootstrapServers={ip1}:9192,{ip2}:9192
+
+# 如果有需要，配置其他的属性, 形式为：datarangers.sdk.kafka.properties.${key}=${value}, 比如配置重试次数。
+# kafkaProducer的参数参考：https://kafka.apache.org/0102/documentation.html#producerconfigs
+# 重试次数
+# datarangers.sdk.kafka.properties.retries=3
 ```
 
 ### 3. 使用SDK

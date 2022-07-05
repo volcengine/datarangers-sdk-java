@@ -13,7 +13,6 @@ import com.datarangers.message.MessageEnv;
 import com.datarangers.sender.Callback;
 import com.datarangers.sender.callback.LoggingCallback;
 import com.datarangers.util.HttpUtils;
-import java.util.Arrays;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.message.BasicHeader;
@@ -21,11 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.*;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author hTangle
@@ -47,6 +45,14 @@ public class DataRangersSDKConfigProperties {
 
   public String timeZone = "+8";
   public ZoneOffset timeOffset = null;
+
+  /**
+   * 过期的配置，使用mode配置，支持：
+   * file: 保存到本地
+   * http: 直接http发送
+   * kafka: 通过kafka进行发送
+   */
+  @Deprecated
   public boolean save = false;
   public int threadCount = 1;
   public int queueSize = 10240;
@@ -87,8 +93,7 @@ public class DataRangersSDKConfigProperties {
 
   private List<String> SAAS_DOMAIN_URLS = Arrays.asList(
       "https://mcs.ctobsnssdk.com",
-      "https://mcs.tobsnssdk.com",
-      "https://mcs.itobsnssdk.com");
+      "https://mcs.tobsnssdk.com");
 
   /**
    * saas openapi 配置地址
@@ -101,6 +106,31 @@ public class DataRangersSDKConfigProperties {
    * 同步还是异步发送，默认是异步发送
    */
   private boolean sync;
+
+  private SdkMode mode;
+  private KafkaConfig kafka;
+
+  public KafkaConfig getKafka() {
+    return kafka;
+  }
+
+  public void setKafka(KafkaConfig kafka) {
+    this.kafka = kafka;
+  }
+
+  public SdkMode getMode() {
+    if (this.mode != null) {
+      return mode;
+    }
+    if (isSave()) {
+      return SdkMode.FILE;
+    }
+    return SdkMode.HTTP;
+  }
+
+  public void setMode(SdkMode mode) {
+    this.mode = mode;
+  }
 
   public boolean isSync() {
     return sync;
@@ -279,10 +309,12 @@ public class DataRangersSDKConfigProperties {
     this.timeOffset = timeOffset;
   }
 
+  @Deprecated
   public boolean isSave() {
     return save;
   }
 
+  @Deprecated
   public void setSave(boolean save) {
     this.save = save;
   }
@@ -305,9 +337,9 @@ public class DataRangersSDKConfigProperties {
   }
 
   public void setCommon() {
-    EventConfig.saveFlag = save;
-    EventConfig.sendFlag = !save;
-    if (!save) {
+    EventConfig.saveFlag = SdkMode.FILE == getMode();
+    EventConfig.sendFlag = SdkMode.HTTP == getMode();
+    if (EventConfig.sendFlag) {
       httpConfig = this.getHttpConfig();
       if (httpConfig.getMaxPerRoute() < this.getThreadCount()) {
         httpConfig.setMaxPerRoute(this.getThreadCount());
@@ -454,7 +486,7 @@ public class DataRangersSDKConfigProperties {
 
           new Consumer(Collector.collectorContainer, properties).flush();
         }));
-
   }
+
 }
 

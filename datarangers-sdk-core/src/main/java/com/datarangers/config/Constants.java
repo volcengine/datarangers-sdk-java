@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.GregorianCalendar;
 
 public class Constants {
-    public static final String SDK_VERSION = "datarangers_sdk_1.5.1-release";
+    public static final String SDK_VERSION = "datarangers_sdk_1.5.2-release";
     public static DateTimeFormatter FULL_HOUR = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH");
     public static DateTimeFormatter FULL_DAY = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     public static final String APP_LOG_PATH = "/sdk/log";
@@ -24,4 +24,6 @@ public class Constants {
     public static final int TIME_ZONE_OFFSET = TIME_ZONE_OFFSET_CURRENT / 60 / 60;
 
     public static final String APP_KEY = "X-MCS-AppKey";
+
+    public static final String SDK_SERVER = "sdk_server";
 }
