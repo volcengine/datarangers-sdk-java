@@ -20,7 +20,7 @@ public class SaasProfileAppMessage {
     put(ProfileMethod.SET.toString(), "SET");
     put(ProfileMethod.SET_ONCE.toString(), "SET_ONCE");
     put(ProfileMethod.APPEND.toString(), "APPEND");
-    put(ProfileMethod.INCREMENT.toString(), "INCREMENT");
+    put(ProfileMethod.INCREMENT.toString(), "INCREASE");
     put(ProfileMethod.UNSET.toString(), "UNSET");
   }};
 
