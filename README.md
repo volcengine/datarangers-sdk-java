@@ -32,7 +32,7 @@ version是sdk的版本号，当前最新的版本为1.5.3-release。
 
 ### 2. 配置SDK
 DataRangers SDK需要进行一定的参数配置才能够使用，具体需要配置的参数为：
-* domain：datarangers的域名或者ip，支持http和https，例如为 http://www.datarangers.com，在私有化环境中，需要修改为对应的sdk上报域名或者使用DataRangers服务器的ip地址。在saas环境中需要修改成对应的域名：
+* domain：datarangers的域名或者ip，支持http和https，例如为 https://www.xxx.com，在私有化环境中，需要修改为对应的sdk上报域名或者使用DataRangers服务器的ip地址。在saas环境中需要修改成对应的域名：
     * 中国区：https://mcs.ctobsnssdk.com
     * sg(新加坡): https://mcs.tobsnssdk.com
     * va(美东): https://mcs.itobsnssdk.com  
@@ -108,7 +108,7 @@ datarangers.sdk.headers.Host=host
 # datarangers.sdk.appKeys.${appId}=xxx
 
 # 如果是在saas环境中，需要配置openapi, 私有化环境中可以不配置
-# openapi的domain， 国内: https://analytics.volcengineapi.com，国际是: https://datarangers.com
+# openapi的domain， 国内: https://analytics.volcengineapi.com，国际是: https://analytics.byteplusapi.com
 # datarangers.sdk.openapiConfig.domain=xxx
 
 # openapi的ak, sk
