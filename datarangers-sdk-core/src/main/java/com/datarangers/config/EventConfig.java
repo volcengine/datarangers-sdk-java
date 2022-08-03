@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class EventConfig {
     public static String appUrl;
+    public static String appListUrl;
     public static Header[] headers;
     public static Map<String, String> SEND_HEADER;
     public static boolean saveFlag = false;
@@ -19,6 +20,7 @@ public class EventConfig {
 
     public static void setUrl(String url) {
         setAppUrl(url + Constants.APP_LOG_PATH);
+        setAppListUrl(url + Constants.APP_LIST_PATH);
     }
 
     public static String getAppUrl() {
@@ -27,5 +29,13 @@ public class EventConfig {
 
     public static void setAppUrl(String appUrl) {
         EventConfig.appUrl = appUrl;
+    }
+
+    public static String getAppListUrl() {
+        return EventConfig.appListUrl;
+    }
+
+    public static void setAppListUrl(String appUrl) {
+        EventConfig.appListUrl = appUrl;
     }
 }

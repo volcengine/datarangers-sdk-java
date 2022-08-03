@@ -43,6 +43,10 @@ public class CollectorContainer {
         return handleMessage(messageQueue.poll(waitTimeMs));
     }
 
+    public List<Message> consume(int size, int waitTimeMs) throws InterruptedException {
+        return handleMessage(messageQueue.poll(size, waitTimeMs));
+    }
+
     public int size() {
         return messageQueue.size();
     }

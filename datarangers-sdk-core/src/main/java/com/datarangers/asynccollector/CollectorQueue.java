@@ -23,7 +23,17 @@ public interface CollectorQueue {
      * @date: 2021/2/7 15:51
      */
     List<Message> take() throws InterruptedException;
+
     List<Message> poll(int waitTimeMs) throws InterruptedException;
+
+    /**
+     * 每次等待waitTimeMs，获取数据最多size的数据
+     * @param size
+     * @param waitTimeMs
+     * @return
+     * @throws InterruptedException
+     */
+    List<Message> poll(int size, int waitTimeMs) throws InterruptedException;
     /**
      * 功能描述: 发送一个Message到队列中
      *
