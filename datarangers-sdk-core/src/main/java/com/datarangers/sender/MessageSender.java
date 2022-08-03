@@ -3,6 +3,8 @@ package com.datarangers.sender;
 import com.datarangers.config.DataRangersSDKConfigProperties;
 import com.datarangers.message.Message;
 
+import java.util.List;
+
 /**
  * @Author zhangpeng.spin@bytedance.com
  * @Date 2021-07-22
@@ -15,4 +17,13 @@ public interface MessageSender {
    * @param sdkConfigProperties
    */
   void send(Message message, DataRangersSDKConfigProperties sdkConfigProperties);
+
+  /**
+   * 使用批量上报
+   * @param message
+   * @param sdkConfigProperties
+   */
+  default void sendBatch(List<Message> message, DataRangersSDKConfigProperties sdkConfigProperties) {
+    throw new UnsupportedOperationException("Not support batch");
+  };
 }

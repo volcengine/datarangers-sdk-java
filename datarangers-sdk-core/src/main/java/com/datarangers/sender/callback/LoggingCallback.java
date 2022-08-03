@@ -1,7 +1,13 @@
 package com.datarangers.sender.callback;
 
+import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.logger.RangersLoggerWriter;
 import com.datarangers.sender.Callback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * @Author zhangpeng.spin@bytedance.com
@@ -9,6 +15,8 @@ import com.datarangers.sender.Callback;
  */
 
 public class LoggingCallback implements Callback {
+  public static final Logger logger = LoggerFactory.getLogger(LoggingCallback.class);
+
 
   private static RangersLoggerWriter writer;
   private static final Object lock = new Object();
@@ -19,7 +27,24 @@ public class LoggingCallback implements Callback {
 
   @Override
   public void onFailed(FailedData failedData) {
-    writeFailedMessage(failedData.getMessage());
+    if (failedData.getMessage() == null) {
+      return;
+    }
+    if(!failedData.isListable()){
+      writeFailedMessage(failedData.getMessage());
+    }else{
+      try {
+        List list = RangersJSONConfig.getInstance().fromJson(failedData.getMessage(), List.class);
+        list.forEach(n-> {
+          writeFailedMessage(RangersJSONConfig.getInstance().toJson(n));
+        });
+      } catch (IOException e) {
+        e.printStackTrace();
+        logger.error("json error", e);
+        writeFailedMessage(failedData.getMessage());
+      }
+    }
+
   }
 
   private void writeFailedMessage(String message) {
