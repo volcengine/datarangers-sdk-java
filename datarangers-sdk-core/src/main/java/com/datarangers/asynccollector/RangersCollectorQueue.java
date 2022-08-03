@@ -2,6 +2,7 @@ package com.datarangers.asynccollector;
 
 import com.datarangers.message.Message;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -55,6 +56,26 @@ public class RangersCollectorQueue implements CollectorQueue {
             return Collections.singletonList(msg);
         }
         return null;
+    }
+
+    @Override
+    public List<Message> poll(int size, int waitTimeMs) throws InterruptedException {
+        List<Message> messages = new ArrayList<>();
+        Message msg = queue.poll(waitTimeMs, TimeUnit.MILLISECONDS);
+        if(msg != null){
+            messages.add(msg);
+        }
+
+        // 只有
+        while(messages.size() < size){
+            msg = queue.poll(waitTimeMs, TimeUnit.MILLISECONDS);
+            if(msg == null){
+                // 退出循环
+                break;
+            }
+            messages.add(msg);
+        }
+        return messages;
     }
 
     @Override
