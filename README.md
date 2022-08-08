@@ -13,11 +13,11 @@ datarangers-sdk-java是 [DataFinder](https://www.volcengine.com/product/datafind
 <dependency>
   <groupId>com.datarangers</groupId>
   <artifactId>datarangers-sdk-core</artifactId>
-  <version>1.5.4-release</version>
+  <version>1.5.5-release</version>
 </dependency>
 ```
 
-version是sdk的版本号，当前最新的版本为1.5.4-release。
+version是sdk的版本号，当前最新的版本为1.5.5-release。
 
 火山引擎仓库地址：
 ```xml
@@ -86,7 +86,7 @@ DataRangers SDK需要进行一定的参数配置才能够使用，具体需要�
 <dependency>
    <groupId>com.datarangers</groupId>
    <artifactId>datarangers-sdk-starter</artifactId>
-   <version>1.5.4-release</version>
+   <version>1.5.5-release</version>
 </dependency>
 ```
 
