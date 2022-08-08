@@ -101,7 +101,7 @@ public class RangersLoggerWriter implements RangersFileWriter {
         File parent = new File(targetPrefix);
         if (!parent.exists()) parent.mkdirs();
         this.currentIndex = setCurrentIndex();
-        if (this.currentIndex == 0) this.currentIndex++;
+        this.currentIndex++;
         fullTarget = this.targetPrefix + "/" + this.targetName;
         this.output = new File(fullTarget);
         currentName = targetName + "." + LocalDateTime.now().format(Constants.FULL_HOUR);
@@ -120,7 +120,7 @@ public class RangersLoggerWriter implements RangersFileWriter {
 
     private int setCurrentIndex() {
         String current = LocalDateTime.now().format(Constants.FULL_HOUR);
-        String full = targetName + "-" + current + "-";
+        String full = targetName + "." + current + ".";
         int number = 0;
         for (File f : new File(targetPrefix).listFiles()) {
             if (f.getName().contains(full)) {
