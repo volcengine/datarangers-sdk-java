@@ -13,14 +13,15 @@ public interface Callback {
 
   class FailedData {
 
-    public FailedData(String message, String cause) {
-      this(message, cause, null);
+    public FailedData(String message, String cause, boolean listable) {
+      this(message, cause, null, listable);
     }
 
-    public FailedData(String message, String cause, Exception exception) {
+    public FailedData(String message, String cause, Exception exception, boolean listable) {
       this.message = message;
       this.cause = cause;
       this.exception = exception;
+      this.listable = listable;
     }
 
     /**
@@ -37,6 +38,8 @@ public interface Callback {
      * 失败时的异常，如果有的话
      */
     private Exception exception;
+
+    private boolean listable;
 
     public String getMessage() {
       return message;
@@ -60,6 +63,14 @@ public interface Callback {
 
     public void setException(Exception exception) {
       this.exception = exception;
+    }
+
+    public boolean isListable() {
+      return listable;
+    }
+
+    public void setListable(boolean listable) {
+      this.listable = listable;
     }
   }
 }

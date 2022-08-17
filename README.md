@@ -13,11 +13,11 @@ datarangers-sdk-java是 [DataFinder](https://www.volcengine.com/product/datafind
 <dependency>
   <groupId>com.datarangers</groupId>
   <artifactId>datarangers-sdk-core</artifactId>
-  <version>1.5.3-release</version>
+  <version>1.5.4-release</version>
 </dependency>
 ```
 
-version是sdk的版本号，当前最新的版本为1.5.3-release。
+version是sdk的版本号，当前最新的版本为1.5.4-release。
 
 火山引擎仓库地址：
 ```xml
@@ -86,7 +86,7 @@ DataRangers SDK需要进行一定的参数配置才能够使用，具体需要�
 <dependency>
    <groupId>com.datarangers</groupId>
    <artifactId>datarangers-sdk-starter</artifactId>
-   <version>1.5.3-release</version>
+   <version>1.5.4-release</version>
 </dependency>
 ```
 
@@ -115,13 +115,24 @@ datarangers.sdk.headers.Host=host
 # datarangers.sdk.openapiConfig.ak=xxx
 # datarangers.sdk.openapiConfig.sk=xxx
 
-
 # 是否保存到本地,如果需要配合logagent使用需要将其定义为true
 datarangers.sdk.save=true
 # 异步方式的发送线程数量,如果为logagent模式请设置为1
 datarangers.sdk.threadCount=4
+# 异步方式的发送核心线程数量，建议corePoolSize 跟threadCount 配置成一样
+datarangers.sdk.corePoolSize=4
 # 异步方式队列长度
 datarangers.sdk.queueSize=102400
+
+# 是否使用批量发送,默认为false
+#datarangers.sdk.sendBatch=true
+
+# 批量发送的大小
+#datarangers.sdk.batchSize=16
+
+# 批量的等待时间，当批量达到batchSize，或者等待时间超过waitTimeMs，就立刻发送
+#datarangers.sdk.waitTimeMs=100
+
 # 保存日志文件路径
 datarangers.sdk.eventSavePath=logs/
 # 保存日志文件名
