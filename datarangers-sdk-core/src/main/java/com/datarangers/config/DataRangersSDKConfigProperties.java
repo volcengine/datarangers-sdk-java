@@ -58,6 +58,34 @@ public class DataRangersSDKConfigProperties {
   public int queueSize = 10240;
   public boolean send = true;
 
+  private boolean sendBatch = false;
+  private int batchSize = 20;
+  private int waitTimeMs = 100;
+
+  public boolean isSendBatch() {
+    return sendBatch;
+  }
+
+  public void setSendBatch(boolean sendBatch) {
+    this.sendBatch = sendBatch;
+  }
+
+  public int getBatchSize() {
+    return batchSize;
+  }
+
+  public void setBatchSize(int batchSize) {
+    this.batchSize = batchSize;
+  }
+
+  public int getWaitTimeMs() {
+    return waitTimeMs;
+  }
+
+  public void setWaitTimeMs(int waitTimeMs) {
+    this.waitTimeMs = waitTimeMs;
+  }
+
   public boolean isEnable() {
     return enable;
   }
