@@ -119,14 +119,14 @@ public abstract class Collector implements EventCollector {
         public void onCompletion(RecordMetadata recordMetadata, Exception e) {
           if (e != null) {
             logger.error(String.format("kafka send message error. value: \r\n %s", sendMessage), e);
-            getCallback().onFailed(new FailedData(sendMessage, e.getMessage(), e));
+            getCallback().onFailed(new FailedData(sendMessage, e.getMessage(), e, false));
           }
         }
       });
     } catch (Exception e) {
       e.printStackTrace();
       logger.error(String.format("kafka send message error. value: \r\n %s", sendMessage), e);
-      getCallback().onFailed(new FailedData(sendMessage, e.getMessage(), e));
+      getCallback().onFailed(new FailedData(sendMessage, e.getMessage(), e, false));
     }
   }
 
@@ -136,7 +136,7 @@ public abstract class Collector implements EventCollector {
     } catch (Exception e) {
       e.printStackTrace();
       logger.error("sync send message error", e);
-      getCallback().onFailed(new FailedData(sendMessage, e.getMessage(), e));
+      getCallback().onFailed(new FailedData(sendMessage, e.getMessage(), e, false));
     }
   }
 
@@ -147,11 +147,11 @@ public abstract class Collector implements EventCollector {
       } catch (Exception e) {
         e.printStackTrace();
         logger.error("async send message error", e);
-        getCallback().onFailed(new FailedData(sendMessage, e.getMessage(), e));
+        getCallback().onFailed(new FailedData(sendMessage, e.getMessage(), e, false));
       }
     } else {
       logger.error("getMessageQueue is null");
-      getCallback().onFailed(new FailedData(sendMessage, "getMessageQueue is null"));
+      getCallback().onFailed(new FailedData(sendMessage, "getMessageQueue is null", false));
     }
   }
 
