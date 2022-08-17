@@ -7,9 +7,7 @@
 package com.datarangers.util;
 
 import com.datarangers.config.HttpConfig;
-import com.datarangers.config.EventConfig;
 import com.datarangers.config.RangersJSONConfig;
-import com.datarangers.logger.RangersLoggerWriter;
 import com.datarangers.sender.Callback;
 import com.datarangers.sender.Callback.FailedData;
 
@@ -27,7 +25,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.hc.client5.http.classic.HttpClient;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
@@ -202,12 +199,12 @@ public class HttpUtils {
                         "request error: requestId={}, method={}, url={}, body={},header={}", requestId, method,
                         url, body,
                         headers);
-                callback.onFailed(new FailedData(body, causeMsg));
+                callback.onFailed(new FailedData(body, causeMsg, isListable(url)));
             }
         } catch (IOException e) {
             if (count > 2) {
                 logger.error(String.format("request error, io error: %s, resultStr: %s", e.getMessage(), resultStr), e);
-                callback.onFailed(new FailedData(body, e.toString(), e));
+                callback.onFailed(new FailedData(body, e.toString(), e, isListable(url)));
             } else {
                 count++;
                 post(url, body, headers, count);
@@ -217,7 +214,7 @@ public class HttpUtils {
                     "request error, parse error: requestId={}, method={}, url={}, body={},header={}", requestId, method,
                     url, body,
                     headers);
-            callback.onFailed(new FailedData(body, e.toString(), e));
+            callback.onFailed(new FailedData(body, e.toString(), e, isListable(url)));
         } finally {
             try {
                 if (response != null) {
@@ -254,6 +251,14 @@ public class HttpUtils {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 是否是list
+     * @return
+     */
+    private static boolean isListable(String url){
+        return url.endsWith("/sdk/list");
     }
 
 }
