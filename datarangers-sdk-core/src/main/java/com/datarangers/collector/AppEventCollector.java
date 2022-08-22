@@ -32,15 +32,6 @@ public class AppEventCollector extends Collector {
 
   public AppEventCollector(String appType, DataRangersSDKConfigProperties properties, Callback cb) {
     super(appType, properties, cb);
-    if (properties != null) {
-      properties.init();
-
-      // 设置同步发送的consumer，队列满的时候使用
-      setConsumer(new Consumer(Collector.collectorContainer, this.properties));
-
-    } else {
-      System.out.println(Constants.INIT_ERROR);
-    }
   }
 
   @Override
@@ -227,6 +218,7 @@ public class AppEventCollector extends Collector {
     appMessage.setAppType(getAppType());
     appMessage.setHeader(header);
     appMessage.addEvents(events);
+    appMessage.setTraceId(UUID.randomUUID().toString());
 
     message.setAppMessage(appMessage);
     send(message);
