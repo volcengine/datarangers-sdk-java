@@ -166,8 +166,8 @@ public class HttpConfig {
   public String toString() {
     return " requestTimeout:" + requestTimeout + "connectTimeout:" + connectTimeout +
             " socketTimeout:" + socketTimeout + " keepAliveTimeout:" + keepAliveTimeout +
-            " maxTotal:" + maxTotal + " maxPerRoute" + maxPerRoute +
-            " keyMaterialPath" + keyMaterialPath + " keyPassword" + keyPassword +
-            " storePassword" + storePassword + " trustMaterialPath" + trustMaterialPath;
+            " maxTotal:" + maxTotal + " maxPerRoute:" + maxPerRoute +
+            " keyMaterialPath:" + keyMaterialPath + " keyPassword:" + keyPassword +
+            " storePassword:" + storePassword + " trustMaterialPath:" + trustMaterialPath;
   }
 }
