@@ -161,4 +161,13 @@ public class HttpConfig {
   public void setKeepAliveTimeout(Integer keepAliveTimeout) {
     this.keepAliveTimeout = keepAliveTimeout;
   }
+
+  @Override
+  public String toString() {
+    return " requestTimeout:" + requestTimeout + "connectTimeout:" + connectTimeout +
+            " socketTimeout:" + socketTimeout + " keepAliveTimeout:" + keepAliveTimeout +
+            " maxTotal:" + maxTotal + " maxPerRoute:" + maxPerRoute +
+            " keyMaterialPath:" + keyMaterialPath + " keyPassword:" + keyPassword +
+            " storePassword:" + storePassword + " trustMaterialPath:" + trustMaterialPath;
+  }
 }

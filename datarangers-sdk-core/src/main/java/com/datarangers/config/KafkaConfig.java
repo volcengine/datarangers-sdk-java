@@ -34,4 +34,25 @@ public class KafkaConfig {
     public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder kafkaSb = new StringBuilder();
+
+        kafkaSb.append(" topic:")
+                .append(topic)
+                .append(" bootstrapServers:")
+                .append(bootstrapServers);
+
+        if (properties != null) {
+            kafkaSb.append("properties:");
+            for (Map.Entry<String, Object> entry:properties.entrySet()) {
+                kafkaSb.append(entry.getKey())
+                        .append(":")
+                        .append(entry.getValue());
+            }
+        }
+
+        return kafkaSb.toString();
+    }
 }
