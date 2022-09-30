@@ -17,6 +17,8 @@ import com.datarangers.config.SdkMode;
 import com.datarangers.sender.Callback;
 
 /**
+ * 适用于需要自定义发送失败后处理的场景
+ *
  * @Author zhangpeng.spin@bytedance.com
  * @Date 2022/9/29
  */

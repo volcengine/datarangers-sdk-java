@@ -16,6 +16,8 @@ import com.datarangers.config.DataRangersSDKConfigProperties;
 import com.datarangers.config.SdkMode;
 
 /**
+ * HTTP模式的特殊场景，当跨网络传输，http 时延比较大的场景，可以使用批量上报的方式来提高性能
+ *
  * @Author zhangpeng.spin@bytedance.com
  * @Date 2022/9/28
  */

@@ -16,6 +16,8 @@ import com.datarangers.config.DataRangersSDKConfigProperties;
 import com.datarangers.config.SdkMode;
 
 /**
+ * saas 使用场景
+ *
  * @Author zhangpeng.spin@bytedance.com
  * @Date 2022/9/28
  */
@@ -70,9 +72,8 @@ public class SaasSdkExample extends AbstractSdkExample {
 
         // 发送事件，时间发生时间为send方法调用的时间
         sdkExample.sendEvent(userUniqueId, appId);
-        sdkExample.senEventWithAbSdk(userUniqueId, appId);
 
-        // 需要保证先在系统新增用户属性
+        // 上报用户属性，需要保证先在系统新增用户属性
         sdkExample.sendUserProfile(userUniqueId, appId);
 
         // 指定localTimeMs时间,即事件发生时间

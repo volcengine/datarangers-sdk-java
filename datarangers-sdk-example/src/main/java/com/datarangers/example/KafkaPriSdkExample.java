@@ -17,6 +17,8 @@ import com.datarangers.config.KafkaConfig;
 import com.datarangers.config.SdkMode;
 
 /**
+ * 在私有化场景，直接使用 Kafka 模式使用进行发送事件，私有化在同一个内网中，对qps有极高的要求
+ *
  * @Author zhangpeng.spin@bytedance.com
  * @Date 2022/9/28
  */
@@ -71,7 +73,8 @@ public class KafkaPriSdkExample extends AbstractSdkExample {
 
         // 发送事件，时间发生时间为send方法调用的时间
         sdkExample.sendEvent(userUniqueId, appId);
-        sdkExample.senEventWithAbSdk(userUniqueId, appId);
+
+        // 上报用户属性
         sdkExample.sendUserProfile(userUniqueId, appId);
 
         // 指定localTimeMs时间,即事件发生时间
