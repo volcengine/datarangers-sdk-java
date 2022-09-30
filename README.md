@@ -37,6 +37,7 @@ datarangers-sdk-java 是 [DataFinder](https://www.volcengine.com/product/datafin
 
 ## 注意事项
 * 当前sdk版本没有主动清理日志的功能，需要手动清理日志
+* 上报事件，需要注意下事件发生时间
 
 
 ## License

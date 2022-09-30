@@ -16,6 +16,7 @@ import com.datarangers.config.DataRangersSDKConfigProperties;
 import com.datarangers.config.SdkMode;
 
 /**
+ * 使用 File 文件模式，需要配合 logagent 一起使用
  * @Author zhangpeng.spin@bytedance.com
  * @Date 2022/9/28
  */
@@ -27,11 +28,10 @@ public class FilePriSdkExample extends AbstractSdkExample {
     FilePriSdkExample() {
         DataRangersSDKConfigProperties properties = new DataRangersSDKConfigProperties();
         // 设置模式
-        properties.setMode(SdkMode.HTTP);
+        properties.setMode(SdkMode.FILE);
 
-        // 设置domain和host
-        properties.setDomain(System.getenv("SDK_DOMAIN"));
-        properties.getHeaders().put("HOST", System.getenv("SDK_HOST"));
+        // 设置路径
+        properties.setEventSavePath("logs/");
 
         // 初始化collector
         appEventCollector = new AppEventCollector("app", properties);
@@ -62,7 +62,8 @@ public class FilePriSdkExample extends AbstractSdkExample {
 
         // 发送事件，时间发生时间为send方法调用的时间
         sdkExample.sendEvent(userUniqueId, appId);
-        sdkExample.senEventWithAbSdk(userUniqueId, appId);
+
+        // 上报用户属性
         sdkExample.sendUserProfile(userUniqueId, appId);
 
         // 指定localTimeMs时间,即事件发生时间
