@@ -41,7 +41,7 @@ public abstract class Collector implements EventCollector {
 
     private String appType;
     public static final Logger logger = LoggerFactory.getLogger("DatarangersLog");
-    public static ExecutorService httpRequestPool = null;
+    public static ExecutorService executorService = null;
     public static ScheduledExecutorService scheduled = null;
     public static CollectorContainer collectorContainer;
     private boolean enable;
@@ -87,11 +87,11 @@ public abstract class Collector implements EventCollector {
     }
 
 
-    private void initKafkaProducer() {
-        logger.info("init kafka producer");
+    private void initModeKafka() {
         if (SdkMode.KAFKA != this.properties.getMode()) {
             return;
         }
+        logger.info("init kafka producer");
         // 设置过了就不需要再自己创建
         if (kafkaProducer != null) {
             return;
@@ -209,13 +209,21 @@ public abstract class Collector implements EventCollector {
                 if (!IS_INIT) {
                     initLogger();
                     initCommon();
-                    initKafkaProducer();
+                    initSdkMode();
                     initConsumer();
                     initHook();
                     IS_INIT = true;
+                    System.out.println(String.format("sdk config: %s\r\n", this.properties));
+                    logger.info("sdk config: %s\r\n", this.properties);
                 }
             }
         }
+    }
+
+    private void initSdkMode() {
+        initModeFile();
+        initModeHttp();
+        initModeKafka();
     }
 
     /**
@@ -239,38 +247,13 @@ public abstract class Collector implements EventCollector {
      * eventConfig,httpclient,EventConfig 初始化
      */
     private void initCommon() {
-        HttpConfig httpConfig = properties.getHttpConfig();
-        HttpClient httpClient = properties.getCustomHttpClient();
-        Callback callback = properties.getCallback();
-        int httpTimeOut = properties.getHttpTimeout();
-
-        //EventConfig配置
-        EventConfig.saveFlag = SdkMode.FILE == properties.getMode();
-        EventConfig.sendFlag = SdkMode.HTTP == properties.getMode();
-        EventConfig.setUrl(properties.getDomain());
-
-        if (EventConfig.sendFlag) {
-            if (httpConfig.getMaxPerRoute() < properties.getCorePoolSize()) {
-                httpConfig.setMaxPerRoute(properties.getCorePoolSize());
-            }
-            if (httpConfig.getMaxTotal() < httpConfig.getMaxPerRoute()) {
-                httpConfig.setMaxTotal(httpConfig.getMaxPerRoute());
-            }
-            // 老版本配置做兼容
-            httpConfig.initTimeOut(httpTimeOut);
-            //httpclient 初始化
-            HttpUtils.createHttpClient(httpConfig, httpClient, callback);
-
-            //EventConfig 初始化
-            if (EventConfig.SEND_HEADER == null) {
-                EventConfig.SEND_HEADER = properties.getHeaders();
-                EventConfig.SEND_HEADER.put("User-Agent", "DataRangers Java SDK");
-                EventConfig.SEND_HEADER.put("Content-Type", "application/json");
-                List<Header> headerList = new ArrayList<>();
-                EventConfig.SEND_HEADER
-                        .forEach((key, value) -> headerList.add(new BasicHeader(key, value)));
-                EventConfig.headers = headerList.toArray(new Header[0]);
-            }
+        // 如果客户自定义了queue，则需要替换为客户自定义queue，否则使用默认的队列
+        CollectorQueue userQueue = this.properties.getUserQueue();
+        if (userQueue == null) {
+            collectorContainer = new CollectorContainer(
+                    RangersCollectorQueue.getInstance(this.properties.getQueueSize()));
+        } else {
+            collectorContainer = new CollectorContainer(userQueue);
         }
     }
 
@@ -279,55 +262,85 @@ public abstract class Collector implements EventCollector {
      */
     private void initConsumer() {
         logger.info("init consumer");
-        int threadCount = this.properties.getCorePoolSize();
-        CollectorQueue userQueue = this.properties.getUserQueue();
-
-        if (EventConfig.saveFlag) {
-            threadCount = 1;
-            logger.info("Start LogAgent Mode");
-        } else {
-            logger.info("Start Http Mode");
-        }
-
-        // 如果客户自定义了queue，则需要替换为客户自定义queue，否则使用默认的队列
-        if (userQueue == null) {
-            collectorContainer = new CollectorContainer(
-                    RangersCollectorQueue.getInstance(this.properties.getQueueSize()));
-        } else {
-            collectorContainer = new CollectorContainer(userQueue);
-        }
-
         boolean isSync = this.properties.isSync();
-        boolean hasConsumer = this.properties.isHasConsumer();
-        boolean hasProducer = this.properties.isHasProducer();
+
+        // 同步设置
+        if (isSync) {
+            setConsumer(new Consumer(Collector.collectorContainer, this.properties));
+            return;
+        }
+
+        // 异步起多个消费者
+        if (executorService == null) {
+            int threadCount = this.properties.getThreadCount();
+            executorService = Executors.newFixedThreadPool(threadCount);
+
+            // 创建consumer
+            for (int i = 0; i < threadCount; i++) {
+                //必须全部消费同一个队列
+                executorService.execute(new Consumer(collectorContainer, properties));
+            }
+        }
+    }
+
+    private void initModeHttp() {
+        if(SdkMode.HTTP != this.properties.getMode()){
+            return;
+        }
+        HttpConfig httpConfig = properties.getHttpConfig();
+        HttpClient httpClient = properties.getCustomHttpClient();
+        Callback callback = properties.getCallback();
+        int httpTimeOut = properties.getHttpTimeout();
+
+        //EventConfig配置
+        EventConfig.setUrl(properties.getDomain());
+        if (httpConfig.getMaxPerRoute() < properties.getThreadCount()) {
+            httpConfig.setMaxPerRoute(properties.getThreadCount());
+        }
+        if (httpConfig.getMaxTotal() < httpConfig.getMaxPerRoute()) {
+            httpConfig.setMaxTotal(httpConfig.getMaxPerRoute());
+        }
+        // 老版本配置做兼容
+        httpConfig.initTimeOut(httpTimeOut);
+        //httpclient 初始化
+        HttpUtils.createHttpClient(httpConfig, httpClient, callback);
+
+        //EventConfig 初始化
+        if (EventConfig.SEND_HEADER == null) {
+            EventConfig.SEND_HEADER = properties.getHeaders();
+            EventConfig.SEND_HEADER.put("User-Agent", "DataRangers Java SDK");
+            EventConfig.SEND_HEADER.put("Content-Type", "application/json");
+            List<Header> headerList = new ArrayList<>();
+            EventConfig.SEND_HEADER
+                    .forEach((key, value) -> headerList.add(new BasicHeader(key, value)));
+            EventConfig.headers = headerList.toArray(new Header[0]);
+        }
+    }
+
+    private void initModeFile() {
+        if(SdkMode.FILE != this.properties.getMode()){
+            return;
+        }
+        // thread 设置为1
+        this.properties.setThreadCount(1);
+
         String eventSavePath = this.properties.getEventSavePath();
         List<String> eventFilePaths = properties.getEventFilePaths();
         String eventSaveName = this.properties.getEventSaveName();
         int eventSaveMaxDays = this.properties.getEventSaveMaxDays();
-        // 设置同步发送的consumer，队列满的时候使用
-        if (isSync) {
-            setConsumer(new Consumer(Collector.collectorContainer, this.properties));
-        }
-        // 异步起多个消费者
-        if (!isSync && hasConsumer && httpRequestPool == null) {
-            httpRequestPool = Executors.newFixedThreadPool(this.properties.getCorePoolSize());
-            for (int i = 0; i < threadCount; i++) {
-                //必须全部消费同一个队列
-                httpRequestPool.execute(new Consumer(collectorContainer, properties));
-            }
-        }
-        if ((!isSync) && hasProducer) {
-            //定时记录日志的条数
-            scheduled = Executors.newSingleThreadScheduledExecutor();
-            scheduled
-                    .scheduleAtFixedRate(new CollectorCounter(eventSavePath), 0, 2, TimeUnit.MINUTES);
-            if (EventConfig.saveFlag) {
-                // 清理日志文件定时任务, 每隔12小时清理一次
-                scheduled.scheduleAtFixedRate(
-                        new RangersFileCleaner(eventFilePaths, eventSaveName, eventSaveMaxDays),
-                        0, 12, TimeUnit.HOURS);
-                logger.info("Start DataRangers Cleaner/Record Thread");
-            }
+
+        //定时记录日志的条数
+        scheduled = Executors.newSingleThreadScheduledExecutor();
+
+        scheduled
+                .scheduleAtFixedRate(new CollectorCounter(eventSavePath), 0, 2, TimeUnit.MINUTES);
+
+        if (eventSaveMaxDays > 0) {
+            // 清理日志文件定时任务, 每隔12小时清理一次
+            scheduled.scheduleAtFixedRate(
+                    new RangersFileCleaner(eventFilePaths, eventSaveName, eventSaveMaxDays),
+                    0, 12, TimeUnit.HOURS);
+            logger.info("Start DataRangers Cleaner/Record Thread");
         }
     }
 
@@ -338,8 +351,8 @@ public abstract class Collector implements EventCollector {
         logger.info("init hook");
         Runtime.getRuntime().addShutdownHook(new Thread(
                 () -> {
-                    if (Collector.httpRequestPool != null) {
-                        Collector.httpRequestPool.shutdown();
+                    if (Collector.executorService != null) {
+                        Collector.executorService.shutdown();
                     }
 
                     new Consumer(Collector.collectorContainer, properties).flush();
