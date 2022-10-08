@@ -7,8 +7,8 @@
 package com.datarangers.asynccollector;
 
 import com.datarangers.config.DataRangersSDKConfigProperties;
-import com.datarangers.config.EventConfig;
 import com.datarangers.config.RangersJSONConfig;
+import com.datarangers.config.SdkMode;
 import com.datarangers.logger.RangersLoggerWriterPool;
 import com.datarangers.message.AppMessage;
 import com.datarangers.message.Message;
@@ -93,7 +93,7 @@ public class Consumer implements Runnable {
     @Override
     public void run() {
         try {
-            if (EventConfig.saveFlag) {
+            if (SdkMode.FILE == sdkConfigProperties.getMode()) {
                 write();
             } else if (sdkConfigProperties.isSendBatch()) {
                 sendBatch();
@@ -116,7 +116,7 @@ public class Consumer implements Runnable {
                 while (message != null) {
                     count++;
                     message = collectorContainer.handleMessage(message);
-                    if (EventConfig.saveFlag) {
+                    if (SdkMode.FILE == sdkConfigProperties.getMode()) {
                         doWrite(message);
                     } else {
                         doSend(message);
@@ -135,7 +135,7 @@ public class Consumer implements Runnable {
 
     public void flush(Message message) {
         message = collectorContainer.handleMessage(message);
-        if (EventConfig.saveFlag) {
+        if (SdkMode.FILE == sdkConfigProperties.getMode()) {
             doWrite(message);
         } else {
             doSend(message);

@@ -33,4 +33,9 @@ public class OpenapiConfig {
   public void setSk(String sk) {
     this.sk = sk;
   }
+
+  @Override
+  public String toString(){
+    return String.format("{\"domain\": %s, \"ak\"=\"xxxxxx\", \"sk\"=\"xxxxxx\"}", domain);
+  }
 }
