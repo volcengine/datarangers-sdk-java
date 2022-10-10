@@ -18,16 +18,16 @@ import java.util.*;
  * @author hTangle
  */
 public class DataRangersSDKConfigProperties {
-
+  public boolean enable = true;
   public Map<String, String> headers;
   public String domain;
-  public int corePoolSize = 4;
+  private int threadCount = 20;
 
   /**
    * 该配置过期，请使用httpConfig的配置
    */
   @Deprecated
-  public int httpTimeout = 500;
+  public int httpTimeout = 10000;
 
   public String timeZone = "+8";
   public ZoneOffset timeOffset = null;
@@ -40,27 +40,30 @@ public class DataRangersSDKConfigProperties {
    */
   @Deprecated
   public boolean save = false;
-  public int queueSize = 10240;
-  public boolean send = true;
 
+  public int queueSize = 10240;
+
+  /**
+   * batch批量配置
+   */
   private boolean sendBatch = false;
   private int batchSize = 20;
   private int waitTimeMs = 100;
 
-  public boolean enable = true;
-
+  /**
+   * file模式 相关配置
+   */
   public String eventSavePath = "logs/";
   public List<String> eventFilePaths;
   public String eventSaveName = "datarangers.log";
   public int eventSaveMaxFileSize = 100;
+
   // 日志清理时间
-  public int eventSaveMaxDays = 5;
+  public int eventSaveMaxDays = -1;
 
   public CollectorQueue userQueue;
 
-  public boolean hasConsumer = true;
-  public boolean hasProducer = true;
-
+  // http相关配置
   private HttpConfig httpConfig = new HttpConfig();
 
   private HttpClient customHttpClient;
@@ -161,24 +164,6 @@ public class DataRangersSDKConfigProperties {
     this.callback = callback;
   }
 
-  public boolean isHasConsumer() {
-    return hasConsumer;
-  }
-
-  public DataRangersSDKConfigProperties setHasConsumer(boolean hasConsumer) {
-    this.hasConsumer = hasConsumer;
-    return this;
-  }
-
-  public boolean isHasProducer() {
-    return hasProducer;
-  }
-
-  public DataRangersSDKConfigProperties setHasProducer(boolean hasProducer) {
-    this.hasProducer = hasProducer;
-    return this;
-  }
-
   public int getHttpTimeout() {
     return httpTimeout;
   }
@@ -237,15 +222,6 @@ public class DataRangersSDKConfigProperties {
     return this;
   }
 
-  public boolean isSend() {
-    return send;
-  }
-
-  public DataRangersSDKConfigProperties setSend(boolean send) {
-    this.send = send;
-    return this;
-  }
-
   public int getQueueSize() {
     return queueSize;
   }
@@ -254,12 +230,12 @@ public class DataRangersSDKConfigProperties {
     this.queueSize = queueSize;
   }
 
-  public int getCorePoolSize() {
-    return corePoolSize;
+  public int getThreadCount() {
+    return threadCount;
   }
 
-  public void setCorePoolSize(int corePoolSize) {
-    this.corePoolSize = corePoolSize;
+  public void setThreadCount(int threadCount) {
+    this.threadCount = threadCount;
   }
 
   public Map<String, String> getHeaders() {
@@ -366,13 +342,27 @@ public class DataRangersSDKConfigProperties {
 
   @Override
   public String toString() {
-    return  " domain:" + domain + " corePoolSize:" + corePoolSize + " httpTimout:" + httpTimeout +
-            " timeZone:" + timeZone + " timeOffset:" + timeOffset + " save:" + save + " queueSize:" + queueSize +
-            " send:" + send + " sendBatch:" + sendBatch + " batchSize:" + batchSize + " waitTimeMs:" + waitTimeMs +
-            " enable:" + enable + " eventSavePath:" + eventSavePath + " eventSaveName:" + eventSaveName +
-            " eventSaveMaxFileSize:" + eventSaveMaxFileSize + " eventSaveMaxDays:" + eventSaveMaxDays +
-            " userQueue:" + userQueue + " hasConsumer:" + hasConsumer + " hasProducer:" + hasProducer +
-            " env" + env + " sync:" + sync + " mode:" + mode + " kafka:" + kafka + " httpConfig" + httpConfig;
+    StringBuilder sb = new StringBuilder();
+    sb.append(String.format("enable: %s \r\n", enable));
+    sb.append(String.format("env: %s \r\n", getMessageEnv()));
+    sb.append(String.format("sync: %s \r\n", sync));
+    sb.append(String.format("sdkMode: %s \r\n", mode));
+    sb.append(String.format("domain: %s \r\n", domain));
+    sb.append(String.format("headers: %s \r\n", headers));
+    sb.append(String.format("threadCount: %s \r\n", threadCount));
+    sb.append(String.format("queueSize: %s \r\n", queueSize));
+    sb.append(String.format("sendBatch: %s \r\n", sendBatch));
+    sb.append(String.format("batchSize: %s \r\n", batchSize));
+    sb.append(String.format("waitTimeMs: %s \r\n", waitTimeMs));
+    sb.append(String.format("httpConfig: %s \r\n", httpConfig));
+    sb.append(String.format("eventSavePath: %s \r\n", eventSavePath));
+    sb.append(String.format("eventSaveName: %s \r\n", eventSaveName));
+    sb.append(String.format("eventFilePaths: %s \r\n", eventFilePaths));
+    sb.append(String.format("eventSaveMaxFileSize: %s \r\n", eventSaveMaxFileSize));
+    sb.append(String.format("eventSaveMaxDays: %s \r\n", eventSaveMaxDays));
+    sb.append(String.format("openapiConfig: %s \r\n", openapiConfig));
+    sb.append(String.format("kafka: %s", kafka));
+    return sb.toString();
   }
 }
 
