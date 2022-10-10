@@ -37,8 +37,12 @@ public class KafkaPriSdkExample extends AbstractSdkExample {
         KafkaConfig kafkaConfig = new KafkaConfig();
         properties.setKafka(kafkaConfig);
 
-        // 设置 BootstrapServers, etc: 127.0.0.1:9192,localhost:9192
-        kafkaConfig.setBootstrapServers(System.getenv("SDK_KAFKA_BOOTSTRAP_SERVERS"));
+        // 设置 BootstrapServers, etc: 127.0.0.1:9192,localhost:9192，这里注意替换成真实的参数
+        String bootstrapServers = System.getenv("SDK_KAFKA_BOOTSTRAP_SERVERS");
+        if(bootstrapServers == null){
+            throw new IllegalArgumentException("bootstrapServers can not be empty");
+        }
+        kafkaConfig.setBootstrapServers(bootstrapServers);
 
         // 如果需要设置其他属性，可以进行设置
         // Map<String, Object> kafkaProperties = new HashMap<>();
