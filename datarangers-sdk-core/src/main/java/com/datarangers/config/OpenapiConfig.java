@@ -1,5 +1,7 @@
 package com.datarangers.config;
 
+import com.datarangers.util.Tools;
+
 /**
  * @Author zhangpeng.spin@bytedance.com
  * @Date 2021-07-23
@@ -36,6 +38,6 @@ public class OpenapiConfig {
 
   @Override
   public String toString(){
-    return String.format("{\"domain\": %s, \"ak\"=\"xxxxxx\", \"sk\"=\"xxxxxx\"}", domain);
+    return String.format("{\"domain\": %s, \"ak\"=\"%s\", \"sk\"=\"%s\"}", domain, Tools.passwordMask(ak), Tools.passwordMask(sk));
   }
 }

@@ -21,13 +21,13 @@ public class DataRangersSDKConfigProperties {
   public boolean enable = true;
   public Map<String, String> headers;
   public String domain;
-  private int threadCount = 4;
+  private int threadCount = 20;
 
   /**
    * 该配置过期，请使用httpConfig的配置
    */
   @Deprecated
-  public int httpTimeout = 500;
+  public int httpTimeout = 10000;
 
   public String timeZone = "+8";
   public ZoneOffset timeOffset = null;
@@ -59,7 +59,7 @@ public class DataRangersSDKConfigProperties {
   public int eventSaveMaxFileSize = 100;
 
   // 日志清理时间
-  public int eventSaveMaxDays = 5;
+  public int eventSaveMaxDays = -1;
 
   public CollectorQueue userQueue;
 
@@ -344,22 +344,24 @@ public class DataRangersSDKConfigProperties {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(String.format("enable: %s \r\n", enable));
-    sb.append(String.format("env: %s \r\n", env));
+    sb.append(String.format("env: %s \r\n", getMessageEnv()));
     sb.append(String.format("sync: %s \r\n", sync));
-    sb.append(String.format("domain: %s \r\n", domain));
-    sb.append(String.format("threadCount: %s \r\n", threadCount));
     sb.append(String.format("sdkMode: %s \r\n", mode));
+    sb.append(String.format("domain: %s \r\n", domain));
+    sb.append(String.format("headers: %s \r\n", headers));
+    sb.append(String.format("threadCount: %s \r\n", threadCount));
     sb.append(String.format("queueSize: %s \r\n", queueSize));
     sb.append(String.format("sendBatch: %s \r\n", sendBatch));
     sb.append(String.format("batchSize: %s \r\n", batchSize));
     sb.append(String.format("waitTimeMs: %s \r\n", waitTimeMs));
+    sb.append(String.format("httpConfig: %s \r\n", httpConfig));
     sb.append(String.format("eventSavePath: %s \r\n", eventSavePath));
     sb.append(String.format("eventSaveName: %s \r\n", eventSaveName));
+    sb.append(String.format("eventFilePaths: %s \r\n", eventFilePaths));
     sb.append(String.format("eventSaveMaxFileSize: %s \r\n", eventSaveMaxFileSize));
     sb.append(String.format("eventSaveMaxDays: %s \r\n", eventSaveMaxDays));
-    sb.append(String.format("httpConfig: %s \r\n", httpConfig));
     sb.append(String.format("openapiConfig: %s \r\n", openapiConfig));
-    sb.append(String.format("kafka: %s \r\n", kafka));
+    sb.append(String.format("kafka: %s", kafka));
     return sb.toString();
   }
 }

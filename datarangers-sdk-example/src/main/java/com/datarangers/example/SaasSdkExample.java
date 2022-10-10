@@ -34,10 +34,10 @@ public class SaasSdkExample extends AbstractSdkExample {
         // 设置domain和appKey, 不需要设置HOST
         properties.setDomain("https://mcs.ctobsnssdk.com");
 
-        // 可以设置多个app
+        // 可以设置多个app，这里注意替换成真实的参数
         properties.getAppKeys().put(Integer.valueOf(System.getenv("SDK_APP_1")), System.getenv("SDK_APP_KEY_1"));
 
-        // 设置openapi domain, AK,SK
+        // 设置openapi domain, AK,SK，这里注意替换成真实的参数
         properties.getOpenapiConfig().setDomain("https://analytics.volcengineapi.com");
         properties.getOpenapiConfig().setAk(System.getenv("OPENAPI_AK"));
         properties.getOpenapiConfig().setSk(System.getenv("OPENAPI_SK"));

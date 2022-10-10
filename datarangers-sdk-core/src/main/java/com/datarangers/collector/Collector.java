@@ -52,8 +52,8 @@ public abstract class Collector implements EventCollector {
     private static volatile Boolean IS_INIT = false;
 
     public Collector(String appType, DataRangersSDKConfigProperties properties, Callback cb) {
-        logger.info("sdk config properties: {}", properties);
-        System.out.println("sdk config properties: " + properties.toString());
+        logger.info("sdk config properties: \r\n{}", properties);
+        System.out.println("sdk config properties: \r\n" + properties.toString());
         this.appType = appType;
         this.enable = properties.isEnable();
         this.properties = properties;
