@@ -49,9 +49,9 @@ public class KafkaPriSdkExample extends AbstractSdkExample {
         // kafkaConfig.setProperties(kafkaProperties);
 
         // 初始化collector
-        appEventCollector = new AppEventCollector("app", properties);
         webEventCollector = new AppEventCollector("web", properties);
         mpEventCollector = new AppEventCollector("mp", properties);
+        appEventCollector = new AppEventCollector("app", properties);
     }
 
 
