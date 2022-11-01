@@ -48,7 +48,7 @@ public abstract class Collector implements EventCollector {
     protected DataRangersSDKConfigProperties properties;
     protected Callback callback;
     protected Consumer consumer = null;
-    protected KafkaProducer kafkaProducer;
+    protected static KafkaProducer kafkaProducer;
     private static volatile Boolean IS_INIT = false;
 
     public Collector(String appType, DataRangersSDKConfigProperties properties, Callback cb) {
