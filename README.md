@@ -13,7 +13,7 @@ datarangers-sdk-java 是 [DataFinder](https://www.volcengine.com/product/datafin
 <dependency>
   <groupId>com.datarangers</groupId>
   <artifactId>datarangers-sdk-core</artifactId>
-  <version>t3-1.5.6-release</version>
+  <version>1.5.6-release</version>
 </dependency>
 ```
 
