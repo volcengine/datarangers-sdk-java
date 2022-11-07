@@ -34,7 +34,7 @@ public class CollectorCounter implements Runnable {
         FileOutputStream stream = null;
         try {
             stream = new FileOutputStream(output, true);
-            Map<String, Object> status = new HashMap<String, Object>() {{
+            Map<String, Object> status = new HashMap<String, Object>(2) {{
                 put("history", CollectorContainer.SEND_HISTORY);
                 put("queue_length", Collector.collectorContainer.size());
             }};

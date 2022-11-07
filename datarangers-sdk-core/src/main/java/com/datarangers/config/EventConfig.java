@@ -15,8 +15,6 @@ public class EventConfig {
     public static String appListUrl;
     public static Header[] headers;
     public static Map<String, String> SEND_HEADER;
-    public static boolean saveFlag = false;
-    public static boolean sendFlag = true;
 
     public static void setUrl(String url) {
         setAppUrl(url + Constants.APP_LOG_PATH);
