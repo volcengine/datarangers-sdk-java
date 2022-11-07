@@ -7,41 +7,27 @@
 package com.datarangers.config;
 
 import com.datarangers.asynccollector.*;
-import com.datarangers.collector.Collector;
-import com.datarangers.logger.RangersFileCleaner;
 import com.datarangers.message.MessageEnv;
 import com.datarangers.sender.Callback;
-import com.datarangers.sender.callback.LoggingCallback;
-import com.datarangers.util.HttpUtils;
 import org.apache.hc.client5.http.classic.HttpClient;
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.message.BasicHeader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.ZoneOffset;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author hTangle
  */
 public class DataRangersSDKConfigProperties {
-
-  public static final Logger logger = LoggerFactory.getLogger(DataRangersSDKConfigProperties.class);
+  public boolean enable = true;
   public Map<String, String> headers;
   public String domain;
-  public int threadPoolCount = 1;
-  public int maxPoolSize = 8;
-  public int corePoolSize = 4;
+  private int threadCount = 20;
 
   /**
    * 该配置过期，请使用httpConfig的配置
    */
   @Deprecated
-  public int httpTimeout = 500;
+  public int httpTimeout = 10000;
 
   public String timeZone = "+8";
   public ZoneOffset timeOffset = null;
@@ -54,13 +40,59 @@ public class DataRangersSDKConfigProperties {
    */
   @Deprecated
   public boolean save = false;
-  public int threadCount = 1;
-  public int queueSize = 10240;
-  public boolean send = true;
 
+  public int queueSize = 10240;
+
+  /**
+   * batch批量配置
+   */
   private boolean sendBatch = false;
   private int batchSize = 20;
   private int waitTimeMs = 100;
+
+  /**
+   * file模式 相关配置
+   */
+  public String eventSavePath = "logs/";
+  public List<String> eventFilePaths;
+  public String eventSaveName = "datarangers.log";
+  public int eventSaveMaxFileSize = 100;
+
+  // 日志清理时间
+  public int eventSaveMaxDays = -1;
+
+  public CollectorQueue userQueue;
+
+  // http相关配置
+  private HttpConfig httpConfig = new HttpConfig();
+
+  private HttpClient customHttpClient;
+
+  private Map<Integer, String> appKeys = new HashMap<>();
+
+  /**
+   * saas 或者 privatization(私有化)
+   */
+  private String env = "privatization";
+
+  private List<String> SAAS_DOMAIN_URLS = Arrays.asList(
+          "https://mcs.ctobsnssdk.com",
+          "https://mcs.tobsnssdk.com");
+
+  /**
+   * saas openapi 配置地址
+   */
+  private OpenapiConfig openapiConfig = new OpenapiConfig();
+
+  private Callback callback;
+
+  /**
+   * 同步还是异步发送，默认是异步发送
+   */
+  private boolean sync;
+
+  private SdkMode mode;
+  private KafkaConfig kafka;
 
   public boolean isSendBatch() {
     return sendBatch;
@@ -93,50 +125,6 @@ public class DataRangersSDKConfigProperties {
   public void setEnable(boolean enable) {
     this.enable = enable;
   }
-
-  public boolean enable = true;
-
-  public String eventSavePath = "logs/";
-  public List<String> eventFilePaths;
-  public String eventSaveName = "datarangers.log";
-  public int eventSaveMaxHistory = 20;
-  public int eventSaveMaxFileSize = 100;
-  public int eventSaveMaxDays = 5;
-
-  public CollectorQueue userQueue;
-
-  public boolean hasConsumer = true;
-  public boolean hasProducer = true;
-
-  private HttpConfig httpConfig = new HttpConfig();
-
-  private HttpClient customHttpClient;
-
-  private Map<Integer, String> appKeys = new HashMap<>();
-
-  /**
-   * saas 或者 privatization(私有化)
-   */
-  private String env = "privatization";
-
-  private List<String> SAAS_DOMAIN_URLS = Arrays.asList(
-      "https://mcs.ctobsnssdk.com",
-      "https://mcs.tobsnssdk.com");
-
-  /**
-   * saas openapi 配置地址
-   */
-  private OpenapiConfig openapiConfig = new OpenapiConfig();
-
-  private Callback callback;
-
-  /**
-   * 同步还是异步发送，默认是异步发送
-   */
-  private boolean sync;
-
-  private SdkMode mode;
-  private KafkaConfig kafka;
 
   public KafkaConfig getKafka() {
     return kafka;
@@ -174,24 +162,6 @@ public class DataRangersSDKConfigProperties {
 
   public void setCallback(Callback callback) {
     this.callback = callback;
-  }
-
-  public boolean isHasConsumer() {
-    return hasConsumer;
-  }
-
-  public DataRangersSDKConfigProperties setHasConsumer(boolean hasConsumer) {
-    this.hasConsumer = hasConsumer;
-    return this;
-  }
-
-  public boolean isHasProducer() {
-    return hasProducer;
-  }
-
-  public DataRangersSDKConfigProperties setHasProducer(boolean hasProducer) {
-    this.hasProducer = hasProducer;
-    return this;
   }
 
   public int getHttpTimeout() {
@@ -243,15 +213,6 @@ public class DataRangersSDKConfigProperties {
     return this;
   }
 
-  public int getEventSaveMaxHistory() {
-    return eventSaveMaxHistory;
-  }
-
-  public DataRangersSDKConfigProperties setEventSaveMaxHistory(int eventSaveMaxHistory) {
-    this.eventSaveMaxHistory = eventSaveMaxHistory;
-    return this;
-  }
-
   public int getEventSaveMaxFileSize() {
     return eventSaveMaxFileSize;
   }
@@ -259,23 +220,6 @@ public class DataRangersSDKConfigProperties {
   public DataRangersSDKConfigProperties setEventSaveMaxFileSize(int eventSaveMaxFileSize) {
     this.eventSaveMaxFileSize = eventSaveMaxFileSize;
     return this;
-  }
-
-  public boolean isSend() {
-    return send;
-  }
-
-  public DataRangersSDKConfigProperties setSend(boolean send) {
-    this.send = send;
-    return this;
-  }
-
-  public int getThreadCount() {
-    return threadCount;
-  }
-
-  public void setThreadCount(int threadCount) {
-    this.threadCount = threadCount;
   }
 
   public int getQueueSize() {
@@ -286,20 +230,12 @@ public class DataRangersSDKConfigProperties {
     this.queueSize = queueSize;
   }
 
-  public int getMaxPoolSize() {
-    return maxPoolSize;
+  public int getThreadCount() {
+    return threadCount;
   }
 
-  public void setMaxPoolSize(int maxPoolSize) {
-    this.maxPoolSize = maxPoolSize;
-  }
-
-  public int getCorePoolSize() {
-    return corePoolSize;
-  }
-
-  public void setCorePoolSize(int corePoolSize) {
-    this.corePoolSize = corePoolSize;
+  public void setThreadCount(int threadCount) {
+    this.threadCount = threadCount;
   }
 
   public Map<String, String> getHeaders() {
@@ -319,14 +255,6 @@ public class DataRangersSDKConfigProperties {
 
   public void setDomain(String domain) {
     this.domain = domain;
-  }
-
-  public int getThreadPoolCount() {
-    return threadPoolCount;
-  }
-
-  public void setThreadPoolCount(int threadPoolCount) {
-    this.threadPoolCount = threadPoolCount;
   }
 
   public ZoneOffset getTimeOffset() {
@@ -354,98 +282,6 @@ public class DataRangersSDKConfigProperties {
   public void setTimeZone(String timeZone) {
     timeOffset = ZoneOffset.of(timeZone);
     this.timeZone = timeZone;
-  }
-
-  public void setLogger() {
-    Consumer.setWriterPool(getEventFilePaths(), getEventSaveName(), getEventSaveMaxFileSize());
-    if (callback == null) {
-      setCallback(new LoggingCallback(getEventSavePath(), "error-" + getEventSaveName(),
-          getEventSaveMaxFileSize()));
-    }
-  }
-
-  public void setCommon() {
-    EventConfig.saveFlag = SdkMode.FILE == getMode();
-    EventConfig.sendFlag = SdkMode.HTTP == getMode();
-    if (EventConfig.sendFlag) {
-      httpConfig = this.getHttpConfig();
-      if (httpConfig.getMaxPerRoute() < this.getThreadCount()) {
-        httpConfig.setMaxPerRoute(this.getThreadCount());
-      }
-      if (httpConfig.getMaxTotal() < httpConfig.getMaxPerRoute()) {
-        httpConfig.setMaxTotal(httpConfig.getMaxPerRoute());
-      }
-      httpConfig.initTimeOut(getHttpTimeout());
-      HttpUtils
-          .createHttpClient(this.getHttpConfig(), this.getCustomHttpClient(), this.getCallback());
-      if (EventConfig.SEND_HEADER == null) {
-        EventConfig.SEND_HEADER = getHeaders();
-        EventConfig.SEND_HEADER.put("User-Agent", "DataRangers Java SDK");
-        EventConfig.SEND_HEADER.put("Content-Type", "application/json");
-        List<Header> headerList = new ArrayList<>();
-        EventConfig.SEND_HEADER
-            .forEach((key, value) -> headerList.add(new BasicHeader(key, value)));
-        EventConfig.headers = headerList.toArray(new Header[0]);
-      }
-    }
-    setConsumer(getThreadCount());
-    EventConfig.setUrl(getDomain());
-  }
-
-
-  public ExecutorService setThreadPool() {
-    return Executors.newFixedThreadPool(getCorePoolSize());
-  }
-
-  public void setConsumer(int threadCount) {
-    if (EventConfig.saveFlag) {
-      threadCount = 1;
-      logger.info("Start LogAgent Mode");
-    } else {
-      logger.info("Start Http Mode");
-    }
-    if (userQueue == null) {
-      Collector.collectorContainer = new CollectorContainer(
-          RangersCollectorQueue.getInstance(getQueueSize()));
-    } else {
-      //如果客户自定义了queue，则需要替换为客户自定义queue
-      Collector.collectorContainer = new CollectorContainer(userQueue);
-    }
-    if ((!sync) && hasConsumer && Collector.httpRequestPool == null) {
-      //有消费者才初始化消费者
-      Collector.httpRequestPool = setThreadPool();
-      for (int i = 0; i < threadCount; i++) {//必须全部消费同一个队列
-        Collector.httpRequestPool.execute(new Consumer(Collector.collectorContainer, this));
-      }
-    }
-    if ((!sync) && hasProducer) {
-      //有生产者才需要记录
-      Collector.scheduled = Executors.newSingleThreadScheduledExecutor();
-      Collector.scheduled
-          .scheduleAtFixedRate(new CollectorCounter(getEventSavePath()), 0, 2, TimeUnit.MINUTES);
-      if (EventConfig.saveFlag) {
-        Collector.scheduled.scheduleAtFixedRate(
-            new RangersFileCleaner(getEventFilePaths(), getEventSaveName(), getEventSaveMaxDays()),
-            0, 12, TimeUnit.HOURS);
-      }
-    }
-    logger.info("Start DataRangers Cleaner/Record Thread");
-  }
-
-
-  public static volatile Boolean IS_INIT = false;
-
-  public void init() {
-    if (!IS_INIT) {
-      synchronized (DataRangersSDKConfigProperties.class) {
-        if (!IS_INIT) {
-          setLogger();
-          setCommon();
-          setHook();
-          IS_INIT = true;
-        }
-      }
-    }
   }
 
   public CollectorQueue getUserQueue() {
@@ -504,17 +340,29 @@ public class DataRangersSDKConfigProperties {
     this.appKeys = appKeys;
   }
 
-  private void setHook() {
-    DataRangersSDKConfigProperties properties = this;
-    Runtime.getRuntime().addShutdownHook(new Thread(
-        () -> {
-          if(Collector.httpRequestPool != null){
-            Collector.httpRequestPool.shutdown();
-          }
-
-          new Consumer(Collector.collectorContainer, properties).flush();
-        }));
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(String.format("enable: %s \r\n", enable));
+    sb.append(String.format("env: %s \r\n", getMessageEnv()));
+    sb.append(String.format("sync: %s \r\n", sync));
+    sb.append(String.format("sdkMode: %s \r\n", mode));
+    sb.append(String.format("domain: %s \r\n", domain));
+    sb.append(String.format("headers: %s \r\n", headers));
+    sb.append(String.format("threadCount: %s \r\n", threadCount));
+    sb.append(String.format("queueSize: %s \r\n", queueSize));
+    sb.append(String.format("sendBatch: %s \r\n", sendBatch));
+    sb.append(String.format("batchSize: %s \r\n", batchSize));
+    sb.append(String.format("waitTimeMs: %s \r\n", waitTimeMs));
+    sb.append(String.format("httpConfig: %s \r\n", httpConfig));
+    sb.append(String.format("eventSavePath: %s \r\n", eventSavePath));
+    sb.append(String.format("eventSaveName: %s \r\n", eventSaveName));
+    sb.append(String.format("eventFilePaths: %s \r\n", eventFilePaths));
+    sb.append(String.format("eventSaveMaxFileSize: %s \r\n", eventSaveMaxFileSize));
+    sb.append(String.format("eventSaveMaxDays: %s \r\n", eventSaveMaxDays));
+    sb.append(String.format("openapiConfig: %s \r\n", openapiConfig));
+    sb.append(String.format("kafka: %s", kafka));
+    return sb.toString();
   }
-
 }
 

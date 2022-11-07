@@ -7,6 +7,8 @@
 package com.datarangers.config;
 
 
+import com.datarangers.util.Tools;
+
 /**
  * @author bytedance
  * @date 2020/12/2 20:02
@@ -18,10 +20,14 @@ public class HttpConfig {
   private Integer maxTotal = 1000;
   private Integer maxPerRoute = 100;
 
-  private Integer requestTimeout;
-  private Integer connectTimeout;
-  private Integer socketTimeout;
-  private Integer keepAliveTimeout;
+  private Integer requestTimeout = 10 * 1000;
+  private Integer connectTimeout = 10 * 1000;
+  private Integer socketTimeout = 20 * 1000;
+
+  /**
+   * 单位是s，默认1分钟
+   */
+  private Integer keepAliveTimeout = 30;
 
   /**
    * 是否需要自定义配置key, store 路径和密码
@@ -134,7 +140,7 @@ public class HttpConfig {
 
     if(keepAliveTimeout == null) {
       // 3分钟
-      keepAliveTimeout = 3 * 60;
+      keepAliveTimeout = 30;
     }
   }
 
@@ -160,5 +166,25 @@ public class HttpConfig {
 
   public void setKeepAliveTimeout(Integer keepAliveTimeout) {
     this.keepAliveTimeout = keepAliveTimeout;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+
+    sb.append(String.format("\"requestTimeout\": %s,", requestTimeout));
+    sb.append(String.format("\"connectTimeout\": %s,", connectTimeout));
+    sb.append(String.format("\"socketTimeout\": %s,", socketTimeout));
+    sb.append(String.format("\"keepAliveTimeout\": %s,", keepAliveTimeout));
+    sb.append(String.format("\"maxTotal\": %s,", maxTotal));
+    sb.append(String.format("\"maxPerRoute\": %s,", maxPerRoute));
+    sb.append(String.format("\"keyMaterialPath\": \"%s\",", keyMaterialPath));
+    sb.append(String.format("\"keyPassword\": \"%s\",", Tools.passwordMask(keyPassword)));
+    sb.append(String.format("\"trustMaterialPath\": \"%s\",", trustMaterialPath));
+    sb.append(String.format("\"storePassword\": \"%s\"", Tools.passwordMask(storePassword)));
+
+    sb.append("}");
+    return sb.toString();
   }
 }
