@@ -94,6 +94,16 @@ public class DataRangersSDKConfigProperties {
   private SdkMode mode;
   private KafkaConfig kafka;
 
+  private VerifyConfig verify = new VerifyConfig();
+
+  public VerifyConfig getVerify() {
+    return verify;
+  }
+
+  public void setVerify(VerifyConfig verify) {
+    this.verify = verify;
+  }
+
   public boolean isSendBatch() {
     return sendBatch;
   }
@@ -360,6 +370,7 @@ public class DataRangersSDKConfigProperties {
     sb.append(String.format("eventFilePaths: %s \r\n", eventFilePaths));
     sb.append(String.format("eventSaveMaxFileSize: %s \r\n", eventSaveMaxFileSize));
     sb.append(String.format("eventSaveMaxDays: %s \r\n", eventSaveMaxDays));
+    sb.append(String.format("verify: %s\r\n", verify));
     sb.append(String.format("openapiConfig: %s \r\n", openapiConfig));
     sb.append(String.format("kafka: %s", kafka));
     return sb.toString();

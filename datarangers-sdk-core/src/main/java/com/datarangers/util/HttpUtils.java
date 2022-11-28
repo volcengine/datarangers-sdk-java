@@ -63,6 +63,13 @@ public class HttpUtils {
     private static HttpClient httpClient = null;
     private static volatile Boolean initFlag = false;
 
+    public static HttpClient getHttpClient(){
+        if(!initFlag){
+            throw new IllegalArgumentException("Not init httpclient");
+        }
+        return httpClient;
+    }
+
     public static void createHttpClient(
             HttpConfig httpConfig, HttpClient customHttpClient, Callback callback) {
         if (!initFlag) {
