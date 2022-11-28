@@ -5,7 +5,7 @@ import com.datarangers.config.VerifyConfig;
 import com.datarangers.message.Message;
 import com.datarangers.message.MessageEnv;
 import com.datarangers.message.MessageType;
-import com.datarangers.message.saas.SaasServerAppMessage;
+import com.datarangers.message.saas.DefaultSaasServerAppMessage;
 import com.datarangers.util.HttpUtils;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -76,7 +76,7 @@ public class VerifySender {
             return;
         }
         // 发送
-        Object sendMessage = new SaasServerAppMessage(message);
+        Object sendMessage = new DefaultSaasServerAppMessage(message);
         Map<String, String> headers = new HashMap<>();
         request("POST", verify.getUrl(), RangersJSONConfig.getInstance().toJson(sendMessage), headers);
     }
