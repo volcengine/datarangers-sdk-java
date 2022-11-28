@@ -14,6 +14,7 @@ import com.datarangers.message.Message;
 import com.datarangers.message.MessageEnv;
 import com.datarangers.sender.Callback;
 import com.datarangers.sender.Callback.FailedData;
+import com.datarangers.sender.VerifySender;
 import com.datarangers.sender.callback.LoggingCallback;
 import com.datarangers.util.HttpUtils;
 import org.apache.hc.client5.http.classic.HttpClient;
@@ -44,6 +45,7 @@ public abstract class Collector implements EventCollector {
     public static ExecutorService executorService = null;
     public static ScheduledExecutorService scheduled = null;
     public static CollectorContainer collectorContainer;
+    public static VerifySender verifySender;
     private boolean enable;
     protected DataRangersSDKConfigProperties properties;
     protected Callback callback;
@@ -121,6 +123,9 @@ public abstract class Collector implements EventCollector {
         String sendMessage;
 
         validate(message);
+        // 埋点实时检测发送
+        sendToVerify(message);
+
         if (kafkaProducer != null) {
             // 使用kafka的方式
             sendByKafka(message.getAppMessage());
@@ -132,6 +137,10 @@ public abstract class Collector implements EventCollector {
         } else {
             asyncSendMessage(message, sendMessage);
         }
+    }
+
+    private void sendToVerify(Message message){
+        verifySender.send(message);
     }
 
     private void sendByKafka(AppMessage appMessage) {
@@ -210,12 +219,17 @@ public abstract class Collector implements EventCollector {
                     initSdkMode();
                     initConsumer();
                     initHook();
+                    initVerifySender();
                     IS_INIT = true;
                     logger.info("sdk config properties: \r\n{}", properties);
                     System.out.println("sdk config properties: \r\n" + properties);
                 }
             }
         }
+    }
+
+    private void initVerifySender(){
+        verifySender = new VerifySender(properties.getVerify());
     }
 
     private void initSdkMode() {
