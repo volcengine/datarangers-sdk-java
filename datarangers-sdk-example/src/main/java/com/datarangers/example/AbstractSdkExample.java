@@ -92,10 +92,10 @@ public abstract class AbstractSdkExample {
         EventCollector appEventCollector = getAppEventCollector();
         Map<String, Object> custom = new HashMap<>();
         Map<String, Object> eventParams = new HashMap<>();
-        Header header = new HeaderV3.Builder().setCustom(custom).setAppId(appId)
-                .setUserUniqueId(userUniqueId).build();
 
         for (int i = 0; i < 5; i++) {
+            Header header = new HeaderV3.Builder().setCustom(custom).setAppId(appId)
+                    .setUserUniqueId(userUniqueId).build();
             Event event1 = new EventV3().setEvent("test_ab_sdk")
                     .setParams(eventParams).setUserId(userUniqueId)
                     .setLocalTimeMs(new Date().getTime())
@@ -119,14 +119,14 @@ public abstract class AbstractSdkExample {
         Map<String, Object> custom = new HashMap<>();
         Map<String, Object> eventParams = new HashMap<>();
         eventParams.put("date_time", new SimpleDateFormat("yyyyMMdd").format(new Date()));
-        Header header = new HeaderV3.Builder().setCustom(custom).setAppId(appId)
-                .setUserUniqueId(userUniqueId)
-                .setLatestReferrer("https://www.toutiao.com/article/7119336107199693345/")
-                .setLatestReferrerHost("www.toutiao.com")
-                .setLatestSearchKeyword("datafinder")
-                .build();
 
         for (int i = 0; i < 5; i++) {
+            Header header = new HeaderV3.Builder().setCustom(custom).setAppId(appId)
+                    .setUserUniqueId(userUniqueId)
+                    .setLatestReferrer("https://www.toutiao.com/article/7119336107199693345/")
+                    .setLatestReferrerHost("www.toutiao.com")
+                    .setLatestSearchKeyword("datafinder")
+                    .build();
             Event event1 = new EventV3().setEvent("test_preset_sdk")
                     .setParams(eventParams).setUserId(userUniqueId)
                     .setLocalTimeMs(new Date().getTime());
