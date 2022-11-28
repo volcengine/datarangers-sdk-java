@@ -43,7 +43,7 @@ public class SaasSdkExample extends AbstractSdkExample {
         properties.getOpenapiConfig().setSk(System.getenv("OPENAPI_SK"));
 
         // 设置服务端埋点实时校验url
-        properties.getVerify().setUrl(System.getenv("VERIFY_URL"));
+        // properties.getVerify().setUrl(System.getenv("VERIFY_URL"));
 
 
         // 初始化collector
@@ -75,7 +75,6 @@ public class SaasSdkExample extends AbstractSdkExample {
 
         // 发送事件，时间发生时间为send方法调用的时间
         sdkExample.sendEvent(userUniqueId, appId);
-        sdkExample.senEventPresetCommonParams(userUniqueId, appId);
 
         // 上报用户属性，需要保证先在系统新增用户属性
         sdkExample.sendUserProfile(userUniqueId, appId);
