@@ -26,10 +26,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -194,8 +191,9 @@ public abstract class Collector implements EventCollector {
      * message 检查
      */
     private void validate(Message message) {
-        // 当前只有saas需要校验下appkey
-        if (this.properties.getMessageEnv() != MessageEnv.SAAS) {
+        // 当前只有saas,saas_native需要校验下appkey
+        if (!Arrays.asList(MessageEnv.SAAS, MessageEnv.SAAS_NATIVE)
+                .contains(this.properties.getMessageEnv())) {
             return;
         }
 

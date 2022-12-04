@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * applog 消息
  */
-public class AppMessage {
+public class AppMessage implements Cloneable {
     @JsonProperty("app_type")
     private String appType;
 
@@ -31,7 +31,7 @@ public class AppMessage {
     private String traceId;
 
     @JsonProperty("app_id")
-    private int appId;
+    private Integer appId;
 
     @JsonProperty("header")
     private HeaderV3 header;
@@ -90,11 +90,11 @@ public class AppMessage {
         this.formatName = formatName;
     }
 
-    public int getAppId() {
+    public Integer getAppId() {
         return appId;
     }
 
-    public void setAppId(int appId) {
+    public void setAppId(Integer appId) {
         this.appId = appId;
     }
 
@@ -120,5 +120,24 @@ public class AppMessage {
 
     public void setUserUniqueId(String userUniqueId) {
         this.userUniqueId = userUniqueId;
+    }
+
+    @Override
+    public AppMessage clone() {
+        AppMessage clone;
+        try {
+            clone = (AppMessage) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+        if(header != null){
+            clone.setHeader(header.clone());
+        }
+        List<Event> cloneEvents = new ArrayList<>();
+        // 这里浅拷贝即可
+        cloneEvents.addAll(events);
+        clone.setEvents(cloneEvents);
+
+        return clone;
     }
 }

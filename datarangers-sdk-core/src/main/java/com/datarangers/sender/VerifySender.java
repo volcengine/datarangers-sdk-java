@@ -6,6 +6,7 @@ import com.datarangers.message.Message;
 import com.datarangers.message.MessageEnv;
 import com.datarangers.message.MessageType;
 import com.datarangers.message.saas.DefaultSaasServerAppMessage;
+import com.datarangers.sender.saasnative.SaasNativeMessageSender;
 import com.datarangers.util.HttpUtils;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -65,9 +66,22 @@ public class VerifySender {
     private void doSend(Message message) {
         // 只支持saas
         MessageEnv messageEnv = message.getMessageEnv();
-        if (MessageEnv.SAAS != messageEnv) {
-            throw new IllegalArgumentException("Verifiy not support message env: " + messageEnv);
+        switch (messageEnv) {
+            case SAAS:
+                verifySaas(message);
+                break;
+            case SAAS_NATIVE:
+                verifySaasNative(message);
+                break;
+            case PRIVATIZATION:
+                verifyPrivatization(message);
+                break;
+            default:
+                throw new IllegalArgumentException("Verify not support message env: " + messageEnv);
         }
+    }
+
+    private void verifySaas(Message message) {
         // 只支持事件
         MessageType messageType = message.getMessageType();
         if (MessageType.EVENT != messageType) {
@@ -77,6 +91,20 @@ public class VerifySender {
         }
         // 发送
         Object sendMessage = new DefaultSaasServerAppMessage(message);
+        Map<String, String> headers = new HashMap<>();
+        request("POST", verify.getUrl(), RangersJSONConfig.getInstance().toJson(sendMessage), headers);
+    }
+
+    private void verifySaasNative(Message message) {
+        // 发送
+        Object sendMessage = SaasNativeMessageSender.getSassNativeMessage(message);
+        Map<String, String> headers = new HashMap<>();
+        request("POST", verify.getUrl(), RangersJSONConfig.getInstance().toJson(sendMessage), headers);
+    }
+
+    private void verifyPrivatization(Message message) {
+        // 私有化使用event/json,or event/list的格式进行上报
+        Object sendMessage = new DefaultSaasServerAppMessage(message);;
         Map<String, String> headers = new HashMap<>();
         request("POST", verify.getUrl(), RangersJSONConfig.getInstance().toJson(sendMessage), headers);
     }
@@ -96,6 +124,11 @@ public class VerifySender {
             verifyUserId = params.get(QUERY_USER_ID);
             if (verifyUserId == null || verifyUserId.length() == 0) {
                 logger.warn("{} is not exist", QUERY_USER_ID);
+                return;
+            }
+            // 是否过期，判断当前时间是否超过
+            if (System.currentTimeMillis() >= validTime) {
+                logger.info("verify config valid time is expired: valid time: {}, now: {}", new Date(validTime), new Date(System.currentTimeMillis()));
                 return;
             }
             isValid = true;

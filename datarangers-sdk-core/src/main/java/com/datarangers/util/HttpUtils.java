@@ -10,20 +10,6 @@ import com.datarangers.config.HttpConfig;
 import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.sender.Callback;
 import com.datarangers.sender.Callback.FailedData;
-
-import java.io.File;
-import java.net.URI;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -49,9 +35,17 @@ import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.UUID;
 
@@ -62,6 +56,7 @@ public class HttpUtils {
 
     private static HttpClient httpClient = null;
     private static volatile Boolean initFlag = false;
+    private static Integer retryCount;
 
     public static HttpClient getHttpClient(){
         if(!initFlag){
@@ -111,6 +106,7 @@ public class HttpUtils {
                     }
                     initFlag = true;
                     HttpUtils.callback = callback;
+                    retryCount = httpConfig.getRetryCount();
                 }
             }
         }
@@ -179,7 +175,7 @@ public class HttpUtils {
         if (body == null) {
             return;
         }
-        request(method, url, body, headers, 1);
+        request(method, url, body, headers, retryCount);
     }
 
     public static void request(String method, String url, String body, Map<String, String> headers,

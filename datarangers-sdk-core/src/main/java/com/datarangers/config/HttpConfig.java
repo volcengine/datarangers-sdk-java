@@ -30,6 +30,11 @@ public class HttpConfig {
   private Integer keepAliveTimeout = 30;
 
   /**
+   * 重试次数
+   */
+  private Integer retryCount;
+
+  /**
    * 是否需要自定义配置key, store 路径和密码
    */
   private boolean customKeyTrustEnable;
@@ -168,6 +173,14 @@ public class HttpConfig {
     this.keepAliveTimeout = keepAliveTimeout;
   }
 
+  public Integer getRetryCount() {
+    return retryCount;
+  }
+
+  public void setRetryCount(Integer retryCount) {
+    this.retryCount = retryCount;
+  }
+
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
@@ -177,6 +190,7 @@ public class HttpConfig {
     sb.append(String.format("\"connectTimeout\": %s,", connectTimeout));
     sb.append(String.format("\"socketTimeout\": %s,", socketTimeout));
     sb.append(String.format("\"keepAliveTimeout\": %s,", keepAliveTimeout));
+    sb.append(String.format("\"retryCount\": %s,", retryCount));
     sb.append(String.format("\"maxTotal\": %s,", maxTotal));
     sb.append(String.format("\"maxPerRoute\": %s,", maxPerRoute));
     sb.append(String.format("\"keyMaterialPath\": \"%s\",", keyMaterialPath));
