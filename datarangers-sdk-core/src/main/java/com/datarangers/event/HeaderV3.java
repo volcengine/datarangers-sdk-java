@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HeaderV3 implements Serializable, Header {
+public class HeaderV3 implements Serializable, Header, Cloneable {
     @JsonProperty("__source")
     private String source;
     private Integer aid;
@@ -86,7 +86,7 @@ public class HeaderV3 implements Serializable, Header {
     private String browser;
     private String browserVersion;
 
-    protected HeaderV3() {
+    public HeaderV3() {
     }
 
     public String getSource() {
@@ -606,6 +606,15 @@ public class HeaderV3 implements Serializable, Header {
         this.browserVersion = browserVersion;
     }
 
+
+    @Override
+    public HeaderV3 clone(){
+        try {
+            return (HeaderV3) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static final class Builder {
         private HeaderV3 headerV3;

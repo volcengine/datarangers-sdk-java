@@ -6,7 +6,7 @@
  */
 package com.datarangers.config;
 
-import com.datarangers.asynccollector.*;
+import com.datarangers.asynccollector.CollectorQueue;
 import com.datarangers.message.MessageEnv;
 import com.datarangers.sender.Callback;
 import org.apache.hc.client5.http.classic.HttpClient;
@@ -78,6 +78,12 @@ public class DataRangersSDKConfigProperties {
   private List<String> SAAS_DOMAIN_URLS = Arrays.asList(
           "https://mcs.ctobsnssdk.com",
           "https://mcs.tobsnssdk.com");
+
+  /**
+   * 云原生的配置
+   */
+  private List<String> SAAS_NATIVE_DOMAIN_URLS = Arrays.asList(
+          "https://gator.volces.com");
 
   /**
    * saas openapi 配置地址
@@ -336,8 +342,11 @@ public class DataRangersSDKConfigProperties {
   }
 
   public MessageEnv getMessageEnv() {
-    if ("saas".equalsIgnoreCase(getEnv()) || SAAS_DOMAIN_URLS.contains(getDomain())) {
+    if (Constants.ENV_SAAS.equalsIgnoreCase(getEnv()) || SAAS_DOMAIN_URLS.contains(getDomain())) {
       return MessageEnv.SAAS;
+    }
+    if (Constants.ENV_SAAS_NATIVE.equalsIgnoreCase(getEnv()) || SAAS_NATIVE_DOMAIN_URLS.contains(getDomain())) {
+      return MessageEnv.SAAS_NATIVE;
     }
     return MessageEnv.PRIVATIZATION;
   }
