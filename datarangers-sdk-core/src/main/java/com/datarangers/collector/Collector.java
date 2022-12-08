@@ -212,8 +212,8 @@ public abstract class Collector implements EventCollector {
         if (!IS_INIT) {
             synchronized (Collector.class) {
                 if (!IS_INIT) {
-                    initLogger();
                     initCommon();
+                    initLogger();
                     initSdkMode();
                     initConsumer();
                     initHook();
@@ -241,12 +241,15 @@ public abstract class Collector implements EventCollector {
      */
     private void initLogger() {
         logger.info("init log writer pool");
-        List<String> eventFilePaths = properties.getEventFilePaths();
         String eventSaveName = properties.getEventSaveName();
         int eventSaveMaxFileSize = properties.getEventSaveMaxFileSize();
         String eventSavePath = properties.getEventSavePath();
+        //定时记录日志的条数
+        scheduled = Executors.newSingleThreadScheduledExecutor();
 
-        Consumer.setWriterPool(eventFilePaths, eventSaveName, eventSaveMaxFileSize);
+        scheduled
+                .scheduleAtFixedRate(new CollectorCounter(eventSavePath), 0, 2, TimeUnit.MINUTES);
+
         if (properties.getCallback() == null) {
             properties.setCallback(new LoggingCallback(eventSavePath, "error-" + eventSaveName,
                     eventSaveMaxFileSize));
@@ -334,17 +337,12 @@ public abstract class Collector implements EventCollector {
         // thread 设置为1
         this.properties.setThreadCount(1);
 
-        String eventSavePath = this.properties.getEventSavePath();
-        List<String> eventFilePaths = properties.getEventFilePaths();
+        List<String> eventFilePaths = this.properties.getEventFilePaths();
         String eventSaveName = this.properties.getEventSaveName();
         int eventSaveMaxDays = this.properties.getEventSaveMaxDays();
+        int eventSaveMaxFileSize = this.properties.getEventSaveMaxFileSize();
 
-        //定时记录日志的条数
-        scheduled = Executors.newSingleThreadScheduledExecutor();
-
-        scheduled
-                .scheduleAtFixedRate(new CollectorCounter(eventSavePath), 0, 2, TimeUnit.MINUTES);
-
+        Consumer.setWriterPool(eventFilePaths, eventSaveName, eventSaveMaxFileSize);
         if (eventSaveMaxDays > 0) {
             // 清理日志文件定时任务, 每隔12小时清理一次
             scheduled.scheduleAtFixedRate(
