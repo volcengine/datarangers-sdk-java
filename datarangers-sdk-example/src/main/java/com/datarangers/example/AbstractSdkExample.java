@@ -151,6 +151,7 @@ public abstract class AbstractSdkExample {
                     .setBrowser("qq")
                     .setBrowserVersion("1.9")
                     .setPackages("com.bytedance")
+                    .setAppPackage("com.bytedance.app")
                     .setDeviceBrand("huawei")
                     .build();
             Event event1 = new EventV3().setEvent("test_preset_sdk")
