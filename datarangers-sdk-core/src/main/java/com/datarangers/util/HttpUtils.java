@@ -233,7 +233,7 @@ public class HttpUtils {
         if (body == null) {
             return;
         }
-        post(url, body, headers, 1);
+        post(url, body, headers, retryCount);
     }
 
     public static String getXRequestID() {
