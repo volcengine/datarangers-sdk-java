@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.datarangers</groupId>
         <artifactId>datarangers-sdk</artifactId>
-        <version>t3-1.5.7-release</version>
+        <version>t4-1.5.7-release</version>
     </parent>
     <packaging>jar</packaging>
     <artifactId>datarangers-sdk-starter</artifactId>
