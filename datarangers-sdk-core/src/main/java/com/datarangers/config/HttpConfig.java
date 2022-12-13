@@ -32,7 +32,7 @@ public class HttpConfig {
   /**
    * 重试次数
    */
-  private Integer retryCount;
+  private Integer retryCount = 1;
 
   /**
    * 是否需要自定义配置key, store 路径和密码
