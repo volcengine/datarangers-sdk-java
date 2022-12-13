@@ -474,136 +474,153 @@ public class HeaderV3 implements Serializable, Header, Cloneable {
         return brand;
     }
 
-    public void setBrand(String brand) {
+    public HeaderV3 setBrand(String brand) {
         this.brand = brand;
+        return this;
     }
 
     public String getOsName() {
         return osName;
     }
 
-    public void setOsName(String osName) {
+    public HeaderV3 setOsName(String osName) {
         this.osName = osName;
+        return this;
     }
 
     public String getSdkLib() {
         return sdkLib;
     }
 
-    public void setSdkLib(String sdkLib) {
+    public HeaderV3 setSdkLib(String sdkLib) {
         this.sdkLib = sdkLib;
+        return this;
     }
 
     public String getLatestReferrer() {
         return latestReferrer;
     }
 
-    public void setLatestReferrer(String latestReferrer) {
+    public HeaderV3 setLatestReferrer(String latestReferrer) {
         this.latestReferrer = latestReferrer;
+        return this;
     }
 
     public String getLatestReferrerHost() {
         return latestReferrerHost;
     }
 
-    public void setLatestReferrerHost(String latestReferrerHost) {
+    public HeaderV3 setLatestReferrerHost(String latestReferrerHost) {
         this.latestReferrerHost = latestReferrerHost;
+        return this;
     }
 
     public String getLatestSearchKeyword() {
         return latestSearchKeyword;
     }
 
-    public void setLatestSearchKeyword(String latestSearchKeyword) {
+    public HeaderV3 setLatestSearchKeyword(String latestSearchKeyword) {
         this.latestSearchKeyword = latestSearchKeyword;
+        return this;
     }
 
     public String getLatestTrafficSourceType() {
         return latestTrafficSourceType;
     }
 
-    public void setLatestTrafficSourceType(String latestTrafficSourceType) {
+    public HeaderV3 setLatestTrafficSourceType(String latestTrafficSourceType) {
         this.latestTrafficSourceType = latestTrafficSourceType;
+        return this;
     }
 
     public String getUserUniqueIdType() {
         return userUniqueIdType;
     }
 
-    public void setUserUniqueIdType(String userUniqueIdType) {
+    public HeaderV3 setUserUniqueIdType(String userUniqueIdType) {
         this.userUniqueIdType = userUniqueIdType;
+        return this;
     }
 
     public String getHeight() {
         return height;
     }
 
-    public void setHeight(String height) {
+    public HeaderV3 setHeight(String height) {
         this.height = height;
+        return this;
     }
 
     public String getWidth() {
         return width;
     }
 
-    public void setWidth(String width) {
+    public HeaderV3 setWidth(String width) {
         this.width = width;
+        return this;
     }
 
     public String getResolution() {
         return resolution;
     }
 
-    public void setResolution(String resolution) {
+    public HeaderV3 setResolution(String resolution) {
         this.resolution = resolution;
+        return this;
     }
 
     public String getAppChannel() {
         return appChannel;
     }
 
-    public void setAppChannel(String appChannel) {
+    public HeaderV3 setAppChannel(String appChannel) {
         this.appChannel = appChannel;
+        return this;
     }
 
     public String getNetworkType() {
         return networkType;
     }
 
-    public void setNetworkType(String networkType) {
+    public HeaderV3 setNetworkType(String networkType) {
         this.networkType = networkType;
+        return this;
     }
 
     public String getNetworkCarrier() {
         return networkCarrier;
     }
 
-    public void setNetworkCarrier(String networkCarrier) {
+    public HeaderV3 setNetworkCarrier(String networkCarrier) {
         this.networkCarrier = networkCarrier;
+        return this;
     }
 
     public String getPlatform() {
         return platform;
     }
 
-    public void setPlatform(String platform) {
+    public HeaderV3 setPlatform(String platform) {
         this.platform = platform;
+        return this;
     }
 
     public String getBrowser() {
         return browser;
     }
 
-    public void setBrowser(String browser) {
+    public HeaderV3 setBrowser(String browser) {
         this.browser = browser;
+        return this;
     }
 
     public String getBrowserVersion() {
         return browserVersion;
     }
 
-    public void setBrowserVersion(String browserVersion) {
+    public HeaderV3 setBrowserVersion(String browserVersion) {
         this.browserVersion = browserVersion;
+        return this;
     }
 
 
@@ -870,7 +887,7 @@ public class HeaderV3 implements Serializable, Header, Cloneable {
         }
 
         public Builder setOsName(String osName) {
-            this.setOsName(osName);
+            headerV3.setOsName(osName);
             return this;
         }
 
