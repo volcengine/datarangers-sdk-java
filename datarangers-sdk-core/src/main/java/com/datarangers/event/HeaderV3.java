@@ -49,6 +49,8 @@ public class HeaderV3 implements Serializable, Header, Cloneable {
     private String osVersion;
     @JsonProperty("package")
     private String packages;
+    @JsonProperty("app_package")
+    private String appPackage;
     private String region;
     private String sdkVersion;
     private String sdkLib;
@@ -394,6 +396,15 @@ public class HeaderV3 implements Serializable, Header, Cloneable {
 
     public HeaderV3 setPackages(String packages) {
         this.packages = packages;
+        return this;
+    }
+
+    public String getAppPackage() {
+        return appPackage;
+    }
+
+    public HeaderV3 setAppPackage(String appPackage) {
+        this.appPackage = appPackage;
         return this;
     }
 
@@ -902,6 +913,10 @@ public class HeaderV3 implements Serializable, Header, Cloneable {
             return this;
         }
 
+        public Builder setAppPackage(String appPackage) {
+            headerV3.setAppPackage(appPackage);
+            return this;
+        }
 
         public Builder setRegion(String region) {
             headerV3.setRegion(region);
