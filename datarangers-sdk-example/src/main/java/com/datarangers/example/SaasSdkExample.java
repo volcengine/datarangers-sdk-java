@@ -76,6 +76,8 @@ public class SaasSdkExample extends AbstractSdkExample {
         // 发送事件，时间发生时间为send方法调用的时间
         sdkExample.sendEvent(userUniqueId, appId);
 
+        sdkExample.senEventPresetCommonParams(userUniqueId, appId);
+
         // 上报用户属性，需要保证先在系统新增用户属性
         sdkExample.sendUserProfile(userUniqueId, appId);
 

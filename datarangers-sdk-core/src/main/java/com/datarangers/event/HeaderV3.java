@@ -87,6 +87,7 @@ public class HeaderV3 implements Serializable, Header, Cloneable {
     private String platform;
     private String browser;
     private String browserVersion;
+    private String access;
 
     public HeaderV3() {
     }
@@ -634,6 +635,14 @@ public class HeaderV3 implements Serializable, Header, Cloneable {
         return this;
     }
 
+    public String getAccess() {
+        return access;
+    }
+
+    public HeaderV3 setAccess(String access) {
+        this.access = access;
+        return this;
+    }
 
     @Override
     public HeaderV3 clone(){
@@ -964,6 +973,11 @@ public class HeaderV3 implements Serializable, Header, Cloneable {
 
         public Builder setAppId(Integer appId) {
             headerV3.setAppId(appId);
+            return this;
+        }
+
+        public Builder setAccess(String access) {
+            headerV3.setAccess(access);
             return this;
         }
 
