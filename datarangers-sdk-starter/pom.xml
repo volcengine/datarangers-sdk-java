@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.datarangers</groupId>
         <artifactId>datarangers-sdk</artifactId>
-        <version>${reversion}</version>
+        <version>t9-1.5.7-release</version>
     </parent>
     <packaging>jar</packaging>
     <artifactId>datarangers-sdk-starter</artifactId>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.datarangers</groupId>
             <artifactId>datarangers-sdk-core</artifactId>
-            <version>${reversion}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
