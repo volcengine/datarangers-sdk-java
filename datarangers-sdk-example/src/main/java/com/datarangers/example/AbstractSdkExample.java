@@ -116,7 +116,6 @@ public abstract class AbstractSdkExample {
      */
     public void senEventPresetCommonParams(String userUniqueId, int appId) {
         EventCollector appEventCollector = getAppEventCollector();
-        Map<String, Object> custom = new HashMap<>();
         Map<String, Object> eventParams = new HashMap<>();
         eventParams.put("date_time", new SimpleDateFormat("yyyyMMdd").format(new Date()));
 
@@ -153,6 +152,8 @@ public abstract class AbstractSdkExample {
                     .setPackages("com.bytedance")
                     .setAppPackage("com.bytedance.app")
                     .setDeviceBrand("huawei")
+                    .setAccess("wifi")
+                    .setNetworkType("wifi")
                     .build();
             Event event1 = new EventV3().setEvent("test_preset_sdk")
                     .setParams(eventParams).setUserId(userUniqueId)
