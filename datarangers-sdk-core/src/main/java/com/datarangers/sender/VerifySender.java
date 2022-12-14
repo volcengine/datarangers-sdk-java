@@ -96,8 +96,8 @@ public class VerifySender {
     }
 
     private void verifySaasNative(Message message) {
-        // 发送
-        Object sendMessage = SaasNativeMessageSender.getSassNativeMessage(message);
+        // 云原生使用event/json,or event/list的格式进行上报
+        Object sendMessage = new DefaultSaasServerAppMessage(message);
         Map<String, String> headers = new HashMap<>();
         request("POST", verify.getUrl(), RangersJSONConfig.getInstance().toJson(sendMessage), headers);
     }
@@ -165,12 +165,13 @@ public class VerifySender {
             response = (CloseableHttpResponse) HttpUtils.getHttpClient().execute(httpRequest);
             String resultStr = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
             if (!isSuccess(response, resultStr)) {
-                String causeMsg = String.format("HTTP ERROR, code: %s, resultStr: %s", response.getCode(), resultStr);
+                String causeMsg = String.format("verify HTTP ERROR, code: %s, resultStr: %s", response.getCode(), resultStr);
                 logger.error(causeMsg);
                 logger.error(
-                        "request error: requestId={}, method={}, url={}, ,header={}, body=\r\n{}", requestId, method,
+                        "verify request error: requestId={}, method={}, url={}, ,header={}, body=\r\n{}", requestId, method,
                         url, headers, body);
             }
+            logger.info("verify request success. result: {}", resultStr);
         } catch (Exception e) {
             String errorMsg = String.format("request error, parse error: requestId=%s, method=%s, url=%s, header={}, body=\r\n%s", requestId, method, url, headers, body);
             logger.error(errorMsg);
