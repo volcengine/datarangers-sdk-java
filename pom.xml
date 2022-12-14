@@ -6,7 +6,7 @@
     <groupId>com.datarangers</groupId>
     <artifactId>datarangers-sdk</artifactId>
     <packaging>pom</packaging>
-    <version>t7-1.5.7-release</version>
+    <version>${reversion}</version>
     <modules>
         <module>datarangers-sdk-core</module>
         <module>datarangers-sdk-starter</module>
@@ -14,6 +14,8 @@
     </modules>
     <properties>
         <spring.boot.version>2.3.4.RELEASE</spring.boot.version>
+        <reversion>t8-1.5.7-release</reversion>
+        <java.version>1.8</java.version>
     </properties>
     <distributionManagement>
     </distributionManagement>
