@@ -116,6 +116,31 @@ public interface EventCollector {
     void profileUnset(String userUniqueId, int appId, List<String> params);
 
     /**
+     * 功能描述: 对用户进行profile属性设置
+     *
+     * @param header  用户相关信息
+     * @param profiles  需要设置的用户属性
+     * @return: void
+     * @date 2020/12/23 10:43
+     */
+    void profileSet(Header header, Map<String, Object> profiles);
+
+    void profileSetOnce(Header header, Map<String, Object> profiles);
+
+    void profileIncrement(Header header, Map<String, Object> profiles);
+
+    void profileAppend(Header header, Map<String, Object> profiles);
+
+    /**
+     * 功能描述: 删除用户的属性
+     * @param header  用户相关信息
+     * @param profiles 需要删除的用户属性名
+     * @return: void
+     * @date 2020/12/25 16:11
+     */
+    void profileUnset(Header header, List<String> profiles);
+
+    /**
      * 功能描述: 对业务对象进行设置
      *
      * @param appId app id

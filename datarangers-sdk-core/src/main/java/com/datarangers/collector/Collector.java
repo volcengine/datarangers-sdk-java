@@ -14,6 +14,7 @@ import com.datarangers.message.Message;
 import com.datarangers.message.MessageEnv;
 import com.datarangers.sender.Callback;
 import com.datarangers.sender.Callback.FailedData;
+import com.datarangers.sender.VerifySender;
 import com.datarangers.sender.callback.LoggingCallback;
 import com.datarangers.util.HttpUtils;
 import org.apache.hc.client5.http.classic.HttpClient;
@@ -25,10 +26,7 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,6 +42,7 @@ public abstract class Collector implements EventCollector {
     public static ExecutorService executorService = null;
     public static ScheduledExecutorService scheduled = null;
     public static CollectorContainer collectorContainer;
+    public static VerifySender verifySender;
     private boolean enable;
     protected DataRangersSDKConfigProperties properties;
     protected Callback callback;
@@ -121,6 +120,9 @@ public abstract class Collector implements EventCollector {
         String sendMessage;
 
         validate(message);
+        // 埋点实时检测发送
+        sendToVerify(message);
+
         if (kafkaProducer != null) {
             // 使用kafka的方式
             sendByKafka(message.getAppMessage());
@@ -132,6 +134,10 @@ public abstract class Collector implements EventCollector {
         } else {
             asyncSendMessage(message, sendMessage);
         }
+    }
+
+    private void sendToVerify(Message message){
+        verifySender.send(message);
     }
 
     private void sendByKafka(AppMessage appMessage) {
@@ -185,8 +191,9 @@ public abstract class Collector implements EventCollector {
      * message 检查
      */
     private void validate(Message message) {
-        // 当前只有saas需要校验下appkey
-        if (this.properties.getMessageEnv() != MessageEnv.SAAS) {
+        // 当前只有saas,saas_native需要校验下appkey
+        if (!Arrays.asList(MessageEnv.SAAS, MessageEnv.SAAS_NATIVE)
+                .contains(this.properties.getMessageEnv())) {
             return;
         }
 
@@ -205,17 +212,22 @@ public abstract class Collector implements EventCollector {
         if (!IS_INIT) {
             synchronized (Collector.class) {
                 if (!IS_INIT) {
-                    initLogger();
                     initCommon();
+                    initLogger();
                     initSdkMode();
                     initConsumer();
                     initHook();
+                    initVerifySender();
                     IS_INIT = true;
                     logger.info("sdk config properties: \r\n{}", properties);
                     System.out.println("sdk config properties: \r\n" + properties);
                 }
             }
         }
+    }
+
+    private void initVerifySender(){
+        verifySender = new VerifySender(properties.getVerify());
     }
 
     private void initSdkMode() {
@@ -229,12 +241,15 @@ public abstract class Collector implements EventCollector {
      */
     private void initLogger() {
         logger.info("init log writer pool");
-        List<String> eventFilePaths = properties.getEventFilePaths();
         String eventSaveName = properties.getEventSaveName();
         int eventSaveMaxFileSize = properties.getEventSaveMaxFileSize();
         String eventSavePath = properties.getEventSavePath();
+        //定时记录日志的条数
+        scheduled = Executors.newSingleThreadScheduledExecutor();
 
-        Consumer.setWriterPool(eventFilePaths, eventSaveName, eventSaveMaxFileSize);
+        scheduled
+                .scheduleAtFixedRate(new CollectorCounter(eventSavePath), 0, 2, TimeUnit.MINUTES);
+
         if (properties.getCallback() == null) {
             properties.setCallback(new LoggingCallback(eventSavePath, "error-" + eventSaveName,
                     eventSaveMaxFileSize));
@@ -322,17 +337,12 @@ public abstract class Collector implements EventCollector {
         // thread 设置为1
         this.properties.setThreadCount(1);
 
-        String eventSavePath = this.properties.getEventSavePath();
-        List<String> eventFilePaths = properties.getEventFilePaths();
+        List<String> eventFilePaths = this.properties.getEventFilePaths();
         String eventSaveName = this.properties.getEventSaveName();
         int eventSaveMaxDays = this.properties.getEventSaveMaxDays();
+        int eventSaveMaxFileSize = this.properties.getEventSaveMaxFileSize();
 
-        //定时记录日志的条数
-        scheduled = Executors.newSingleThreadScheduledExecutor();
-
-        scheduled
-                .scheduleAtFixedRate(new CollectorCounter(eventSavePath), 0, 2, TimeUnit.MINUTES);
-
+        Consumer.setWriterPool(eventFilePaths, eventSaveName, eventSaveMaxFileSize);
         if (eventSaveMaxDays > 0) {
             // 清理日志文件定时任务, 每隔12小时清理一次
             scheduled.scheduleAtFixedRate(

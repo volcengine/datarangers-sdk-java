@@ -12,28 +12,35 @@ package com.datarangers.example;
 
 import com.datarangers.collector.AppEventCollector;
 import com.datarangers.collector.EventCollector;
+import com.datarangers.config.Constants;
 import com.datarangers.config.DataRangersSDKConfigProperties;
 import com.datarangers.config.SdkMode;
 
 /**
- * 在私有化场景，直接使用 Http 模式使用进行发送事件
+ * saas 使用场景
  *
  * @Author zhangpeng.spin@bytedance.com
  * @Date 2022/9/28
  */
-public class HttpPriSdkExample extends AbstractSdkExample {
+public class SaasNativeSdkExample extends AbstractSdkExample {
     private EventCollector appEventCollector;
     private EventCollector webEventCollector;
     private EventCollector mpEventCollector;
 
-    HttpPriSdkExample() {
+    SaasNativeSdkExample() {
         DataRangersSDKConfigProperties properties = new DataRangersSDKConfigProperties();
         // 设置模式
+        properties.setEnv(Constants.ENV_SAAS_NATIVE);
         properties.setMode(SdkMode.HTTP);
 
-        // 设置domain和host，这里注意替换成真实的参数
-        properties.setDomain(System.getenv("SDK_DOMAIN"));
-        properties.getHeaders().put("HOST", System.getenv("SDK_HOST"));
+        // 设置domain和appKey, 不需要设置HOST
+        properties.setDomain("https://gator.volces.com");
+
+        // 可以设置多个app，这里注意替换成真实的参数
+        properties.getAppKeys().put(Integer.valueOf(System.getenv("SDK_APP_1")), System.getenv("SDK_APP_KEY_1"));
+
+        // 设置服务端埋点实时校验url
+        // properties.getVerify().setUrl(System.getenv("VERIFY_URL"));
 
         // 初始化collector
         appEventCollector = new AppEventCollector("app", properties);
@@ -58,14 +65,12 @@ public class HttpPriSdkExample extends AbstractSdkExample {
     }
 
     public static void main(String[] args) {
-        HttpPriSdkExample sdkExample = new HttpPriSdkExample();
+        SaasNativeSdkExample sdkExample = new SaasNativeSdkExample();
         String userUniqueId = "test_sdk_user1";
-        int appId = 10000000;
+        int appId = Integer.valueOf(System.getenv("SDK_APP_1"));
 
         // 发送事件，时间发生时间为send方法调用的时间
         sdkExample.sendEvent(userUniqueId, appId);
-
-        sdkExample.senEventPresetCommonParams(userUniqueId, appId);
 
         // 上报用户属性
         sdkExample.sendUserProfile(userUniqueId, appId);
