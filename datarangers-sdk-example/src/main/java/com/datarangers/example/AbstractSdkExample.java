@@ -92,10 +92,10 @@ public abstract class AbstractSdkExample {
         EventCollector appEventCollector = getAppEventCollector();
         Map<String, Object> custom = new HashMap<>();
         Map<String, Object> eventParams = new HashMap<>();
-        Header header = new HeaderV3.Builder().setCustom(custom).setAppId(appId)
-                .setUserUniqueId(userUniqueId).build();
 
         for (int i = 0; i < 5; i++) {
+            Header header = new HeaderV3.Builder().setCustom(custom).setAppId(appId)
+                    .setUserUniqueId(userUniqueId).build();
             Event event1 = new EventV3().setEvent("test_ab_sdk")
                     .setParams(eventParams).setUserId(userUniqueId)
                     .setLocalTimeMs(new Date().getTime())
@@ -104,6 +104,63 @@ public abstract class AbstractSdkExample {
                     .setParams(eventParams).setUserId(userUniqueId)
                     .setLocalTimeMs(new Date().getTime())
                     .setAbSdkVersion("12345");
+            appEventCollector.sendEvents(header, Arrays.asList(event1, event2));
+        }
+
+    }
+
+    /**
+     * 上报预置的事件公共属性
+     * @param userUniqueId
+     * @param appId
+     */
+    public void senEventPresetCommonParams(String userUniqueId, int appId) {
+        EventCollector appEventCollector = getAppEventCollector();
+        Map<String, Object> eventParams = new HashMap<>();
+        eventParams.put("date_time", new SimpleDateFormat("yyyyMMdd").format(new Date()));
+
+        for (int i = 0; i < 5; i++) {
+            Header header = new HeaderV3.Builder()
+                    .setAppId(appId)
+                    .setUserUniqueId(userUniqueId)
+                    .setLatestReferrer("https://www.toutiao.com/article/7119336107199693345/")
+                    .setLatestReferrerHost("www.toutiao.com")
+                    .setDeviceManufacturer("huawei")
+                    .setHeight("10px")
+                    .setWidth("12px")
+                    .setLatestSearchKeyword("search")
+                    .setLatestTrafficSourceType("source")
+                    .setUserUniqueIdType("type")
+                    .setAppChannel("华为应用市场")
+                    .setAppRegion("cn")
+                    .setRegion("CN.r")
+                    .setAppVersion("6.14.2")
+                    .setAppVersionMinor("6")
+                    .setDeviceModel("iphone 10 pro Max")
+                    .setOsName("ios")
+                    .setOsVersion("2.0.0")
+                    .setSdkVersion("6.14.1")
+                    .setSdkLib("java")
+                    .setClientIp("10.10.0.1")
+                    .setNetworkType("5G")
+                    .setCarrier("中国电信")
+                    .setResolution("1080*1080")
+                    .setAppLanguage("ZH")
+                    .setPlatform("android")
+                    .setBrowser("qq")
+                    .setBrowserVersion("1.9")
+                    .setPackages("com.bytedance")
+                    .setAppPackage("com.bytedance.app")
+                    .setDeviceBrand("huawei")
+                    .setAccess("wifi")
+                    .setNetworkType("wifi")
+                    .build();
+            Event event1 = new EventV3().setEvent("test_preset_sdk")
+                    .setParams(eventParams).setUserId(userUniqueId)
+                    .setLocalTimeMs(new Date().getTime());
+            Event event2 = new EventV3().setEvent("test_preset_sdk")
+                    .setParams(eventParams).setUserId(userUniqueId)
+                    .setLocalTimeMs(new Date().getTime());
             appEventCollector.sendEvents(header, Arrays.asList(event1, event2));
         }
 

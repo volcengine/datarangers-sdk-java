@@ -40,7 +40,7 @@ public class CollectorCounter implements Runnable {
             }};
             stream.write((LocalDateTime.now().format(Constants.FULL_DAY) + " " + RangersJSONConfig.getInstance().toJson(status) + "\n").getBytes());
             stream.flush();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (stream != null) {

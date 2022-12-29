@@ -6,6 +6,7 @@ import com.datarangers.message.MessageType;
 import com.datarangers.sender.saas.SaasItemAppMessageSender;
 import com.datarangers.sender.saas.SaasProfileAppMessageSender;
 import com.datarangers.sender.saas.SaasServerAppMessageSender;
+import com.datarangers.sender.saasnative.SaasNativeMessageSender;
 
 /**
  * @Author zhangpeng.spin@bytedance.com
@@ -13,24 +14,27 @@ import com.datarangers.sender.saas.SaasServerAppMessageSender;
  */
 public class MessageSenderFactory {
 
-  private MessageSenderFactory() {
-  }
+    private MessageSenderFactory() {
+    }
 
-  public static MessageSender getMessageSender(Message message) {
-    MessageEnv messageEnv = message.getMessageEnv();
-    if (MessageEnv.SAAS != messageEnv) {
-      return new PrivatizationMessageSender();
+    public static MessageSender getMessageSender(Message message) {
+        MessageEnv messageEnv = message.getMessageEnv();
+        if (MessageEnv.PRIVATIZATION == messageEnv) {
+            return new PrivatizationMessageSender();
+        }
+        if (MessageEnv.SAAS_NATIVE == messageEnv) {
+            return new SaasNativeMessageSender();
+        }
+        MessageType messageType = message.getMessageType();
+        switch (messageType) {
+            case EVENT:
+                return new SaasServerAppMessageSender();
+            case ITEM:
+                return new SaasItemAppMessageSender();
+            case PROFILE:
+                return new SaasProfileAppMessageSender();
+            default:
+                throw new IllegalArgumentException("Not support message: " + messageType);
+        }
     }
-    MessageType messageType = message.getMessageType();
-    switch (messageType) {
-      case EVENT:
-        return new SaasServerAppMessageSender();
-      case ITEM:
-        return new SaasItemAppMessageSender();
-      case PROFILE:
-        return new SaasProfileAppMessageSender();
-      default:
-        throw new IllegalArgumentException("Not support message: " + messageType);
-    }
-  }
 }

@@ -13,6 +13,11 @@ public enum MessageEnv {
   /**
    * 私有化环境
    */
-  PRIVATIZATION
+  PRIVATIZATION,
+  /**
+   * 云原生
+   * saas_native
+   */
+  SAAS_NATIVE,
 }
 

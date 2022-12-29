@@ -5,7 +5,7 @@
     <parent>
         <artifactId>datarangers-sdk</artifactId>
         <groupId>com.datarangers</groupId>
-        <version>1.5.6-release</version>
+        <version>t10-1.5.7-release</version>
     </parent>
     <groupId>com.datarangers</groupId>
     <artifactId>datarangers-sdk-example</artifactId>
@@ -35,12 +35,12 @@
             <artifactId>datarangers-sdk-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.1</version>
-            <scope>test</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>junit</groupId>-->
+<!--            <artifactId>junit</artifactId>-->
+<!--            <version>4.13.1</version>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
     </dependencies>
 
     <build>

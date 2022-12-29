@@ -6,7 +6,6 @@
  */
 package com.datarangers.collector;
 
-import com.datarangers.asynccollector.Consumer;
 import com.datarangers.config.Constants;
 import com.datarangers.config.DataRangersSDKConfigProperties;
 import com.datarangers.config.RangersJSONConfig;
@@ -16,8 +15,8 @@ import com.datarangers.message.Message;
 import com.datarangers.message.MessageType;
 import com.datarangers.profile.ItemMethod;
 import com.datarangers.profile.ProfileMethod;
-
 import com.datarangers.sender.Callback;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -104,6 +103,22 @@ public class AppEventCollector extends Collector {
     sendEvent(header, event, MessageType.PROFILE);
   }
 
+  private void profile(Header header, ProfileMethod method,
+                       Map<String, Object> profiles) {
+    if (header == null || header.getAppId() == null) {
+      logger.error("header is null or appId is empty");
+      return;
+    }
+    if (profiles == null) {
+      logger.error("userUniqueId={}, app_id={}, device_id={} params are null.",
+              header.getUserUniqueId(), header.getAppId(), header.getDeviceId());
+      return;
+    }
+    Event event = new EventV3().setEvent(method.toString()).setParams(profiles)
+            .setUserId(header.getUserUniqueId());
+    sendEvent(header, event, MessageType.PROFILE);
+  }
+
   @Override
   public void profileSet(String userUniqueId, int appId, Map<String, Object> eventParams) {
     profile(userUniqueId, appId, ProfileMethod.SET, eventParams);
@@ -124,6 +139,33 @@ public class AppEventCollector extends Collector {
     Map<String, Object> eventParams = new HashMap<>();
     params.forEach(p -> eventParams.put(p, "java"));
     profile(userUniqueId, appId, ProfileMethod.UNSET, eventParams);
+  }
+
+  @Override
+  public void profileSet(Header header, Map<String, Object> profiles) {
+    profile(header, ProfileMethod.SET, profiles);
+  }
+
+  @Override
+  public void profileSetOnce(Header header, Map<String, Object> profiles) {
+    profile(header, ProfileMethod.SET_ONCE, profiles);
+  }
+
+  @Override
+  public void profileIncrement(Header header, Map<String, Object> profiles) {
+    profile(header, ProfileMethod.INCREMENT, profiles);
+  }
+
+  @Override
+  public void profileAppend(Header header, Map<String, Object> profiles) {
+    profile(header, ProfileMethod.APPEND, profiles);
+  }
+
+  @Override
+  public void profileUnset(Header header, List<String> profiles) {
+    Map<String, Object> eventParams = new HashMap<>();
+    profiles.forEach(p -> eventParams.put(p, "java"));
+    profile(header, ProfileMethod.UNSET, eventParams);
   }
 
   @Override

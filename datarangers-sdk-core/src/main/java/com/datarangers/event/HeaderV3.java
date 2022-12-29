@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HeaderV3 implements Serializable, Header {
+public class HeaderV3 implements Serializable, Header, Cloneable {
     @JsonProperty("__source")
     private String source;
     private Integer aid;
@@ -31,6 +31,7 @@ public class HeaderV3 implements Serializable, Header {
     private String cpuAbi;
     private Map<String, Object> custom;
     private Long deviceId;
+    private String brand;
     private String deviceBrand;
     private String deviceManufacturer;
     private String deviceModel;
@@ -44,11 +45,15 @@ public class HeaderV3 implements Serializable, Header {
     private String openudid;
     private String os;
     private String osApi;
+    private String osName;
     private String osVersion;
     @JsonProperty("package")
     private String packages;
+    @JsonProperty("app_package")
+    private String appPackage;
     private String region;
     private String sdkVersion;
+    private String sdkLib;
     private Integer timezone = Constants.TIME_ZONE_OFFSET;
     private Integer tzOffset = Constants.TIME_ZONE_OFFSET_CURRENT;
     private String tzName = Constants.TIME_ZONE_NAME;
@@ -57,7 +62,34 @@ public class HeaderV3 implements Serializable, Header {
     private String vendorId;
     private String clientIp;
 
-    protected HeaderV3() {
+    // 新增的预置属性
+    @JsonProperty("$latest_referrer")
+    private String latestReferrer;
+
+    @JsonProperty("$latest_referrer_host")
+    private String latestReferrerHost;
+
+    @JsonProperty("$latest_search_keyword")
+    private String latestSearchKeyword;
+
+    @JsonProperty("$latest_traffic_source_type")
+    private String latestTrafficSourceType;
+
+    @JsonProperty("$user_unique_id_type")
+    private String userUniqueIdType;
+
+    private String height;
+    private String width;
+    private String resolution;
+    private String appChannel;
+    private String networkType;
+    private String networkCarrier;
+    private String platform;
+    private String browser;
+    private String browserVersion;
+    private String access;
+
+    public HeaderV3() {
     }
 
     public String getSource() {
@@ -368,6 +400,15 @@ public class HeaderV3 implements Serializable, Header {
         return this;
     }
 
+    public String getAppPackage() {
+        return appPackage;
+    }
+
+    public HeaderV3 setAppPackage(String appPackage) {
+        this.appPackage = appPackage;
+        return this;
+    }
+
     public String getRegion() {
         return region;
     }
@@ -441,6 +482,177 @@ public class HeaderV3 implements Serializable, Header {
         return this;
     }
 
+    public String getBrand() {
+        return brand;
+    }
+
+    public HeaderV3 setBrand(String brand) {
+        this.brand = brand;
+        return this;
+    }
+
+    public String getOsName() {
+        return osName;
+    }
+
+    public HeaderV3 setOsName(String osName) {
+        this.osName = osName;
+        return this;
+    }
+
+    public String getSdkLib() {
+        return sdkLib;
+    }
+
+    public HeaderV3 setSdkLib(String sdkLib) {
+        this.sdkLib = sdkLib;
+        return this;
+    }
+
+    public String getLatestReferrer() {
+        return latestReferrer;
+    }
+
+    public HeaderV3 setLatestReferrer(String latestReferrer) {
+        this.latestReferrer = latestReferrer;
+        return this;
+    }
+
+    public String getLatestReferrerHost() {
+        return latestReferrerHost;
+    }
+
+    public HeaderV3 setLatestReferrerHost(String latestReferrerHost) {
+        this.latestReferrerHost = latestReferrerHost;
+        return this;
+    }
+
+    public String getLatestSearchKeyword() {
+        return latestSearchKeyword;
+    }
+
+    public HeaderV3 setLatestSearchKeyword(String latestSearchKeyword) {
+        this.latestSearchKeyword = latestSearchKeyword;
+        return this;
+    }
+
+    public String getLatestTrafficSourceType() {
+        return latestTrafficSourceType;
+    }
+
+    public HeaderV3 setLatestTrafficSourceType(String latestTrafficSourceType) {
+        this.latestTrafficSourceType = latestTrafficSourceType;
+        return this;
+    }
+
+    public String getUserUniqueIdType() {
+        return userUniqueIdType;
+    }
+
+    public HeaderV3 setUserUniqueIdType(String userUniqueIdType) {
+        this.userUniqueIdType = userUniqueIdType;
+        return this;
+    }
+
+    public String getHeight() {
+        return height;
+    }
+
+    public HeaderV3 setHeight(String height) {
+        this.height = height;
+        return this;
+    }
+
+    public String getWidth() {
+        return width;
+    }
+
+    public HeaderV3 setWidth(String width) {
+        this.width = width;
+        return this;
+    }
+
+    public String getResolution() {
+        return resolution;
+    }
+
+    public HeaderV3 setResolution(String resolution) {
+        this.resolution = resolution;
+        return this;
+    }
+
+    public String getAppChannel() {
+        return appChannel;
+    }
+
+    public HeaderV3 setAppChannel(String appChannel) {
+        this.appChannel = appChannel;
+        return this;
+    }
+
+    public String getNetworkType() {
+        return networkType;
+    }
+
+    public HeaderV3 setNetworkType(String networkType) {
+        this.networkType = networkType;
+        return this;
+    }
+
+    public String getNetworkCarrier() {
+        return networkCarrier;
+    }
+
+    public HeaderV3 setNetworkCarrier(String networkCarrier) {
+        this.networkCarrier = networkCarrier;
+        return this;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public HeaderV3 setPlatform(String platform) {
+        this.platform = platform;
+        return this;
+    }
+
+    public String getBrowser() {
+        return browser;
+    }
+
+    public HeaderV3 setBrowser(String browser) {
+        this.browser = browser;
+        return this;
+    }
+
+    public String getBrowserVersion() {
+        return browserVersion;
+    }
+
+    public HeaderV3 setBrowserVersion(String browserVersion) {
+        this.browserVersion = browserVersion;
+        return this;
+    }
+
+    public String getAccess() {
+        return access;
+    }
+
+    public HeaderV3 setAccess(String access) {
+        this.access = access;
+        return this;
+    }
+
+    @Override
+    public HeaderV3 clone(){
+        try {
+            return (HeaderV3) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static final class Builder {
         private HeaderV3 headerV3;
 
@@ -457,8 +669,84 @@ public class HeaderV3 implements Serializable, Header {
             headerV3.setSource(source);
             return this;
         }
+
+        public Builder setAid(Integer aid) {
+            headerV3.setAid(aid);
+            return this;
+        }
+
         public Builder setClientIp(String clientIp) {
             headerV3.setClientIp(clientIp);
+            return this;
+        }
+
+        public Builder setLatestReferrer(String latestReferrer) {
+            headerV3.setLatestReferrer(latestReferrer);
+            return this;
+        }
+
+        public Builder setLatestReferrerHost(String latestReferrerHost) {
+            headerV3.setLatestReferrerHost(latestReferrerHost);
+            return this;
+        }
+
+        public Builder setLatestSearchKeyword(String latestSearchKeyword) {
+            headerV3.setLatestSearchKeyword(latestSearchKeyword);
+            return this;
+        }
+
+        public Builder setLatestTrafficSourceType(String latestTrafficSourceType) {
+            headerV3.setLatestTrafficSourceType(latestTrafficSourceType);
+            return this;
+        }
+
+        public Builder setUserUniqueIdType(String userUniqueIdType) {
+            headerV3.setUserUniqueIdType(userUniqueIdType);
+            return this;
+        }
+
+        public Builder setHeight(String height) {
+            headerV3.setHeight(height);
+            return this;
+        }
+
+        public Builder setWidth(String width) {
+            headerV3.setWidth(width);
+            return this;
+        }
+
+        public Builder setResolution(String resolution) {
+            headerV3.setResolution(resolution);
+            return this;
+        }
+
+        public Builder setAppChannel(String appChannel) {
+            headerV3.setAppChannel(appChannel);
+            return this;
+        }
+
+        public Builder setNetworkType(String networkType) {
+            headerV3.setNetworkType(networkType);
+            return this;
+        }
+
+        public Builder setNetworkCarrier(String networkCarrier) {
+            headerV3.setNetworkCarrier(networkCarrier);
+            return this;
+        }
+
+        public Builder setPlatform(String platform) {
+            headerV3.setPlatform(platform);
+            return this;
+        }
+
+        public Builder setBrowser(String browser) {
+            headerV3.setBrowser(browser);
+            return this;
+        }
+
+        public Builder setBrowserVersion(String browserVersion) {
+            headerV3.setBrowserVersion(browserVersion);
             return this;
         }
 
@@ -542,6 +830,11 @@ public class HeaderV3 implements Serializable, Header {
             return this;
         }
 
+        public Builder setBrand(String brand) {
+            headerV3.setBrand(brand);
+            return this;
+        }
+
 
         public Builder setDeviceBrand(String deviceBrand) {
             headerV3.setDeviceBrand(deviceBrand);
@@ -613,6 +906,11 @@ public class HeaderV3 implements Serializable, Header {
             return this;
         }
 
+        public Builder setOsName(String osName) {
+            headerV3.setOsName(osName);
+            return this;
+        }
+
         public Builder setOsVersion(String osVersion) {
             headerV3.setOsVersion(osVersion);
             return this;
@@ -624,6 +922,10 @@ public class HeaderV3 implements Serializable, Header {
             return this;
         }
 
+        public Builder setAppPackage(String appPackage) {
+            headerV3.setAppPackage(appPackage);
+            return this;
+        }
 
         public Builder setRegion(String region) {
             headerV3.setRegion(region);
@@ -633,6 +935,26 @@ public class HeaderV3 implements Serializable, Header {
 
         public Builder setSdkVersion(String sdkVersion) {
             headerV3.setSdkVersion(sdkVersion);
+            return this;
+        }
+
+        public Builder setSdkLib(String sdkLib) {
+            headerV3.setSdkLib(sdkLib);
+            return this;
+        }
+
+        public Builder setTimezone(Integer timezone) {
+            headerV3.setTimezone(timezone);
+            return this;
+        }
+
+        public Builder setTzOffset(Integer tzOffset) {
+            headerV3.setTzOffset(tzOffset);
+            return this;
+        }
+
+        public Builder setTzName(String tzName) {
+            headerV3.setTzName(tzName);
             return this;
         }
 
@@ -654,11 +976,15 @@ public class HeaderV3 implements Serializable, Header {
             return this;
         }
 
+        public Builder setAccess(String access) {
+            headerV3.setAccess(access);
+            return this;
+        }
+
         public Header build() {
             headerV3.addCustom("__sdk_platform", Constants.SDK_VERSION);
             return this.headerV3;
         }
-
 
     }
 }
