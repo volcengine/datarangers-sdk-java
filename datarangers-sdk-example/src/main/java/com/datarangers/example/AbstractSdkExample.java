@@ -51,11 +51,23 @@ public abstract class AbstractSdkExample {
     public void sendEvent(String userUniqueId, int appId) {
         EventCollector appEventCollector = getAppEventCollector();
         appEventCollector
-                .sendEvent(userUniqueId, appId, null, "test_event_java_sdk",
+                .sendEvent(userUniqueId, appId, new HashMap<String, Object>() {{
+                            put("platform", 1002);
+                        }}, "test_event",
                         new HashMap<String, Object>() {{
                             put("date_time", new SimpleDateFormat("yyyyMMdd").format(new Date()));
                             put("current_time",
                                     new SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date()));
+                            put("test_item_id", 1002);
+                        }});
+
+        appEventCollector
+                .sendEvent(userUniqueId, appId, new HashMap<String, Object>() {{
+                            put("platform", 1000);
+                        }}, "test_event",
+                        new HashMap<String, Object>() {{
+                            put("$event_duration", 68);
+                            put("test_item_id", 1000);
                         }});
 
         System.out.println("end");

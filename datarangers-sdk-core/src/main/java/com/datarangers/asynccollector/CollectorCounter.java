@@ -31,6 +31,14 @@ public class CollectorCounter implements Runnable {
     @Override
     public void run() {
         File output = new File(countName);
+        if(!output.exists()){
+            try {
+                output.createNewFile();
+            } catch (IOException e) {
+                // 忽略
+                e.printStackTrace();
+            }
+        }
         FileOutputStream stream = null;
         try {
             stream = new FileOutputStream(output, true);

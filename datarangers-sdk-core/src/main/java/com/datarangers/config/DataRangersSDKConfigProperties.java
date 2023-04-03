@@ -57,6 +57,7 @@ public class DataRangersSDKConfigProperties {
   public List<String> eventFilePaths;
   public String eventSaveName = "datarangers.log";
   public int eventSaveMaxFileSize = 100;
+  private boolean eventCountFileDisable = false;
 
   // 日志清理时间
   public int eventSaveMaxDays = -1;
@@ -238,6 +239,14 @@ public class DataRangersSDKConfigProperties {
     return this;
   }
 
+  public boolean isEventCountFileDisable() {
+    return eventCountFileDisable;
+  }
+
+  public void setEventCountFileDisable(boolean eventCountFileDisable) {
+    this.eventCountFileDisable = eventCountFileDisable;
+  }
+
   public int getQueueSize() {
     return queueSize;
   }
@@ -379,6 +388,7 @@ public class DataRangersSDKConfigProperties {
     sb.append(String.format("eventFilePaths: %s \r\n", eventFilePaths));
     sb.append(String.format("eventSaveMaxFileSize: %s \r\n", eventSaveMaxFileSize));
     sb.append(String.format("eventSaveMaxDays: %s \r\n", eventSaveMaxDays));
+    sb.append(String.format("eventCountFileDisable: %s \r\n", eventCountFileDisable));
     sb.append(String.format("verify: %s\r\n", verify));
     sb.append(String.format("openapiConfig: %s \r\n", openapiConfig));
     sb.append(String.format("kafka: %s", kafka));

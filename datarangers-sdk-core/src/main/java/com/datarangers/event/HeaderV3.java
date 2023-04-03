@@ -89,6 +89,8 @@ public class HeaderV3 implements Serializable, Header, Cloneable {
     private String browserVersion;
     private String access;
 
+    private String anonymousId;
+
     public HeaderV3() {
     }
 
@@ -644,6 +646,14 @@ public class HeaderV3 implements Serializable, Header, Cloneable {
         return this;
     }
 
+    public String getAnonymousId() {
+        return anonymousId;
+    }
+
+    public void setAnonymousId(String anonymousId) {
+        this.anonymousId = anonymousId;
+    }
+
     @Override
     public HeaderV3 clone(){
         try {
@@ -978,6 +988,11 @@ public class HeaderV3 implements Serializable, Header, Cloneable {
 
         public Builder setAccess(String access) {
             headerV3.setAccess(access);
+            return this;
+        }
+
+        public Builder setAnonymousId(String anonymousId) {
+            headerV3.setAnonymousId(anonymousId);
             return this;
         }
 
