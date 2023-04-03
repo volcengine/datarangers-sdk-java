@@ -247,8 +247,11 @@ public abstract class Collector implements EventCollector {
         //定时记录日志的条数
         scheduled = Executors.newSingleThreadScheduledExecutor();
 
-        scheduled
-                .scheduleAtFixedRate(new CollectorCounter(eventSavePath), 0, 2, TimeUnit.MINUTES);
+        // 没有禁用count，就增加count文件
+        if (!properties.isEventCountFileDisable()) {
+            scheduled
+                    .scheduleAtFixedRate(new CollectorCounter(eventSavePath), 1, 2, TimeUnit.MINUTES);
+        }
 
         if (properties.getCallback() == null) {
             properties.setCallback(new LoggingCallback(eventSavePath, "error-" + eventSaveName,
