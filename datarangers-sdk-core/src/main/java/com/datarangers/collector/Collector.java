@@ -248,7 +248,7 @@ public abstract class Collector implements EventCollector {
         scheduled = Executors.newSingleThreadScheduledExecutor();
 
         scheduled
-                .scheduleAtFixedRate(new CollectorCounter(eventSavePath), 0, 2, TimeUnit.MINUTES);
+                .scheduleAtFixedRate(new CollectorCounter(eventSavePath), 1, 2, TimeUnit.MINUTES);
 
         if (properties.getCallback() == null) {
             properties.setCallback(new LoggingCallback(eventSavePath, "error-" + eventSaveName,
