@@ -17,6 +17,7 @@ import java.nio.channels.FileLock;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class RangersLoggerWriter implements RangersFileWriter {
     private final String targetName;
@@ -118,22 +119,62 @@ public class RangersLoggerWriter implements RangersFileWriter {
         this(targetPrefix, targetName, 1024 * 1024 * 200);
     }
 
+//    private int setCurrentIndex() {
+//        String current = LocalDateTime.now().format(Constants.FULL_HOUR);
+//        String full = targetName + "." + current + ".";
+//        int number = 0;
+//        for (File f : new File(targetPrefix).listFiles()) {
+//            if (f.getName().contains(full)) {
+//                String arr = f.getName().replace(full, "");
+//                try {
+//                    number = Math.max(number, Integer.valueOf(arr));
+//                } catch (Exception e) {
+//                    continue;
+//                }
+//            }
+//        }
+//        return number;
+//    }
+
     private int setCurrentIndex() {
         String current = LocalDateTime.now().format(Constants.FULL_HOUR);
         String full = targetName + "." + current + ".";
         int number = 0;
-        for (File f : new File(targetPrefix).listFiles()) {
-            if (f.getName().contains(full)) {
-                String arr = f.getName().replace(full, "");
+
+        File directory = new File(targetPrefix);
+        // 检查目录是否存在，如果不存在，则尝试创建它
+        if (!directory.exists()) {
+            boolean created = directory.mkdirs();
+            if (!created) {
+                // 如果无法创建目录，记录或抛出异常
+                throw new IllegalStateException("无法创建目录：" + targetPrefix);
+            }
+        }
+
+        // 确保是一个目录
+        if (!directory.isDirectory()) {
+            throw new IllegalStateException(targetPrefix + " 不是一个有效的目录。");
+        }
+
+        // 获取目录下所有文件，如果目录为空或出错，则返回空数组
+        File[] files = Optional.ofNullable(directory.listFiles()).orElse(new File[0]);
+
+        // 遍历文件，寻找匹配的文件并更新计数
+        for (File f : files) {
+            if (f.isFile() && f.getName().contains(full)) {
+                String suffix = f.getName().replace(full, "");
                 try {
-                    number = Math.max(number, Integer.valueOf(arr));
-                } catch (Exception e) {
-                    continue;
+                    // 尝试将文件名中的数字部分转换为整数
+                    number = Math.max(number, Integer.parseInt(suffix));
+                } catch (NumberFormatException e) {
+                    // 如果转换失败，记录或忽略，并继续处理其他文件
+                    // 这里可以记录日志或者做其他异常处理
                 }
             }
         }
         return number;
     }
+
 
     @Override
     public boolean valid(String targetName) {
