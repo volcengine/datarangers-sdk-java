@@ -142,7 +142,7 @@ public abstract class AbstractSdkExample {
                     .setWidth("12px")
                     .setLatestSearchKeyword("search")
                     .setLatestTrafficSourceType("source")
-                    .setUserUniqueIdType("type")
+                    .setUserUniqueIdType("phone_id")
                     .setAppChannel("华为应用市场")
                     .setAppRegion("cn")
                     .setRegion("CN.r")
