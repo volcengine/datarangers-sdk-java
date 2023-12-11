@@ -75,7 +75,6 @@ public class HeaderV3 implements Serializable, Header, Cloneable {
     @JsonProperty("$latest_traffic_source_type")
     private String latestTrafficSourceType;
 
-    @JsonProperty("$user_unique_id_type")
     private String userUniqueIdType;
 
     private String height;
