@@ -1,5 +1,6 @@
 package com.datarangers.message.saas;
 
+import com.datarangers.event.HeaderV3;
 import com.datarangers.message.Message;
 
 /**
@@ -11,8 +12,11 @@ public class SaasServerAppMessage extends DefaultSaasServerAppMessage {
     public SaasServerAppMessage(Message message) {
         super(message);
 
-        this.getHeader().setAid(null);
-        this.getHeader().setAppId(null);
+        HeaderV3 header = this.getHeader();
+        HeaderV3 headerClone = header.clone();
+        headerClone.setAid(null);
+        headerClone.setAppId(null);
+        setHeader(headerClone);
     }
 
 }
