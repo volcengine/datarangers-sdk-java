@@ -72,6 +72,14 @@ public class SaasSdkExample extends AbstractSdkExample {
         SaasSdkExample sdkExample = new SaasSdkExample();
         String userUniqueId = "test_sdk_user1";
         int appId = Integer.valueOf(System.getenv("SDK_APP_1"));
+        sdkExample.sendEventWithHeader(userUniqueId, appId);
+
+        try {
+            Thread.sleep(10* 1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        sdkExample.sendEventWithHeader(userUniqueId, appId);
 
         // 发送事件，时间发生时间为send方法调用的时间
         sdkExample.sendEvent(userUniqueId, appId);
