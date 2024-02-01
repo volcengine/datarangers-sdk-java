@@ -6,7 +6,7 @@
     <groupId>com.datarangers</groupId>
     <artifactId>datarangers-sdk</artifactId>
     <packaging>pom</packaging>
-    <version>1.5.9-release</version>
+    <version>1.5.10-release</version>
     <modules>
         <module>datarangers-sdk-core</module>
         <module>datarangers-sdk-starter</module>
