@@ -8,6 +8,7 @@ package com.datarangers.collector;
 
 import com.datarangers.config.Constants;
 import com.datarangers.config.DataRangersSDKConfigProperties;
+import com.datarangers.config.ProducerConfig;
 import com.datarangers.config.RangersJSONConfig;
 import com.datarangers.event.*;
 import com.datarangers.message.AppMessage;
@@ -32,6 +33,11 @@ public class AppEventCollector extends Collector {
   public AppEventCollector(String appType, DataRangersSDKConfigProperties properties, Callback cb) {
     super(appType, properties, cb);
   }
+
+  public AppEventCollector(String appType, DataRangersSDKConfigProperties properties, Callback cb, ProducerConfig producerConfig) {
+    super(appType, properties, cb, producerConfig);
+  }
+
 
   @Override
   public void sendEvent(String userUniqueId, int appId, Map<String, Object> custom,
