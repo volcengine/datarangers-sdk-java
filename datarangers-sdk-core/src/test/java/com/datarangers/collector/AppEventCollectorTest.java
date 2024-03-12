@@ -1,4 +1,4 @@
-package test;
+package com.datarangers.collector;
 
 import com.datarangers.collector.AppEventCollector;
 import com.datarangers.config.DataRangersSDKConfigProperties;

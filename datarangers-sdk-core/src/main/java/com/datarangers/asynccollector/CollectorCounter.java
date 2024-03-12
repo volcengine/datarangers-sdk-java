@@ -33,6 +33,10 @@ public class CollectorCounter implements Runnable {
         File output = new File(countName);
         if(!output.exists()){
             try {
+                File parent = output.getParentFile();
+                if (!parent.exists()) {
+                    parent.mkdirs();
+                }
                 output.createNewFile();
             } catch (IOException e) {
                 // 忽略

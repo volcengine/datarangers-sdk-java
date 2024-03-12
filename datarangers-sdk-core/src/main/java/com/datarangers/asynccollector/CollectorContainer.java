@@ -27,6 +27,10 @@ public class CollectorContainer {
         messageQueue.put(message);
     }
 
+    public boolean offer(Message message, long timeout)  throws InterruptedException{
+       return messageQueue.offer(message, timeout);
+    }
+
     private List<Message> handleMessage(List<Message> messages) throws InterruptedException {
         if (messages == null) {
             return null;
