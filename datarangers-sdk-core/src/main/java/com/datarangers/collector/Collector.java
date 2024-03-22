@@ -46,7 +46,7 @@ public abstract class Collector implements EventCollector {
     private boolean enable;
     protected DataRangersSDKConfigProperties properties;
     protected Callback callback;
-    protected Consumer consumer = null;
+    protected static Consumer consumer = null;
     protected static KafkaProducer kafkaProducer;
     private static volatile Boolean IS_INIT = false;
 
@@ -81,14 +81,6 @@ public abstract class Collector implements EventCollector {
 
     public void setCallback(Callback callback) {
         this.callback = callback;
-    }
-
-    public Consumer getConsumer() {
-        return consumer;
-    }
-
-    public void setConsumer(Consumer consumer) {
-        this.consumer = consumer;
     }
 
 
@@ -172,7 +164,7 @@ public abstract class Collector implements EventCollector {
 
     private void syncSendMessage(Message message, String sendMessage) {
         try {
-            this.consumer.flush(message);
+            consumer.flush(message);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("sync send message error", e);
@@ -242,6 +234,7 @@ public abstract class Collector implements EventCollector {
                 }
             }
         }
+        initCallback();
     }
 
     private void initVerifySender(){
@@ -259,8 +252,6 @@ public abstract class Collector implements EventCollector {
      */
     private void initLogger() {
         logger.info("init log writer pool");
-        String eventSaveName = properties.getEventSaveName();
-        int eventSaveMaxFileSize = properties.getEventSaveMaxFileSize();
         String eventSavePath = properties.getEventSavePath();
         //定时记录日志的条数
         scheduled = Executors.newSingleThreadScheduledExecutor();
@@ -271,9 +262,17 @@ public abstract class Collector implements EventCollector {
                     .scheduleAtFixedRate(new CollectorCounter(eventSavePath), 1, 2, TimeUnit.MINUTES);
         }
 
-        if (properties.getCallback() == null || this.callback == null) {
+    }
+
+    private void initCallback(){
+        if (properties.getCallback() == null) {
+            String eventSavePath = properties.getEventSavePath();
+            String eventSaveName = properties.getEventSaveName();
+            int eventSaveMaxFileSize = properties.getEventSaveMaxFileSize();
             properties.setCallback(new LoggingCallback(eventSavePath, "error-" + eventSaveName,
                     eventSaveMaxFileSize));
+        }
+        if(this.callback == null){
             this.callback = properties.getCallback();
         }
     }
@@ -301,7 +300,7 @@ public abstract class Collector implements EventCollector {
 
         // 同步设置
         if (isSync) {
-            setConsumer(new Consumer(Collector.collectorContainer, this.properties));
+            consumer = new Consumer(Collector.collectorContainer, this.properties);
             return;
         }
 
