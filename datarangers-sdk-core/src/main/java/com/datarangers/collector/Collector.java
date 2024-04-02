@@ -46,15 +46,23 @@ public abstract class Collector implements EventCollector {
     private boolean enable;
     protected DataRangersSDKConfigProperties properties;
     protected Callback callback;
-    protected Consumer consumer = null;
+    protected static Consumer consumer = null;
     protected static KafkaProducer kafkaProducer;
     private static volatile Boolean IS_INIT = false;
 
+    private ProducerConfig producerConfig;
+
     public Collector(String appType, DataRangersSDKConfigProperties properties, Callback cb) {
+        this(appType, properties, cb, null);
+    }
+
+    public Collector(String appType, DataRangersSDKConfigProperties properties, Callback cb, ProducerConfig producerConfig) {
         this.appType = appType;
         this.enable = properties.isEnable();
         this.properties = properties;
         this.callback = cb;
+        this.producerConfig = producerConfig;
+
         this.properties.setCallback(this.getCallback());
         this.init();
     }
@@ -73,14 +81,6 @@ public abstract class Collector implements EventCollector {
 
     public void setCallback(Callback callback) {
         this.callback = callback;
-    }
-
-    public Consumer getConsumer() {
-        return consumer;
-    }
-
-    public void setConsumer(Consumer consumer) {
-        this.consumer = consumer;
     }
 
 
@@ -164,7 +164,7 @@ public abstract class Collector implements EventCollector {
 
     private void syncSendMessage(Message message, String sendMessage) {
         try {
-            this.consumer.flush(message);
+            consumer.flush(message);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("sync send message error", e);
@@ -175,7 +175,17 @@ public abstract class Collector implements EventCollector {
     private void asyncSendMessage(Message message, String sendMessage) {
         if (collectorContainer.getMessageQueue() != null) {
             try {
-                collectorContainer.produce(message);
+                if (producerConfig != null && producerConfig.isUseOffer()) {
+                    boolean res = collectorContainer.offer(message, producerConfig.getOfferTimeout());
+                    if (!res) {
+                        // 队列满了，导致失败
+                        logger.error("datarangers send Queue reach max length: {}", this.properties.getQueueSize());
+                        getCallback().onFailed(new FailedData(sendMessage, "datarangers send Queue reach max length",
+                                new IllegalStateException("datarangers send Queue reach max length"), false));
+                    }
+                } else {
+                    collectorContainer.produce(message);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.error("async send message error", e);
@@ -224,6 +234,7 @@ public abstract class Collector implements EventCollector {
                 }
             }
         }
+        initCallback();
     }
 
     private void initVerifySender(){
@@ -241,8 +252,6 @@ public abstract class Collector implements EventCollector {
      */
     private void initLogger() {
         logger.info("init log writer pool");
-        String eventSaveName = properties.getEventSaveName();
-        int eventSaveMaxFileSize = properties.getEventSaveMaxFileSize();
         String eventSavePath = properties.getEventSavePath();
         //定时记录日志的条数
         scheduled = Executors.newSingleThreadScheduledExecutor();
@@ -253,9 +262,18 @@ public abstract class Collector implements EventCollector {
                     .scheduleAtFixedRate(new CollectorCounter(eventSavePath), 1, 2, TimeUnit.MINUTES);
         }
 
+    }
+
+    private void initCallback(){
         if (properties.getCallback() == null) {
+            String eventSavePath = properties.getEventSavePath();
+            String eventSaveName = properties.getEventSaveName();
+            int eventSaveMaxFileSize = properties.getEventSaveMaxFileSize();
             properties.setCallback(new LoggingCallback(eventSavePath, "error-" + eventSaveName,
                     eventSaveMaxFileSize));
+        }
+        if(this.callback == null){
+            this.callback = properties.getCallback();
         }
     }
 
@@ -282,7 +300,7 @@ public abstract class Collector implements EventCollector {
 
         // 同步设置
         if (isSync) {
-            setConsumer(new Consumer(Collector.collectorContainer, this.properties));
+            consumer = new Consumer(Collector.collectorContainer, this.properties);
             return;
         }
 

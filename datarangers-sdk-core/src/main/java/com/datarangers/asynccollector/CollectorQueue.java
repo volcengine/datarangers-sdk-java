@@ -42,6 +42,16 @@ public interface CollectorQueue {
      * @date: 2021/2/7 15:52
      */
     void put(Message t)throws InterruptedException;
+
+    /**
+     * 不阻塞的方式添加
+     * @param t
+     * @param timeout
+     * @return
+     * @throws InterruptedException
+     */
+    boolean offer(Message t, long timeout) throws InterruptedException;
+
     int size();
 
     /**
