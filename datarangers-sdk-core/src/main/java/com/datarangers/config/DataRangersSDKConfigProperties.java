@@ -21,6 +21,9 @@ public class DataRangersSDKConfigProperties {
   public boolean enable = true;
   public Map<String, String> headers;
   public String domain;
+
+  private String path;
+
   private int threadCount = 20;
 
   /**
@@ -280,6 +283,14 @@ public class DataRangersSDKConfigProperties {
 
   public void setDomain(String domain) {
     this.domain = domain;
+  }
+
+  public String getPath() {
+    return path;
+  }
+
+  public void setPath(String path) {
+    this.path = path;
   }
 
   public ZoneOffset getTimeOffset() {
