@@ -253,6 +253,10 @@ public class HttpUtils {
             logger.debug(resultStr);
             return true;
         }
+        if (object != null && object.containsKey("e") && "0".equals(object.get("e").toString())) {
+            HttpUtils.logger.debug("Send Success: {}", (Object)resultStr);
+            return true;
+        }
         return false;
     }
 
