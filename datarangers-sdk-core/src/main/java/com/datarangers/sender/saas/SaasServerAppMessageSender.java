@@ -22,7 +22,7 @@ public class SaasServerAppMessageSender implements MessageSender {
   @Override
   public void send(Message message, DataRangersSDKConfigProperties sdkConfigProperties) {
     Object sendMessage = new SaasServerAppMessage(message);
-    String url = sdkConfigProperties.getDomain() + path;
+    String url = sdkConfigProperties.getDomain() + getPath(sdkConfigProperties);
     Map<String, String> headers = new HashMap<>();
     headers.putAll(EventConfig.SEND_HEADER);
     Integer appId = message.getAppMessage().getAppId();
@@ -33,5 +33,16 @@ public class SaasServerAppMessageSender implements MessageSender {
     }
     headers.put(Constants.APP_KEY, appKey);
     HttpUtils.post(url, RangersJSONConfig.getInstance().toJson(sendMessage), headers);
+  }
+
+  protected String getPath(DataRangersSDKConfigProperties sdkConfigProperties) {
+    String domainPath = sdkConfigProperties.getPath();
+    if (domainPath == null || domainPath.trim().length() == 0) {
+      return path;
+    }
+    if (!domainPath.startsWith("/")) {
+      domainPath = "/" + domainPath;
+    }
+    return domainPath;
   }
 }

@@ -222,6 +222,7 @@ public abstract class Collector implements EventCollector {
         if (!IS_INIT) {
             synchronized (Collector.class) {
                 if (!IS_INIT) {
+                    initCallback();
                     initCommon();
                     initLogger();
                     initSdkMode();
@@ -234,7 +235,6 @@ public abstract class Collector implements EventCollector {
                 }
             }
         }
-        initCallback();
     }
 
     private void initVerifySender(){
