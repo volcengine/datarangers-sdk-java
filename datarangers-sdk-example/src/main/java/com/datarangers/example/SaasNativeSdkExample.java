@@ -33,7 +33,7 @@ public class SaasNativeSdkExample extends AbstractSdkExample {
         properties.setEnv(Constants.ENV_SAAS_NATIVE);
         properties.setMode(SdkMode.HTTP);
 
-        // 设置domain和appKey, 不需要设置HOST
+        // 设置domain和appKey
         properties.setDomain("https://gator.volces.com");
 
         // 可以设置多个app，这里注意替换成真实的参数

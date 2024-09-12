@@ -51,9 +51,8 @@ public class ProducerConfigExample extends AbstractSdkExample {
         // 设置队列大小为1
         properties.setQueueSize(10);
 
-        // 设置domain和host，这里注意替换成真实的参数
+        // 设置sdk domain，这里注意替换成真实的参数
         properties.setDomain(System.getenv("SDK_DOMAIN"));
-        properties.getHeaders().put("HOST", System.getenv("SDK_HOST"));
 
         ProducerConfig producerConfig = new ProducerConfig();
         producerConfig.setUseOffer(true);
