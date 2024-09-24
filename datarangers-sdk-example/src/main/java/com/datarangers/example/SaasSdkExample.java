@@ -31,7 +31,7 @@ public class SaasSdkExample extends AbstractSdkExample {
         // 设置模式
         properties.setMode(SdkMode.HTTP);
 
-        // 设置domain和appKey, 不需要设置HOST
+        // 设置domain和appKey
         properties.setDomain("https://mcs.ctobsnssdk.com");
 
         // 可以设置多个app，这里注意替换成真实的参数

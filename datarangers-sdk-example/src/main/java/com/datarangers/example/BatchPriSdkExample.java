@@ -31,9 +31,8 @@ public class BatchPriSdkExample extends AbstractSdkExample {
         // 设置模式
         properties.setMode(SdkMode.HTTP);
 
-        // 设置domain和host，这里注意替换成真实的参数
+        // 设置sdk domain，这里注意替换成真实的参数
         properties.setDomain(System.getenv("SDK_DOMAIN"));
-        properties.getHeaders().put("HOST", System.getenv("SDK_HOST"));
 
         // 设置batch
         properties.setSendBatch(true);
