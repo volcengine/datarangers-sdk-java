@@ -23,6 +23,7 @@ public class DataRangersSDKConfigProperties {
   public String domain;
 
   private String path;
+  private String batchPath;
 
   private int threadCount = 20;
 
@@ -291,6 +292,14 @@ public class DataRangersSDKConfigProperties {
 
   public void setPath(String path) {
     this.path = path;
+  }
+
+  public String getBatchPath() {
+    return batchPath;
+  }
+
+  public void setBatchPath(String batchPath) {
+    this.batchPath = batchPath;
   }
 
   public ZoneOffset getTimeOffset() {

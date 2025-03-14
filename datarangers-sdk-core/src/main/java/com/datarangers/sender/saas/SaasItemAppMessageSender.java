@@ -50,4 +50,12 @@ public class SaasItemAppMessageSender implements MessageSender {
 
     }
   }
+
+  @Override
+  public void sendBatch(List<Message> message, DataRangersSDKConfigProperties sdkConfigProperties) {
+    // 接口不支持批量，这里循环处理
+    for (Message m : message) {
+      send(m, sdkConfigProperties);
+    }
+  }
 }

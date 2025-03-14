@@ -28,9 +28,10 @@ public class SaasNativeMessageSender implements MessageSender {
     }
 
     @Override
-    public void sendBatch(List<Message> message, DataRangersSDKConfigProperties sdkConfigProperties) {
-        Map<String, String> headers = getHeaders(message.get(0), sdkConfigProperties);
-        List<AppMessage> sendMessages = message.stream().map(n -> getSassNativeMessage(n)).collect(Collectors.toList());
+    public void sendBatch(List<Message> messages, DataRangersSDKConfigProperties sdkConfigProperties) {
+        Map<String, String> headers = getHeaders(messages.get(0), sdkConfigProperties);
+        List<AppMessage> sendMessages =
+                messages.stream().map(n -> getSassNativeMessage(n)).collect(Collectors.toList());
         HttpUtils.post(EventConfig.getAppListUrl(), RangersJSONConfig.getInstance().toJson(sendMessages), headers);
     }
 

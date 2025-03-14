@@ -260,14 +260,12 @@ public abstract class AbstractSdkExample {
                         .setName("Java")
                         .setPrice(100)
                         .setPublishDate("2010-10-11")
-                        .setAuthors(Arrays.asList("zhangsan", "lisi"))
                         .setCategory("1"));
         items.add(
                 new BookItem("1002", "book")
                         .setName("PHP")
                         .setPrice(100)
                         .setPublishDate("2021-07-20")
-                        .setAuthors(Arrays.asList("zhangsan", "wanger"))
                         .setCategory("2"));
 
         appEventCollector.itemSet(appId, "book", items);

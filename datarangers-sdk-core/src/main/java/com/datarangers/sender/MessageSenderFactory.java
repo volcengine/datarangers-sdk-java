@@ -4,6 +4,7 @@ import com.datarangers.message.Message;
 import com.datarangers.message.MessageEnv;
 import com.datarangers.message.MessageType;
 import com.datarangers.sender.saas.SaasItemAppMessageSender;
+import com.datarangers.sender.saas.SaasMessageSender;
 import com.datarangers.sender.saas.SaasProfileAppMessageSender;
 import com.datarangers.sender.saas.SaasServerAppMessageSender;
 import com.datarangers.sender.saasnative.SaasNativeMessageSender;
@@ -25,16 +26,7 @@ public class MessageSenderFactory {
         if (MessageEnv.SAAS_NATIVE == messageEnv) {
             return new SaasNativeMessageSender();
         }
-        MessageType messageType = message.getMessageType();
-        switch (messageType) {
-            case EVENT:
-                return new SaasServerAppMessageSender();
-            case ITEM:
-                return new SaasItemAppMessageSender();
-            case PROFILE:
-                return new SaasProfileAppMessageSender();
-            default:
-                throw new IllegalArgumentException("Not support message: " + messageType);
-        }
+        // saas
+        return new SaasMessageSender();
     }
 }

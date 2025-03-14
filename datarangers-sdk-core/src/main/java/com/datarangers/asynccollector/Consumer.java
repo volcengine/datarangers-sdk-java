@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Consumer implements Runnable {
 
@@ -64,8 +66,18 @@ public class Consumer implements Runnable {
                 List<Message> messages = collectorContainer.consume(sdkConfigProperties.getBatchSize(),
                         sdkConfigProperties.getWaitTimeMs());
                 if (messages != null && messages.size() > 0) {
-                    MessageSenderFactory.getMessageSender(messages.get(0))
-                            .sendBatch(messages, this.sdkConfigProperties);
+                    // 根据appId 进行分组
+                    Map<Integer, List<Message>> messagesMap =
+                            messages.stream().collect(Collectors.groupingBy(n -> n.getAppMessage().getAppId()));
+                    // 上报
+                    for (Map.Entry<Integer, List<Message>> entry : messagesMap.entrySet()) {
+                        List<Message> messageList = entry.getValue();
+                        if(messageList != null && messageList.size() > 0) {
+                            MessageSenderFactory.getMessageSender(messageList.get(0))
+                                    .sendBatch(messageList, this.sdkConfigProperties);
+                        }
+                    }
+
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
