@@ -23,8 +23,8 @@ public class PrivatizationMessageSender implements MessageSender {
   }
 
   @Override
-  public void sendBatch(List<Message> message, DataRangersSDKConfigProperties sdkConfigProperties) {
-    List<AppMessage> sendMessages = message.stream().map(n -> n.getAppMessage()).collect(Collectors.toList());
+  public void sendBatch(List<Message> messages, DataRangersSDKConfigProperties sdkConfigProperties) {
+    List<AppMessage> sendMessages = messages.stream().map(n -> n.getAppMessage()).collect(Collectors.toList());
     HttpUtils.post(EventConfig.getAppListUrl(), RangersJSONConfig.getInstance().toJson(sendMessages), EventConfig.SEND_HEADER);
   }
 }

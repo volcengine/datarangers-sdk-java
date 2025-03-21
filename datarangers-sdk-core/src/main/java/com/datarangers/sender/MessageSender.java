@@ -20,10 +20,10 @@ public interface MessageSender {
 
   /**
    * 使用批量上报
-   * @param message
+   * @param messages
    * @param sdkConfigProperties
    */
-  default void sendBatch(List<Message> message, DataRangersSDKConfigProperties sdkConfigProperties) {
+  default void sendBatch(List<Message> messages, DataRangersSDKConfigProperties sdkConfigProperties) {
     throw new UnsupportedOperationException("Not support batch");
   };
 }

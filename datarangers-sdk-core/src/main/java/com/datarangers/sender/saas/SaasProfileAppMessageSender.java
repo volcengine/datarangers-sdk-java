@@ -11,6 +11,7 @@ import com.datarangers.sender.MessageSender;
 import com.datarangers.util.AuthUtils;
 import com.datarangers.util.HttpUtils;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +41,14 @@ public class SaasProfileAppMessageSender implements MessageSender {
 
     HttpUtils.request(method, url, body, headers);
 
+  }
+
+  @Override
+  public void sendBatch(List<Message> message, DataRangersSDKConfigProperties sdkConfigProperties) {
+    // 接口不支持批量，这里循环处理
+    for (Message m : message) {
+      send(m, sdkConfigProperties);
+    }
   }
 
 }
