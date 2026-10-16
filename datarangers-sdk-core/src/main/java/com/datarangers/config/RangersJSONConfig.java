@@ -26,8 +26,25 @@ public class RangersJSONConfig {
     private RangersJSONConfig() {
         mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+        mapper.setPropertyNamingStrategy(snakeCaseStrategy());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    private static PropertyNamingStrategy snakeCaseStrategy() {
+        Class<?> strategies;
+        try {
+            // Use the replacement added in 2.12; the legacy constants were removed in 2.20.
+            strategies = Class.forName(
+                    "com.fasterxml.jackson.databind.PropertyNamingStrategies",
+                    true, PropertyNamingStrategy.class.getClassLoader());
+        } catch (ClassNotFoundException e) {
+            strategies = PropertyNamingStrategy.class;
+        }
+        try {
+            return (PropertyNamingStrategy) strategies.getField("SNAKE_CASE").get(null);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Cannot initialize Jackson SNAKE_CASE strategy", e);
+        }
     }
 
     public static RangersJSONConfig getInstance() {
